@@ -89,6 +89,7 @@ class Ui {
   bool          gotCategorySelected();
   bool          isCategory(const std::string& str) const;
   void          toggleCategoryFolding(const std::string& category);
+  void          closeAllFolds();
   void          registerPkgChange(Event::Type event);
   void          performPending();
   void          promptFilter();

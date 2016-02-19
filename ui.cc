@@ -111,6 +111,7 @@ void Ui::handleEvent(Event::Type event) {
 
     case Event::Type::go:
       performPending();
+      closeAllFolds();
       updatePkgListPanel();
       break;
 
@@ -300,6 +301,11 @@ void Ui::toggleCategoryFolding(const std::string& category) {
     unfolded_[category] = unfolded_[category] == true ? false : true;
   else
     unfolded_[category] = true;
+}
+
+void Ui::closeAllFolds() {
+  unfolded_.clear();
+  panels_[pkgList].resetCursor();
 }
 
 void Ui::registerPkgChange(Event::Type event) {
