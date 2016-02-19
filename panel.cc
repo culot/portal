@@ -160,7 +160,7 @@ void Panel::applyAttributes() const {
     return;
 
   unsigned int xMin = area_.getXmin() + (drawBorder_ ? 1 : 0);
-  unsigned int xMax = area_.getXmax() - (drawBorder_ ? 1 : 0) - 1;
+  unsigned int xMax = area_.getXmax() - (drawBorder_ ? 1 : 0);
   unsigned int y = area_.getYmin() + (drawBorder_ ? 1 : 0);
 
   unsigned long lastRowNum = std::min(getAbsLastRowNum(), rowAttrs_.size());
