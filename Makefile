@@ -11,6 +11,8 @@ CXXFLAGS+=	-g -Wall -std=c++11
 CPPFLAGS+=	-I./termbox
 LDADD=		-lstdc++ -lpthread
 
+all:		${PROG}
+
 ${PROG}:	${OBJS}
 	${CC} ${CXXFLAGS} -o ${.TARGET} ${OBJS} ${LDADD}
 
