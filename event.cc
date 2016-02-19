@@ -104,6 +104,8 @@ Event::Type Event::poll() const {
         case TB_KEY_ENTER:
         case TB_KEY_SPACE:
           return Type::select;
+        case TB_KEY_CTRL_L:
+          return Type::redraw;
         default:
           return Type::unknown;
       }

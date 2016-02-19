@@ -79,11 +79,9 @@ void useAsciiOnly();
 
 class Gfx {
  public:
-  static Gfx&   instance() {static Gfx instance_; return instance_;}
-  void          refresh() const;
-
-
-  void         clear() const;
+  static Gfx&  instance() {static Gfx instance_; return instance_;}
+  void         refresh() const;
+  void         reinit() const;
   struct Size  getScreenSize() const;
   void         plot(const Point& point,
                     uint32_t symbol,

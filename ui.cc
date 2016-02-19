@@ -114,6 +114,12 @@ void Ui::handleEvent(Event::Type event) {
       updatePkgListPanel();
       break;
 
+    case Event::Type::redraw:
+      gfx::Gfx::instance().reinit();
+      for (auto& panel : panels_)
+        panel.requestRefresh();
+      break;
+
     default:
       // forward the event to all panels
       for (auto & panel : panels_)

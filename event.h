@@ -46,6 +46,7 @@ class Event {
     go,
     filter,
     search,
+    redraw,
     quit
   };
 

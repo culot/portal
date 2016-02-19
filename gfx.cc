@@ -84,8 +84,9 @@ Gfx::~Gfx() {
   tb_shutdown();
 }
 
-void Gfx::clear() const {
-  tb_clear();
+void Gfx::reinit() const {
+  tb_shutdown();
+  tb_init();
 }
 
 void Gfx::refresh() const {
