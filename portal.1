@@ -1,0 +1,91 @@
+.\"
+.\"Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
+.\"All rights reserved.
+.\"
+.\"Redistribution and use in source and binary forms, with or without
+.\"modification, are permitted provided that the following conditions
+.\"are met:
+.\"1. Redistributions of source code must retain the above copyright
+.\"   notice, this list of conditions and the following disclaimer
+.\"   in this position and unchanged.
+.\"2. Redistributions in binary form must reproduce the above copyright
+.\"   notice, this list of conditions and the following disclaimer in the
+.\"   documentation and/or other materials provided with the distribution.
+.\"
+.\"THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
+.\"IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+.\"OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+.\"IN NO EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY DIRECT, INDIRECT,
+.\"INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+.\"NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+.\"DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+.\"THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+.\"(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+.\"THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd February 17, 2016
+.Dt PORTAL 1
+.Os
+.Sh NAME
+.Nm portal
+.Nd Front-end to pkg(8)
+.Sh SYNOPSIS
+.Nm
+.Op Fl a
+.Sh DESCRIPTION
+.Nm
+provides a front-end to pkg(8).
+.Pp
+Currently, the application is a MVP (Minimum Viable Product)
+which provides only the following features: packages listing
+and searching, installation and deinstallation of packages,
+and filtering based on the package state.
+.Sh OPTIONS
+The following options are supported by
+.Nm :
+.Bl -tag -width automatic
+.It Fl a
+Use only ascii characters to draw the user interface.
+Otherwise, utf8 characters are used to make the interface
+look nicer, but it requires a utf8-compatible environment,
+together with a unicode font able to support a large subset
+of the utf8 character set.
+.El
+.Sh KEYBINDINGS
+.Bl -tag -width automatic
+.It /
+Search for packages. A popup window will appear allowing
+the user to specify the name of the package to be searched for.
+.It +
+Mark the currently selected package for installation
+.It -
+Mark the currently selected package for deinstallation
+.It f
+Filter the packages list. A second key must be pressed
+after 'f' to select the filtering criteria to be used: '+' to
+only display installed packages, '-' to only display available
+packages, or 'n' to reset the filtering rules.
+.It g
+Proceed with the installation / deinstallation of packages
+.It j
+Move down within the listing panel
+.It J
+Scroll down the description panel
+.It k
+Move up within the listing panel
+.It K
+Scroll up the description panel
+.It q
+Quit
+.Nm
+.El
+.Sh SEE ALSO
+.Xr pkg 8
+.Sh AUTHORS AND CONTRIBUTORS
+.An Frederic Culot Aq culot@FreeBSD.org
+.Sh BUGS
+See the issue tracker at
+.Em https://github.com/culot/portal/issues
+.Pp
+Please direct questions and issues to
+.An Frederic Culot Aq culot@FreeBSD.org
