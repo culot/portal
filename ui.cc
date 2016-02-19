@@ -291,11 +291,11 @@ bool Ui::gotCategorySelected() {
   return isCategory(selected);
 }
 
-bool Ui::isCategory(const std::string & str) const {
+bool Ui::isCategory(const std::string& str) const {
   return str.find(markerCategory) != std::string::npos;
 }
 
-void Ui::toggleCategoryFolding(const std::string & category) {
+void Ui::toggleCategoryFolding(const std::string& category) {
   if (unfolded_.find(category) != unfolded_.end())
     unfolded_[category] = unfolded_[category] == true ? false : true;
   else
