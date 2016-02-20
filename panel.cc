@@ -53,6 +53,11 @@ void Panel::draw() {
   }
 }
 
+void Panel::resetPosition() {
+  absCursorRowNum_ = 0;
+  absFirstRowNum_ = 0;
+}
+
 void Panel::clear() {
   unsigned int xMin = area_.getXmin() + (drawBorder_ ? 1 : 0);
   unsigned int xMax = area_.getXmax() - (drawBorder_ ? 1 : 0);

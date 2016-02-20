@@ -75,7 +75,7 @@ class Panel {
   void           drawBorder(bool flag) {drawBorder_ = flag;}
   void           drawScrollBar(bool flag) {drawScrollBar_ = flag;}
   void           highlightCursorLine(bool flag) {highlightCurrent_ = flag;}
-  void           resetCursor() {absCursorRowNum_ = 0;}
+  void           resetPosition();
   void           clear();
   void           clearStatus() {status_.clear();}
   unsigned long  getWidth() const {return area_.getWidth();}

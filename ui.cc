@@ -96,7 +96,7 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::filter:
       panels_[pkgList].status("filter");
       panels_[pkgList].refreshStatus();
-      panels_[pkgList].resetCursor();
+      panels_[pkgList].resetPosition();
       promptFilter();
       updatePanels();
       break;
@@ -104,7 +104,7 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::search:
       panels_[pkgList].status("search");
       panels_[pkgList].refreshStatus();
-      panels_[pkgList].resetCursor();
+      panels_[pkgList].resetPosition();
       promptSearch();
       updatePanels();
       break;
@@ -309,7 +309,7 @@ void Ui::toggleCategoryFolding(const std::string& category) {
 
 void Ui::closeAllFolds() {
   unfolded_.clear();
-  panels_[pkgList].resetCursor();
+  panels_[pkgList].resetPosition();
 }
 
 void Ui::registerPkgChange(Event::Type event) {
