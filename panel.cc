@@ -95,7 +95,7 @@ void Panel::drawStatus() const {
     }
     Gfx::instance().plot({x++, y}, SP_HORIZ_OPENG_BAR);
     Gfx::instance().plot({x++, y}, ' ');
-    Gfx::instance().write({x, y}, status_, ATTR_BOLD);
+    Gfx::instance().write({x, y}, status_, ATTR_BOLD | statusColor_);
     x += status_.length();
     Gfx::instance().plot({x++, y}, ' ');
     Gfx::instance().plot({x++, y}, SP_HORIZ_CLOSEG_BAR);
@@ -194,6 +194,12 @@ void Panel::removeRowAttributes(const unsigned long absRowNum, Attr fg, Attr bg)
 
 void Panel::addRowColors(unsigned long absRowNum, Color fg, Color bg) {
   addRowAttributes(absRowNum, fg, bg);
+}
+
+Panel& Panel::status(const std::string& status, Color color) {
+  status_ = status;
+  statusColor_ = color;
+  return *this;
 }
 
 Panel& Panel::layout(const Point& point, const Size& size) {

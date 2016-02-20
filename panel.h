@@ -84,7 +84,7 @@ class Panel {
   void           requestRefresh() {needRedraw_ = true;}
   void           refreshStatus();
   Panel&         title(const std::string& title) {title_ = title; return *this;};
-  Panel&         status(const std::string& status) {status_ = status; return *this;}
+  Panel&         status(const std::string& status, Color color = COLOR_DEFAULT);
   Panel&         layout(const Point& point, const Size& size);
   Panel&         content(portal::Grid<std::string>& content);
 
@@ -96,6 +96,7 @@ class Panel {
   void           handleEvent(portal::Event::Type event);
   std::string    getHighlightedRowContentAtCol(unsigned long colNum);
   std::string    getContentAt(unsigned long row, unsigned long col);
+  std::string    getStatus() const {return status_;}
 
   void           addRowColors(unsigned long absRowNum, Color fg, Color bg = ATTR_NORMAL);
   void           addRowAttributes(const unsigned int absRowNum, Attr fg, Attr bg = ATTR_NORMAL);
@@ -109,6 +110,7 @@ class Panel {
   Area                      area_;
   std::string               title_;
   std::string               status_;
+  Color                     statusColor_ {COLOR_DEFAULT};
   unsigned int              absFirstRowNum_ {0};
   unsigned int              absCursorRowNum_ {0};
   std::vector<int>          colWidth_;
