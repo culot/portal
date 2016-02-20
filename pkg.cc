@@ -24,6 +24,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <unistd.h>
+#include <sys/types.h>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -35,6 +37,14 @@
 namespace portal {
 
 static const char delimiter = '\2';
+
+Pkg::Pkg() {
+  checkPrivileges();
+}
+
+void Pkg::checkPrivileges() {
+  rootPrivileges_ = getuid() ? false : true;
+}
 
 void Pkg::reload(Repo repo) {
   switchToReferenceRepository();

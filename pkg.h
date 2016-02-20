@@ -76,6 +76,7 @@ class Pkg {
   void                      search(const std::string& args);
   void                      filter(Pkg::Status status);
   std::string               getStatusAsString(Pkg::Status status) const;
+  bool                      gotRootPrivileges() const {return rootPrivileges_;}
 
  private:
   struct Port {
@@ -89,9 +90,11 @@ class Pkg {
     bool operator<(const Port & other) const {return origin < other.origin;} 
   };
 
-  Pkg() {}
+  Pkg();
   Pkg(const Pkg&) = delete;
   void operator=(const Pkg&) = delete;
+
+  bool      rootPrivileges_;
 
   // category -> set of Ports
   using PkgRepo = std::map<std::string, std::set<Port>>;
@@ -100,6 +103,7 @@ class Pkg {
   PkgRepo   tmpPkgs_; // to store search/filter result set
   PkgRepo*  pkgs_;    // pointer to the currently used package repository
 
+  void                            checkPrivileges();
   void                            buildPackagesList(Repo repo);
   void                            execPkg(const std::string& args) const;
   std::vector<Port>               runPkg(const std::string& args) const;
