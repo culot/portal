@@ -96,6 +96,7 @@ class Ui {
   void          promptSearch() const;
   void          setBusyStatus(gfx::Panel& panel, const std::string& status);
   void          busyStatus(gfx::Panel& panel);
+  void          warningStatus(gfx::Panel& panel, const std::string& status);
 };
 
 }

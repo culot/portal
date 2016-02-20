@@ -110,9 +110,13 @@ void Ui::handleEvent(Event::Type event) {
       break;
 
     case Event::Type::go:
-      performPending();
-      closeAllFolds();
-      updatePkgListPanel();
+      if (!Pkg::instance().gotRootPrivileges()) {
+        warningStatus(panels_[pkgList], "Insufficient privileges, please retry as root");
+      } else {
+        performPending();
+        closeAllFolds();
+        updatePkgListPanel();
+      }
       break;
 
     case Event::Type::redraw:
@@ -405,6 +409,15 @@ void Ui::busyStatus(gfx::Panel& panel) {
     if (!busy_)
       return;
   }
+}
+
+void Ui::warningStatus(gfx::Panel& panel, const std::string& status) {
+  std::string oldStatus = panel.getStatus();
+  panel.status(status, gfx::COLOR_RED);
+  panel.refreshStatus();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+  panel.status(oldStatus);
+  panel.requestRefresh();
 }
 
 }
