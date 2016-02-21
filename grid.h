@@ -35,18 +35,18 @@ class Grid {
  public:
 
   struct Coord {
-    size_t  row;
-    size_t  col;
+    unsigned long  row;
+    unsigned long  col;
   };
 
   class GridRow {
    public:
     GridRow();
-    explicit GridRow(size_t width);
+    explicit GridRow(unsigned long width);
     ~GridRow();
 
     void              clear();
-    void              resize(size_t width);
+    void              resize(unsigned long width);
     void              set(unsigned long colNum, const ValueType& value);
     ValueType&        getColumn(unsigned long colNum);
 
@@ -57,13 +57,13 @@ class Grid {
   };
 
   Grid();
-  explicit Grid(size_t width);
+  explicit Grid(unsigned long width);
   ~Grid();
 
   void              clear();
-  size_t            height() const {return grid_.size();}
-  size_t            width() const {return width_;}
-  void              resize(size_t width);
+  unsigned long     height() const {return grid_.size();}
+  unsigned long     width() const {return width_;}
+  void              resize(unsigned long width);
   bool              inBounds(const Coord& coord) const;
   void              addRow();
   void              removeRow();
@@ -75,7 +75,7 @@ class Grid {
  private:
   using  GridType = std::vector<GridRow>;
 
-  size_t         width_ {0};
+  unsigned long  width_ {0};
   unsigned long  currentRow_ {0};
 
   GridType  grid_;
@@ -86,7 +86,7 @@ template <typename ValueType>
 Grid<ValueType>::Grid() {}
 
 template <typename ValueType>
-Grid<ValueType>::Grid(size_t width)
+Grid<ValueType>::Grid(unsigned long width)
     : width_(width),
       grid_(1, GridRow(width)) {}
 
@@ -151,7 +151,7 @@ ValueType& Grid<ValueType>::getValueAt(const Coord& coord) {
 }
 
 template <typename ValueType>
-void Grid<ValueType>::resize(size_t width) {
+void Grid<ValueType>::resize(unsigned long width) {
   width_ = width;
 
   for (auto & row : grid_)
@@ -162,7 +162,7 @@ template <typename ValueType>
 Grid<ValueType>::GridRow::GridRow() : row_() {}
 
 template <typename ValueType>
-Grid<ValueType>::GridRow::GridRow(size_t width) : row_(width) {}
+Grid<ValueType>::GridRow::GridRow(unsigned long width) : row_(width) {}
 
 template <typename ValueType>
 Grid<ValueType>::GridRow::~GridRow() {
@@ -193,7 +193,7 @@ ValueType& Grid<ValueType>::GridRow::getColumn(unsigned long colNum) {
 }
 
 template <typename ValueType>
-void Grid<ValueType>::GridRow::resize(size_t width) {
+void Grid<ValueType>::GridRow::resize(unsigned long width) {
   row_.resize(width);
 }
 

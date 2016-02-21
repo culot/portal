@@ -136,7 +136,7 @@ void Panel::drawContent() {
 void Panel::drawRowContent(const Point& point, const unsigned int absRowNum) {
   unsigned int startCol = 0;
 
-  for (size_t col = 0; col < dataGrid_.width(); ++col) {
+  for (unsigned long col = 0; col < dataGrid_.width(); ++col) {
     std::string content = dataGrid_.getValueAt({absRowNum, col});
 
     int colWidth = colWidth_.size() > col ? colWidth_[col] : -1;

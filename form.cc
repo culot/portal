@@ -54,11 +54,11 @@ void Form::setLayout() {
   const unsigned long xOffset = 2;
 
   Size screenSize = gfx::Gfx::instance().getScreenSize();
-  size_t width = screenSize.width - 2 * xOffset;
-  size_t height = 3;
+  unsigned long width = screenSize.width - 2 * xOffset;
+  unsigned long height = 3;
 
-  size_t x = xOffset;
-  size_t y = screenSize.height / 2 - (height / 2);
+  unsigned long x = xOffset;
+  unsigned long y = screenSize.height / 2 - (height / 2);
 
   area_.resetLayout({x, y}, {height, width});
 }
