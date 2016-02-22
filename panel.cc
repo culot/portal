@@ -168,7 +168,8 @@ void Panel::applyAttributes() const {
   unsigned int xMax = area_.getXmax() - (drawBorder_ ? 1 : 0);
   unsigned int y = area_.getYmin() + (drawBorder_ ? 1 : 0);
 
-  unsigned long lastRowNum = std::min(getAbsLastRowNum(), rowAttrs_.size());
+  unsigned long lastRowNum = std::min(getAbsLastRowNum(),
+                                      static_cast<unsigned long>(rowAttrs_.size()));
 
   for (unsigned long rowNum = absFirstRowNum_; rowNum < lastRowNum; ++rowNum) {
     Attr fg = rowAttrs_[rowNum].first;
