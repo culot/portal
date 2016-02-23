@@ -23,7 +23,7 @@
 .\"(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 .\"THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.Dd February 17, 2016
+.Dd February 23, 2016
 .Dt PORTAL 1
 .Os
 .Sh NAME
@@ -44,6 +44,9 @@ and filtering based on the package state.
 The following options are supported by
 .Nm :
 .Bl -tag -width automatic
+.It Fl v
+Display the current version of
+.Nm .
 .It Fl a
 Use only ascii characters to draw the user interface.
 Otherwise, utf8 characters are used to make the interface
@@ -80,7 +83,7 @@ Move up within the listing panel.
 Scroll up the description panel.
 .It q
 Quit
-.Nm
+.Nm .
 .El
 .Sh SEE ALSO
 .Xr pkg 8

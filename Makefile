@@ -1,4 +1,6 @@
 PROG=		portal
+VERSION=	0.2
+
 SRCS=		portal.cc pkg.cc ui.cc gfx.cc area.cc panel.cc form.cc event.cc prompt.cc
 TBSRCDIR=	termbox
 TBSRCS=		${TBSRCDIR}/utf8.c ${TBSRCDIR}/termbox.c
@@ -10,6 +12,7 @@ CFLAGS+=	-g -Wall
 CXXFLAGS+=	-g -Wall -std=c++11
 CPPFLAGS+=	-I./termbox
 LDADD=		-lstdc++ -lpthread
+DEFS=		-DVERSION=${VERSION}
 
 all:		${PROG}
 
@@ -17,7 +20,7 @@ ${PROG}:	${OBJS}
 	${CC} ${CXXFLAGS} -o ${.TARGET} ${OBJS} ${LDADD}
 
 .cc.o:
-	${CC} ${CXXFLAGS} ${CPPFLAGS} -c ${.IMPSRC}
+	${CC} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -c ${.IMPSRC}
 
 .c.o:
 	${CC} ${CFLAGS} -o ${.TARGET} -c ${.IMPSRC}

@@ -37,19 +37,26 @@
 
 using namespace portal;
 
+void version(void) {
+  std::cout << "portal " << VERSION << std::endl;
+  exit(0);
+}
+
 void usage(void) {
-  std::cerr << "usage: portal [-a]" << std::endl;
+  std::cerr << "usage: portal [-v] [-a]" << std::endl;
   exit(1);
 }
 
 int main(int argc, char** argv) {
   int opt;
-  while ((opt = getopt(argc, argv, "a")) != -1) {
+  while ((opt = getopt(argc, argv, "av")) != -1) {
     switch (opt) {
       case 'a':
         gfx::useAsciiOnly();
         break;
-
+      case 'v':
+        version();
+        break;
       default:
         usage();
     }
