@@ -46,4 +46,5 @@ This is the list of items that should be worked on for future releases
 * a new filtering rule should be added to only show packages with
   pending actions (ie those who are marked for installation or
   removal)
+* portal should be made configurable using a ~/.portal.conf file
 * portal should use the libpkg directly instead of calling pkg(8)
