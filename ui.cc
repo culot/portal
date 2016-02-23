@@ -76,6 +76,8 @@ void Ui::handleEvent(Event::Type event) {
 
     case Event::Type::keyUp:
     case Event::Type::keyDown:
+    case Event::Type::pageUp:
+    case Event::Type::pageDown:
       panels_[pkgList].handleEvent(event);
       updatePkgCommentPanel();
       updatePkgDescrPanel();

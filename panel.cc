@@ -238,6 +238,14 @@ void Panel::handleEvent(portal::Event::Type event) {
       moveCursor(Movement::up);
       break;
 
+    case portal::Event::Type::pageUp:
+      movePage(Movement::up);
+      break;
+
+    case portal::Event::Type::pageDown:
+      movePage(Movement::down);
+      break;
+
     default:
       break;
   }
@@ -252,21 +260,25 @@ std::string Panel::getContentAt(unsigned long row, unsigned long col) {
 }
 
 void Panel::movePage(Movement direction) {
+  unsigned long pageSize = area_.getHeight() - (drawBorder_ ? 2 : 0);
+  unsigned long dataSize = dataGrid_.height() - 1;
+
+  removeRowAttributes(absCursorRowNum_, ATTR_REVERSE);
+
   switch (direction) {
     case Movement::up:
-      if (absFirstRowNum_ > 0) {
-        --absFirstRowNum_;
-        scroll(Movement::up);
-      }
+      // Could not use std::max here because of possible unsigned underflow
+      absCursorRowNum_ = absCursorRowNum_ > pageSize ? absCursorRowNum_ - pageSize : 0UL;
+      absFirstRowNum_ = absFirstRowNum_ > pageSize ? absFirstRowNum_ - pageSize : 0UL;
       break;
-
     case Movement::down:
-      if (dataGrid_.height() > 0 && getAbsLastRowNum() < dataGrid_.height() - (drawBorder_ ? 1 : 0)) {
-        absCursorRowNum_ = getAbsLastRowNum() + 1;
-        scroll(Movement::down);
-      }
+      absCursorRowNum_ = std::min(absCursorRowNum_ + pageSize, dataSize);
+      absFirstRowNum_ = std::min(absFirstRowNum_ + pageSize, dataSize - pageSize + 1);
       break;
   }
+
+  highlightRow(absCursorRowNum_);
+  needRedraw_ = true;
 }
 
 void Panel::moveCursor(Movement direction) {

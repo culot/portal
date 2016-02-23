@@ -38,24 +38,24 @@
 
 /*
      
-   0 /- - - -  +--------------+ 
-   1 |         |              | 
-   2 |         |              | 
-   3 |         |______________| 
-   4 |        /|             /|0 <- absFirstRowNum
-   5 |       / |            / |1
-   6 |      +--------------+  |2
-   7 |      |  |           |  |3
-   8 |      |  |           |  |4
-   9 |      |  |           |  |5
-  10 |      |  |___________|__|6 
-  11 |      | /            | /| 
-  12 |      |/             |/ | 
-  13 |      +--------------+  | 
-  14 |         |              | 
-  15 |         |              | 
-  16 |         |              | 
-  17 \- - - -  +--------------+ 
+             +--------------+ - - -\0
+             |              |      |1
+             |              |      |2
+    v  _ _ _ |______________|      |3
+    i |     /|             /|0     |4   <- absFirstRowNum = 4
+    e      / |            / |1     |5
+    w |   +--------------+  |2     |6
+    p     |  |           |  |3     |7
+    o |   |  |->cursor<- |  |4     |8   <- absCursorRowNum = 8
+    r     |  |           |  |5     |9
+    t |__ |_ |___________|__|6     |10
+          | /            | /|      |11
+          |/             |/ |      |12
+          +--------------+  |      |13
+             |              |      |14
+             |              |      |15
+             |              |      |16
+             +--------------+ - - -/17  <- dataGrid_.height() - 1 = 17
 
  */
 
@@ -111,8 +111,8 @@ class Panel {
   std::string               title_;
   std::string               status_;
   Color                     statusColor_ {COLOR_DEFAULT};
-  unsigned int              absFirstRowNum_ {0};
-  unsigned int              absCursorRowNum_ {0};
+  unsigned long             absFirstRowNum_ {0};
+  unsigned long             absCursorRowNum_ {0};
   std::vector<int>          colWidth_;
 
   std::vector<std::pair<Attr, Attr>>   rowAttrs_;

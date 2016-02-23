@@ -47,6 +47,8 @@ class Event {
     filter,
     search,
     redraw,
+    pageDown,
+    pageUp,
     quit
   };
 

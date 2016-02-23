@@ -101,6 +101,12 @@ Event::Type Event::poll() const {
         case TB_KEY_ARROW_UP:
         case TB_KEY_MOUSE_WHEEL_UP:
           return Type::keyUp;
+        case TB_KEY_PGUP:
+        case TB_KEY_CTRL_B:
+          return Type::pageUp;
+        case TB_KEY_PGDN:
+        case TB_KEY_CTRL_F:
+          return Type::pageDown;
         case TB_KEY_ENTER:
         case TB_KEY_SPACE:
           return Type::select;
