@@ -1,0 +1,13 @@
+Version 0.2 ():
+
+  New features
+    - new '-v' flag added to display version number
+    - Page{Up,Down} keys now used to scroll up/down one page
+
+  Bugfixes
+    - fix build on i386 
+
+
+Version 0.1 (2016-02-20):
+
+  - Initial release
