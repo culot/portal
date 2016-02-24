@@ -8,6 +8,7 @@ Table of Contents
 * [Description](#Description)
 * [Frequently Asked Questions](#FAQ)
 * [TODO](#TODO)
+* [Additional resources](#resources)
 
 
 <a name="Description"></a>
@@ -48,3 +49,16 @@ This is the list of items that should be worked on for future releases
   removal)
 * portal should be made configurable using a ~/.portal.conf file
 * portal should use the libpkg directly instead of calling pkg(8)
+
+
+<a name="resources"></a>
+### Additional resources
+
+* The Git repository of [portal is hosted on GitHub][1]
+* In order to share your thoughts about portal, you can join the
+  __#portal__ irc channel on EFnet.
+* If you hit a bug when using portal, you can submit an issue in the
+  [portal issue tracker][2].
+
+[1]: https://github.com/culot/portal
+[2]: https://github.com/culot/portal/issues
