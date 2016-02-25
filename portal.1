@@ -72,9 +72,16 @@ Mark the currently selected package for installation.
 Mark the currently selected package for deinstallation.
 .It f
 Filter the packages list. A second key must be pressed
-after 'f' to select the filtering criteria to be used: '+' to
-only display installed packages, '-' to only display available
-packages, or 'n' to reset the filtering rules.
+after 'f' to select the filtering criteria to be used, which
+can be one of:
+.Bl -tag -width automatic
+.It '+' or 'i'
+to only display installed packages
+.It '-' or 'a'
+to only display available packages
+.It 'n'
+to reset the filtering rules
+.El
 .It g
 Proceed with the installation / deinstallation of packages.
 .It j
