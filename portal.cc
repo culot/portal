@@ -26,6 +26,7 @@
 
 #include <syslog.h>
 #include <unistd.h>
+#include <cstdlib>
 
 #include <stdexcept>
 #include <iostream>
