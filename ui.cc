@@ -368,6 +368,11 @@ void Ui::promptFilter() {
           panels_[pkgList].status("Available");
           Pkg::instance().filterAvailable();
           break;
+
+        case 'p':
+          panels_[pkgList].status("Pending");
+          Pkg::instance().filterPending();
+          break;
       }
       break;
 

@@ -303,12 +303,12 @@ std::string Pkg::getNameFromOrigin(const std::string & origin) const {
 
 void Pkg::registerInstall(const std::string& origin) {
   const Port& port = getPort(origin);
-  port.status.set(installed);
+  port.status.set(pendingInstall);
 }
 
 void Pkg::registerRemoval(const std::string& origin) {
   const Port& port = getPort(origin);
-  port.status.reset(installed);
+  port.status.reset(pendingRemoval);
 }
 
 void Pkg::performPending() {

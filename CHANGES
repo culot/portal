@@ -1,3 +1,9 @@
+Version 0.3 ():
+
+  New features:
+    - new filter to only display packages having pending actions
+
+
 Version 0.2 (2016-02-24):
 
   New features
