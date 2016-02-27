@@ -30,13 +30,13 @@
 
 namespace gfx {
 
-Area::Area(const Point& point, const Size& size)
+Area::Area(Point point, Size size)
     : topLeft_(point),
       size_(size) {
   normalize();
 }
 
-Area& Area::resetLayout(const Point& point, const Size& size) {
+Area& Area::resetLayout(Point point, Size size) {
   topLeft_ = point;
   bottomRight_ = {0, 0};
   size_ = size;
@@ -45,7 +45,7 @@ Area& Area::resetLayout(const Point& point, const Size& size) {
   return *this;
 }
 
-Area& Area::size(const Size& size) {
+Area& Area::size(Size size) {
   size_ = size;
   normalize();
 

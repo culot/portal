@@ -100,22 +100,22 @@ struct Size Gfx::getScreenSize() const {
   return {height, width};
 }
 
-void Gfx::plot(const Point& point, uint32_t symbol, Attr fg, Attr bg) const {
+void Gfx::plot(Point point, uint32_t symbol, Attr fg, Attr bg) const {
   tb_change_cell(point.x, point.y, symbol, fg, bg);
 }
 
-void Gfx::write(const Point& point, const std::string & str, Attr fg, Attr bg) const {
+void Gfx::write(Point point, const std::string & str, Attr fg, Attr bg) const {
   unsigned int x = point.x;
 
   for (const char& c : str)
     tb_change_cell(x++, point.y, c, fg, bg);
 }
 
-void Gfx::setAttributes(const Point& point, Attr fg, Attr bg) const {
+void Gfx::setAttributes(Point point, Attr fg, Attr bg) const {
   tb_change_cell(point.x, point.y, getCharacter(point), fg, bg);
 }
 
-uint32_t Gfx::getCharacter(const Point& point) const {
+uint32_t Gfx::getCharacter(Point point) const {
   struct tb_cell* charArray = tb_cell_buffer();
 
   return charArray[point.y * tb_width() + point.x].ch;

@@ -40,10 +40,10 @@ enum class Corner {
 class Area {
  public:
   Area() {}
-  Area(const Point& point, const Size& size);
+  Area(Point point, Size size);
 
-  Area&  resetLayout(const Point& point, const Size& size);
-  Area&  size(const Size& size);
+  Area&  resetLayout(Point point, Size size);
+  Area&  size(Size size);
   void   drawBorder() const;
 
   Point         getCornerPoint(Corner corner) const;

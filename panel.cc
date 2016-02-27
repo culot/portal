@@ -35,7 +35,7 @@ namespace gfx {
 Panel::Panel() 
     : area_({0, 0}, Gfx::instance().getScreenSize()) {}
 
-Panel::Panel(const Point & point, const Size & size)
+Panel::Panel(Point point, Size size)
     : area_(point, size) {}
 
 void Panel::draw() {
@@ -133,7 +133,7 @@ void Panel::drawContent() {
     drawRowContent({x, y++}, absRowNum);
 }
 
-void Panel::drawRowContent(const Point& point, const unsigned int absRowNum) {
+void Panel::drawRowContent(Point point, unsigned int absRowNum) {
   unsigned int startCol = 0;
 
   for (unsigned long col = 0; col < dataGrid_.width(); ++col) {
@@ -155,7 +155,7 @@ void Panel::refreshStatus() {
   Gfx::instance().refresh();
 }
 
-void Panel::highlightRow(const unsigned int absRowNum) {
+void Panel::highlightRow(unsigned int absRowNum) {
   if (highlightCurrent_)
     addRowAttributes(absRowNum, ATTR_REVERSE);
 }
@@ -182,7 +182,7 @@ void Panel::applyAttributes() const {
   }
 }
 
-void Panel::addRowAttributes(const unsigned int absRowNum, Attr fg, Attr bg) {
+void Panel::addRowAttributes(unsigned int absRowNum, Attr fg, Attr bg) {
   resizeAttrsIfNeeded(absRowNum + 1);
 
   Attr attrFg = rowAttrs_[absRowNum].first | fg;
@@ -191,7 +191,7 @@ void Panel::addRowAttributes(const unsigned int absRowNum, Attr fg, Attr bg) {
   rowAttrs_[absRowNum] = std::pair<Attr, Attr>(attrFg, attrBg);
 }
 
-void Panel::removeRowAttributes(const unsigned long absRowNum, Attr fg, Attr bg) {
+void Panel::removeRowAttributes(unsigned long absRowNum, Attr fg, Attr bg) {
   Attr attrFg = rowAttrs_[absRowNum].first & ~fg;
   Attr attrBg = rowAttrs_[absRowNum].second & ~bg;
 
@@ -208,7 +208,7 @@ Panel& Panel::status(const std::string& status, Color color) {
   return *this;
 }
 
-Panel& Panel::layout(const Point& point, const Size& size) {
+Panel& Panel::layout(Point point, Size size) {
   area_.resetLayout(point, size);
 
   return *this;
@@ -327,7 +327,7 @@ bool Panel::scroll(Movement direction) {
   return scrollOk;
 }
 
-unsigned long Panel::getAbsRowNum(const unsigned int relRowNum) const {
+unsigned long Panel::getAbsRowNum(unsigned int relRowNum) const {
   return relRowNum + absFirstRowNum_ - (drawBorder_ ? 1 : 0);
 }
 

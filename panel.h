@@ -69,7 +69,7 @@ class Panel {
   };
 
   Panel();
-  Panel(const Point& point, const Size& size);
+  Panel(Point point, Size size);
 
   void           draw();
   void           drawBorder(bool flag) {drawBorder_ = flag;}
@@ -85,13 +85,13 @@ class Panel {
   void           refreshStatus();
   Panel&         title(const std::string& title) {title_ = title; return *this;};
   Panel&         status(const std::string& status, Color color = COLOR_DEFAULT);
-  Panel&         layout(const Point& point, const Size& size);
+  Panel&         layout(Point point, Size size);
   Panel&         content(portal::Grid<std::string>& content);
 
   // Use the following method to set a fixed column width
   // if -1 or no column width is provided, then the column
   // width will fit the content length
-  void           setFixedColWidth(const std::vector<int> & width);
+  void           setFixedColWidth(const std::vector<int>& width);
 
   void           handleEvent(portal::Event::Type event);
   std::string    getHighlightedRowContentAtCol(unsigned long colNum);
@@ -124,15 +124,15 @@ class Panel {
   void            drawStatus() const;
   void            drawScrollBar() const;
   void            drawContent();
-  void            drawRowContent(const Point& point, const unsigned int absRowNum);
-  void            highlightRow(const unsigned int absRowNum);
+  void            drawRowContent(Point point, unsigned int absRowNum);
+  void            highlightRow(unsigned int absRowNum);
   void            applyAttributes() const;
   void            movePage(Movement direction);
   void            moveCursor(Movement direction);
   bool            scroll(Movement direction);
-  unsigned long   getAbsRowNum(const unsigned int relRowNum) const;
+  unsigned long   getAbsRowNum(unsigned int relRowNum) const;
   unsigned long   getAbsLastRowNum() const;
-  void            removeRowAttributes(const unsigned long absRowNum, Attr fg, Attr bg = ATTR_NORMAL);
+  void            removeRowAttributes(unsigned long absRowNum, Attr fg, Attr bg = ATTR_NORMAL);
   void            resizeAttrsIfNeeded(unsigned long size);
 };
 

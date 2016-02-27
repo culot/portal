@@ -64,13 +64,13 @@ class Grid {
   unsigned long     height() const {return grid_.size();}
   unsigned long     width() const {return width_;}
   void              resize(unsigned long width);
-  bool              inBounds(const Coord& coord) const;
+  bool              inBounds(Coord coord) const;
   void              addRow();
   void              removeRow();
   void              set(unsigned long colNum, const ValueType& value);
   GridRow&          getCurrentRow();
   GridRow&          getRow(unsigned long rowNum);
-  ValueType&        getValueAt(const Coord& coord);
+  ValueType&        getValueAt(Coord coord);
 
  private:
   using  GridType = std::vector<GridRow>;
@@ -103,7 +103,7 @@ void Grid<ValueType>::clear() {
 }
 
 template <typename ValueType>
-bool Grid<ValueType>::inBounds(const Coord& coord) const {
+bool Grid<ValueType>::inBounds(Coord coord) const {
   return coord.row < grid_.size() && coord.col < width_;
 }
 
@@ -144,7 +144,7 @@ typename Grid<ValueType>::GridRow& Grid<ValueType>::getRow(unsigned long rowNum)
 }
 
 template <typename ValueType>
-ValueType& Grid<ValueType>::getValueAt(const Coord& coord) {
+ValueType& Grid<ValueType>::getValueAt(Coord coord) {
   GridRow & row = getRow(coord.row);
 
   return row.getColumn(coord.col);

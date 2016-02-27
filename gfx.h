@@ -83,15 +83,15 @@ class Gfx {
   void         refresh() const;
   void         reinit() const;
   struct Size  getScreenSize() const;
-  void         plot(const Point& point,
+  void         plot(Point point,
                     uint32_t symbol,
                     Attr fg = ATTR_NORMAL,
                     Attr bg = ATTR_NORMAL) const;
-  void         write(const Point& point, 
+  void         write(Point point, 
                      const std::string& str, 
                      Attr fg = ATTR_NORMAL,
                      Attr bg = ATTR_NORMAL) const;
-  void         setAttributes(const Point& point, Attr fg, Attr bg) const;
+  void         setAttributes(Point point, Attr fg, Attr bg) const;
 
  private:
   Gfx();
@@ -99,7 +99,7 @@ class Gfx {
   Gfx(const Gfx&) = delete;
   void operator=(const Gfx&) = delete;
 
-  uint32_t     getCharacter(const Point& point) const;
+  uint32_t     getCharacter(Point point) const;
 };
 
 }
