@@ -201,25 +201,19 @@ std::vector<std::string> Pkg::getPkgOrigins(const std::string& category) const {
   return portsList;
 }
 
-Pkg::Status Pkg::getCurrentStatus(const std::string& origin) const {
+Pkg::Status Pkg::getStatus(const std::string& origin) const {
   const Port& port = getPort(origin);
 
-  return port.currentStatus;
+  return port.status;
 }
 
-Pkg::Status Pkg::getPendingStatus(const std::string& origin) const {
-  const Port& port = getPort(origin);
-
-  return port.pendingStatus;
-}
-
-std::string Pkg::getPkgAttr(const std::string & origin, Attr attr) const {
+std::string Pkg::getPkgAttr(const std::string& origin, Attr attr) const {
   const Port& port = getPort(origin);
   switch (attr) {
     case Attr::origin:
       return port.origin;
     case Attr::status:
-      return getStatusAsString(port.currentStatus);
+      return getCurrentStatusAsString(port.origin);
     case Attr::category:
       return getCategoryFromOrigin(port.origin);
     case Attr::name:
@@ -253,24 +247,13 @@ unsigned int Pkg::getCategorySize(const std::string& category) const {
 
 void Pkg::fillPkgRepo(Repo repo, std::vector<Port>& pkgs) {
   for (auto& port : pkgs) {
-    switch (repo) {
-      case Repo::local:
-        port.currentStatus = Status::installed;
-        break;
-
-      case Repo::remote:
-        port.currentStatus = Status::uninstalled;
-        break;
-
-      default:
-        // Do not change current status
-        break;
-    }
+    if (repo == Repo::local)
+      port.status.set(Statuses::installed);
 
     std::string portCategory = getCategoryFromOrigin(port.origin);
     std::set<Port>::iterator it = (*pkgs_)[portCategory].find(port);
     if ((*pkgs_)[portCategory].end() != it)
-      it->currentStatus = port.currentStatus;
+      it->status = port.status;
     else
       (*pkgs_)[portCategory].insert(port);
   }
@@ -282,15 +265,19 @@ void Pkg::fillTmpRepo(std::vector<Port>& pkgs) {
   fillPkgRepo(Repo::tmp, pkgs);
 }
 
-std::string Pkg::getStatusAsString(Pkg::Status status) const {
-  switch (status) {
-    case Status::uninstalled:
-      return "-";
-    case Status::installed:
-      return "+";
-    default:
-      return "?";
-  }
+std::string Pkg::getCurrentStatusAsString(const std::string& origin) const {
+  const Pkg::Port& port = getPort(origin);
+  return port.status[installed] ? "+" : "-";
+}
+
+std::string Pkg::getPendingStatusAsString(const std::string& origin) const {
+  const Pkg::Port& port = getPort(origin);
+  return port.status[pendingInstall] ? "+" : "-";
+}
+
+bool Pkg::hasPendingActions(const std::string& origin) const {
+  const Pkg::Port& port = getPort(origin);
+  return (port.status[pendingInstall] || port.status[pendingRemoval]);
 }
 
 const Pkg::Port& Pkg::getPort(const std::string& origin) const {
@@ -314,28 +301,14 @@ std::string Pkg::getNameFromOrigin(const std::string & origin) const {
   return std::string(origin, origin.find('/') + 1);
 }
 
-void Pkg::registerPending(const std::string &origin, Pkg::Status status) {
+void Pkg::registerInstall(const std::string& origin) {
   const Port& port = getPort(origin);
-  Pkg::Status current = port.currentStatus;
+  port.status.set(installed);
+}
 
-  bool valid(false);
-  switch (status) {
-    case Status::installed:
-      if (current == Status::uninstalled)
-        valid = true;
-      break;
-
-    case Status::uninstalled:
-      if (current == Status::installed)
-        valid = true;
-      break;
-
-    default:
-      break;
-  }
-
-  if (valid)
-    port.pendingStatus = status;
+void Pkg::registerRemoval(const std::string& origin) {
+  const Port& port = getPort(origin);
+  port.status.reset(installed);
 }
 
 void Pkg::performPending() {
@@ -343,19 +316,12 @@ void Pkg::performPending() {
 
   for (const auto& category : refPkgs_) {
     for (const auto& port : category.second) {
-      switch (port.pendingStatus) {
-        case Status::installed:
-          install.append(" ");
-          install.append(port.origin);
-          break;
-
-        case Status::uninstalled:
-          remove.append(" ");
-          remove.append(port.origin);
-          break;
-
-        default:
-          break;
+      if (port.status[pendingInstall]) {
+        install.append(" ");
+        install.append(port.origin);
+      } else if (port.status[pendingRemoval]) {
+        remove.append(" ");
+        remove.append(port.origin);
       }
     }
   }
@@ -374,8 +340,10 @@ void Pkg::performPending() {
 
 void Pkg::resetPending() {
   for (const auto& category : refPkgs_)
-    for (const auto& port : category.second)
-      port.pendingStatus = Status::unset;
+    for (const auto& port : category.second) {
+      port.status.reset(pendingInstall);
+      port.status.reset(pendingRemoval);
+    }
 }
 
 void Pkg::search(const std::string & search) {
@@ -385,12 +353,45 @@ void Pkg::search(const std::string & search) {
   fillTmpRepo(pkgs);
 }
 
-void Pkg::filter(Pkg::Status status) {
+void Pkg::filterAvailable() {
   std::vector<Port> pkgs;
 
   for (const auto& category : refPkgs_)
     for (const auto& pkg : category.second)
-      if (status == Status::unset || status == pkg.currentStatus)
+      if (!pkg.status[installed])
+        pkgs.push_back(pkg);
+
+  fillTmpRepo(pkgs);
+}
+
+void Pkg::filterInstalled() {
+  std::vector<Port> pkgs;
+
+  for (const auto& category : refPkgs_)
+    for (const auto& pkg : category.second)
+      if (pkg.status[installed])
+        pkgs.push_back(pkg);
+
+  fillTmpRepo(pkgs);
+}
+
+void Pkg::filterUpgradable() {
+  std::vector<Port> pkgs;
+
+  for (const auto& category : refPkgs_)
+    for (const auto& pkg : category.second)
+      if (pkg.status[upgradable])
+        pkgs.push_back(pkg);
+
+  fillTmpRepo(pkgs);
+}
+
+void Pkg::filterPending() {
+  std::vector<Port> pkgs;
+
+  for (const auto& category : refPkgs_)
+    for (const auto& pkg : category.second)
+      if (pkg.status[pendingInstall] || pkg.status[pendingRemoval])
         pkgs.push_back(pkg);
 
   fillTmpRepo(pkgs);

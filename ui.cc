@@ -190,14 +190,12 @@ void Ui::updatePkgListPanel() {
       std::vector<std::string> origins = Pkg::instance().getPkgOrigins(category);
       for (const auto& origin : origins) {
         dataGrid.addRow();
-        Pkg::Status current = Pkg::instance().getCurrentStatus(origin); 
-        std::string status = Pkg::instance().getStatusAsString(current);
+        std::string status = Pkg::instance().getCurrentStatusAsString(origin);
 
-        Pkg::Status pending = Pkg::instance().getPendingStatus(origin);
-        if (pending != Pkg::Status::unset) {
+        if (Pkg::instance().hasPendingActions(origin)) {
           panels_[pkgList].addRowAttributes(dataGrid.height() - 1, gfx::ATTR_BOLD);
           status.append("[");
-          status.append(Pkg::instance().getStatusAsString(pending));
+          status.append(Pkg::instance().getPendingStatusAsString(origin));
           status.append("]");
         }
 
@@ -320,11 +318,11 @@ void Ui::registerPkgChange(Event::Type event) {
 
     switch (event) {
       case Event::Type::flagInstall:
-        Pkg::instance().registerPending(origin, Pkg::Status::installed);
+        Pkg::instance().registerInstall(origin);
         break;
 
       case Event::Type::flagRemove:
-        Pkg::instance().registerPending(origin, Pkg::Status::uninstalled);
+        Pkg::instance().registerRemoval(origin);
         break;
 
       default:
@@ -345,7 +343,6 @@ void Ui::performPending() {
 }
 
 void Ui::promptFilter() {
-  Pkg::Status status = Pkg::Status::unset;
   panels_[pkgList].clearStatus();
 
   portal::Event ev;
@@ -358,14 +355,14 @@ void Ui::promptFilter() {
       switch (c) {
         case 'i':
         case '+':
-          status = Pkg::Status::installed;
           panels_[pkgList].status("Installed");
+          Pkg::instance().filterInstalled();
           break;
 
         case '-':
         case 'a':
-          status = Pkg::Status::uninstalled;
           panels_[pkgList].status("Available");
+          Pkg::instance().filterAvailable();
           break;
       }
       break;
@@ -373,8 +370,6 @@ void Ui::promptFilter() {
     default:
       break;
   } 
-
-  Pkg::instance().filter(status);
 }
 
 void Ui::promptSearch() const {

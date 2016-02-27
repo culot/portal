@@ -28,6 +28,7 @@
 
 #include <string>
 #include <tuple>
+#include <bitset>
 #include <vector>
 #include <set>
 #include <map>
@@ -53,35 +54,42 @@ class Pkg {
     nbinfofields
   };
 
-  enum class Status {
-    unset,
-    uninstalled,
+  enum Statuses {
     installed,
-    numStatus
+    upgradable,
+    pendingInstall,
+    pendingRemoval,
+    numStatuses
   };
+
+  using Status = std::bitset<numStatuses>;
 
   static Pkg&    instance() {static Pkg instance_; return instance_;}
 
   std::vector<std::string>  getPkgOrigins() const;
   std::vector<std::string>  getPkgOrigins(const std::string& category) const;
   std::string               getNameFromOrigin(const std::string& origin) const;
-  Status                    getCurrentStatus(const std::string& origin) const;
-  Status                    getPendingStatus(const std::string& origin) const;
+  Status                    getStatus(const std::string& origin) const;
   std::vector<std::string>  getPkgCategories() const;
   unsigned int              getCategorySize(const std::string& category) const;
   std::string               getPkgAttr(const std::string& origin, Attr attr) const;
   void                      reload(Repo repo = Repo::all);
-  void                      registerPending(const std::string& origin, Pkg::Status status);
+  void                      registerInstall(const std::string& origin);
+  void                      registerRemoval(const std::string& origin);
   void                      performPending();
   void                      search(const std::string& args);
-  void                      filter(Pkg::Status status);
-  std::string               getStatusAsString(Pkg::Status status) const;
+  void                      filterAvailable();
+  void                      filterInstalled();
+  void                      filterUpgradable();
+  void                      filterPending();
+  std::string               getCurrentStatusAsString(const std::string& origin) const;
+  std::string               getPendingStatusAsString(const std::string& origin) const;
+  bool                      hasPendingActions(const std::string& origin) const;
   bool                      gotRootPrivileges() const {return rootPrivileges_;}
 
  private:
   struct Port {
-    mutable Status          currentStatus {Status::unset};
-    mutable Status          pendingStatus {Status::unset};
+    mutable Status          status;
 
     std::string             origin;
     std::string             comment;
