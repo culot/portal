@@ -78,6 +78,7 @@ class Pkg {
   void                      registerRemoval(const std::string& origin);
   void                      performPending();
   void                      search(const std::string& args);
+  void                      resetFilter();
   void                      filterAvailable();
   void                      filterInstalled();
   void                      filterUpgradable();

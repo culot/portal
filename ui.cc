@@ -353,6 +353,10 @@ void Ui::promptFilter() {
   switch (evType) {
     case portal::Event::Type::keyPressed:
       switch (c) {
+        case 'n':
+          Pkg::instance().resetFilter();
+          break;
+
         case 'i':
         case '+':
           panels_[pkgList].status("Installed");

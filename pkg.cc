@@ -353,6 +353,10 @@ void Pkg::search(const std::string & search) {
   fillTmpRepo(pkgs);
 }
 
+void Pkg::resetFilter() {
+  switchToReferenceRepository();
+}
+
 void Pkg::filterAvailable() {
   std::vector<Port> pkgs;
 
