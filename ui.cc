@@ -214,6 +214,8 @@ void Ui::updatePkgListPanel() {
 
         dataGrid.set(DataColumn::portStatus, status);
         dataGrid.set(DataColumn::portName, Pkg::instance().getNameFromOrigin(origin));
+        dataGrid.set(DataColumn::portLocalVersion, Pkg::instance().getLocalVersion(origin));
+        dataGrid.set(DataColumn::portRemoteVersion, Pkg::instance().getRemoteVersion(origin));
       }
     } else {
       dataGrid.set(DataColumn::categoryMarker, markerCategory + markerFolded);

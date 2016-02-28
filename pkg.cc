@@ -66,7 +66,15 @@ void Pkg::buildPackagesList(Repo repo) {
   switch (repo) {
     case Repo::local: {
       std::stringstream args;
-      args << "query -a '%o" << delimiter << "%c" << delimiter << "%e" << delimiter << "'";
+      args << "query -a '%o"
+           << delimiter
+           << "%v"
+           << delimiter
+           << "%c"
+           << delimiter
+           << "%e"
+           << delimiter
+           << "'";
       pkgs = runPkg(args.str());
       fillPkgRepo(Repo::local, pkgs);
       break;
@@ -74,7 +82,15 @@ void Pkg::buildPackagesList(Repo repo) {
 
     case Repo::remote: {
       std::stringstream args;
-      args << "rquery -a '%o" << delimiter << "%c" << delimiter << "%e" << delimiter << "'";
+      args << "rquery -a '%o"
+           << delimiter
+           << "%v"
+           << delimiter
+           << "%c"
+           << delimiter
+           << "%e"
+           << delimiter
+           << "'";
       pkgs = runPkg(args.str());
       fillPkgRepo(Repo::remote, pkgs);
       break;
@@ -125,6 +141,10 @@ std::vector<Pkg::Port> Pkg::runPkg(const std::string & args) const {
     struct Port port;
 
     std::tie(eof, port.origin) = extractToken(pipe, delimiter);
+    if (eof)
+      break;
+
+    std::tie(eof, port.remoteVersion) = extractToken(pipe, delimiter);
     if (eof)
       break;
 
@@ -207,6 +227,19 @@ Pkg::Status Pkg::getStatus(const std::string& origin) const {
   return port.status;
 }
 
+std::string Pkg::getLocalVersion(const std::string& origin) const {
+  const Port& port = getPort(origin);
+
+  return port.localVersion;
+}
+
+std::string Pkg::getRemoteVersion(const std::string& origin) const {
+  const Port& port = getPort(origin);
+
+  return port.remoteVersion;
+}
+
+
 std::string Pkg::getPkgAttr(const std::string& origin, Attr attr) const {
   const Port& port = getPort(origin);
   switch (attr) {
@@ -222,9 +255,10 @@ std::string Pkg::getPkgAttr(const std::string& origin, Attr attr) const {
       return port.comment;
     case Attr::description:
       return port.description;
-    default:
-      throw std::runtime_error("Pkg::getPkgAttr(): Unkown port field: [" 
-                               + std::to_string(static_cast<int>(attr)) + "]");
+    case Attr::localVersion:
+      return port.localVersion;
+    case Attr::remoteVersion:
+      return port.remoteVersion;
   }
 }
 
@@ -247,14 +281,21 @@ unsigned int Pkg::getCategorySize(const std::string& category) const {
 
 void Pkg::fillPkgRepo(Repo repo, std::vector<Port>& pkgs) {
   for (auto& port : pkgs) {
-    if (repo == Repo::local)
+    if (repo == Repo::local) {
       port.status.set(Statuses::installed);
+      port.localVersion = port.remoteVersion;
+    }
 
     std::string portCategory = getCategoryFromOrigin(port.origin);
     std::set<Port>::iterator it = (*pkgs_)[portCategory].find(port);
-    if ((*pkgs_)[portCategory].end() != it)
+
+    // The local repository is filled after the remote was,
+    // hence we need to update fields specific to local status
+    // and version. Otherwise we can insert the port as is.
+    if ((*pkgs_)[portCategory].end() != it) {
       it->status = port.status;
-    else
+      it->localVersion = port.localVersion;
+    } else
       (*pkgs_)[portCategory].insert(port);
   }
 }

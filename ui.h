@@ -63,9 +63,9 @@ class Ui {
     category                 = 1,
     portName                 = 1,
 
-    portInstalledVersion     = 2,
+    portLocalVersion         = 2,
 
-    portAvailableVersion     = 3,
+    portRemoteVersion        = 3,
 
     nbDataColumns            = 4
   };
