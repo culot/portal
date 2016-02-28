@@ -60,10 +60,9 @@ class Ui {
     portComment              = 0,
     portDescr                = 0,
 
-    categoryName             = 1,
+    category                 = 1,
     portName                 = 1,
 
-    categorySize             = 2,
     portInstalledVersion     = 2,
 
     portAvailableVersion     = 3,
@@ -77,11 +76,13 @@ class Ui {
   std::map<std::string, bool>    unfolded_;
 
   void          setPanelsLayout();
+  void          setColumnsWidth();
   void          updatePanels();
   void          updatePkgListPanel(const std::vector<std::string>& origins);
   void          updatePkgListPanel();
   void          updatePkgCommentPanel();
   void          updatePkgDescrPanel();
+  std::string   getCategoryFromNameAndSize(const std::string& nameAndSize) const;
   std::string   getSelectedCategoryName();
   std::string   getSelectedPortOrigin();
   std::string   getSelectedPortName();

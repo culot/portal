@@ -47,6 +47,7 @@ const std::string markerUnfolded("\\");
 
 Ui::Ui() {
   setPanelsLayout();
+  setColumnsWidth();
   updatePanels();
 }
 
@@ -155,6 +156,22 @@ void Ui::setPanelsLayout() {
   panels_[pkgDescr].layout({0, pkgPanelHeight + commentPanelHeight}, descrPanelSize);
 }
 
+// Set the column widths for the panel which displays the package list
+void Ui::setColumnsWidth() {
+  unsigned int screenWidth = gfx::Gfx::instance().getScreenSize().width - 2;
+  int markerColWidth = static_cast<int>(markerCategory.length() + 2);
+  int versionColWidth = 15;
+  int nameColWidth = screenWidth - markerColWidth - 2 * versionColWidth;
+
+  std::vector<int> widths;
+  widths.push_back(markerColWidth);
+  widths.push_back(nameColWidth);
+  widths.push_back(versionColWidth);
+  widths.push_back(versionColWidth);
+
+  panels_[pkgList].setFixedColWidth(widths);
+}
+
 void Ui::updatePanels() {
   updatePkgListPanel();
   updatePkgCommentPanel();
@@ -171,9 +188,6 @@ void Ui::updatePanels() {
 void Ui::updatePkgListPanel() {
   Grid<std::string> dataGrid(DataColumn::nbDataColumns);
 
-  // Only set a fixed width for the first column (category marker or port status)
-  panels_[pkgList].setFixedColWidth({static_cast<int>(markerCategory.length() + 2)});
-
   panels_[pkgList].eraseContent();
 
   std::vector<std::string> categories = Pkg::instance().getPkgCategories();
@@ -184,8 +198,7 @@ void Ui::updatePkgListPanel() {
 
     if (unfolded_.find(category) != unfolded_.end() && unfolded_[category] == true) {
       dataGrid.set(DataColumn::categoryMarker, markerCategory + markerUnfolded);
-      dataGrid.set(DataColumn::categoryName, category);
-      dataGrid.set(DataColumn::categorySize, categorySize);
+      dataGrid.set(DataColumn::category, category + " " + categorySize);
 
       std::vector<std::string> origins = Pkg::instance().getPkgOrigins(category);
       for (const auto& origin : origins) {
@@ -204,8 +217,7 @@ void Ui::updatePkgListPanel() {
       }
     } else {
       dataGrid.set(DataColumn::categoryMarker, markerCategory + markerFolded);
-      dataGrid.set(DataColumn::categoryName, category);
-      dataGrid.set(DataColumn::categorySize, categorySize);
+      dataGrid.set(DataColumn::category, category + " " + categorySize);
     }
 
     dataGrid.addRow();
@@ -261,10 +273,14 @@ void Ui::updatePkgDescrPanel() {
   panels_[pkgDescr].requestRefresh();
 }
 
-std::string Ui::getSelectedCategoryName() {
-  std::string category = panels_[pkgList].getHighlightedRowContentAtCol(DataColumn::categoryName);
+std::string Ui::getCategoryFromNameAndSize(const std::string& nameAndSize) const {
+  return nameAndSize.substr(0, nameAndSize.find(" "));
+}
 
-  return category;
+std::string Ui::getSelectedCategoryName() {
+  std::string column = panels_[pkgList].getHighlightedRowContentAtCol(DataColumn::category);
+
+  return getCategoryFromNameAndSize(column);
 }
 
 std::string Ui::getSelectedPortOrigin() {
@@ -282,8 +298,10 @@ std::string Ui::getSelectedPortName() {
 
 std::string Ui::getSelectedPortCategory() {
   for (long rowNum = panels_[pkgList].getCurrentRowNum(); rowNum >= 0; --rowNum)
-    if (isCategory(panels_[pkgList].getContentAt(rowNum, DataColumn::categoryMarker)))
-      return panels_[pkgList].getContentAt(rowNum, DataColumn::categoryName);
+    if (isCategory(panels_[pkgList].getContentAt(rowNum, DataColumn::categoryMarker))) {
+      std::string column = panels_[pkgList].getContentAt(rowNum, DataColumn::category);
+      return getCategoryFromNameAndSize(column);
+    }
 
   throw std::runtime_error("Ui::getSelectedPortCategory(): Unable to find category for port ["
                            + getSelectedPortName()
