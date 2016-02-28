@@ -2,6 +2,7 @@ Version 0.3 ():
 
   New features:
     - new filter to only display packages having pending actions
+    - local and remote packages versions are now displayed
 
 
 Version 0.2 (2016-02-24):
