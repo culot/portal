@@ -89,6 +89,7 @@ class Pkg {
   std::string               getCurrentStatusAsString(const std::string& origin) const;
   std::string               getPendingStatusAsString(const std::string& origin) const;
   bool                      hasPendingActions(const std::string& origin) const;
+  bool                      isUpgradable(const std::string& origin) const;
   bool                      gotRootPrivileges() const {return rootPrivileges_;}
 
  private:

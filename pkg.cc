@@ -295,6 +295,15 @@ void Pkg::fillPkgRepo(Repo repo, std::vector<Port>& pkgs) {
     if ((*pkgs_)[portCategory].end() != it) {
       it->status = port.status;
       it->localVersion = port.localVersion;
+      // For now let's assume that if the port's local and
+      // remote version differ, then the port is outdated.
+      // This does not take into account the fact that a
+      // port could be created locally based on a version
+      // of the software newer than the one available in
+      // remote repositories. I expect this case to be an
+      // exception to avoid costly comparisons.
+      if (it->localVersion != it->remoteVersion)
+        it->status.set(Statuses::upgradable);
     } else
       (*pkgs_)[portCategory].insert(port);
   }
@@ -319,6 +328,11 @@ std::string Pkg::getPendingStatusAsString(const std::string& origin) const {
 bool Pkg::hasPendingActions(const std::string& origin) const {
   const Pkg::Port& port = getPort(origin);
   return (port.status[pendingInstall] || port.status[pendingRemoval]);
+}
+
+bool Pkg::isUpgradable(const std::string& origin) const {
+  const Pkg::Port& port = getPort(origin);
+  return (port.status[upgradable]);
 }
 
 const Pkg::Port& Pkg::getPort(const std::string& origin) const {

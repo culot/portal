@@ -210,7 +210,8 @@ void Ui::updatePkgListPanel() {
           status.append("[");
           status.append(Pkg::instance().getPendingStatusAsString(origin));
           status.append("]");
-        }
+        } else if (Pkg::instance().isUpgradable(origin))
+          status.append("[^]");
 
         dataGrid.set(DataColumn::portStatus, status);
         dataGrid.set(DataColumn::portName, Pkg::instance().getNameFromOrigin(origin));
