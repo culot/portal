@@ -23,7 +23,7 @@
 .\"(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 .\"THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.Dd February 23, 2016
+.Dd February 29, 2016
 .Dt PORTAL 1
 .Os
 .Sh NAME
@@ -53,6 +53,43 @@ Otherwise, utf8 characters are used to make the interface
 look nicer, but it requires a utf8-compatible environment,
 together with a unicode font able to support a large subset
 of the utf8 character set.
+.El
+.Sh INTERFACE
+The user interface is made of two panels: the upper one
+displays a list of packages sorted by category, and the bottom
+one displays the description of the currently highlighted
+package. A single row separates the two panels, which displays
+the currently highlighted package's comment line.
+.Pp
+In the upper panel which displays the packages list, the
+following data appear from left to right:
+.Bl -tag -width automatic
+.It Status
+The following markers are displayed depending on the package
+status:
+.Bl -tag -width automatic
+.It +
+The package is installed locally
+.It +[-]
+The package is installed locally and marked to be deleted
+.\".It +[^]
+.\"The package is installed locally and is upgradable, meaning
+.\"a newer version is available from remote repositories
+.\".It +[+]
+.\"The package is installed locally and marked to be upgraded
+.It -
+The package is not installed locally
+.It -[+]
+The package is not installed locally and marked to be
+installed
+.El
+.It Name
+The package name
+.It Local version
+The current version of the package if it is installed
+.It Remote version
+The latest version of the package available from remote
+repositories
 .El
 .Sh KEYBINDINGS
 .Bl -tag -width automatic
