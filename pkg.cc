@@ -358,12 +358,22 @@ std::string Pkg::getNameFromOrigin(const std::string & origin) const {
 
 void Pkg::registerInstall(const std::string& origin) {
   const Port& port = getPort(origin);
-  port.status.set(pendingInstall);
+  if (!port.status[installed])
+    port.status.set(pendingInstall);
+  else {
+    if (port.status[pendingRemoval])
+      port.status.reset(pendingRemoval);
+    else if (port.status[upgradable])
+      port.status.set(pendingInstall);
+  }
 }
 
 void Pkg::registerRemoval(const std::string& origin) {
   const Port& port = getPort(origin);
-  port.status.reset(pendingRemoval);
+  if (port.status[pendingInstall])
+    port.status.reset(pendingInstall);
+  else if (port.status[installed])
+    port.status.set(pendingRemoval);
 }
 
 void Pkg::performPending() {
