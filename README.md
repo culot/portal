@@ -42,8 +42,6 @@ and filtering based on the package state.
 
 This is the list of items that should be worked on for future releases
 
-* the packages version should be displayed (current and available), and
-  upgradable packages should be identified as such
 * portal should be made configurable using a ~/.portal.conf file
 * portal should use the libpkg directly instead of calling pkg(8)
 
