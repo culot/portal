@@ -394,6 +394,11 @@ void Ui::promptFilter() {
           panels_[pkgList].status("Pending");
           Pkg::instance().filterPending();
           break;
+
+        case 'u':
+          panels_[pkgList].status("Upgradable");
+          Pkg::instance().filterUpgradable();
+          break;
       }
       break;
 
