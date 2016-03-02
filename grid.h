@@ -61,6 +61,7 @@ class Grid {
   ~Grid();
 
   void              clear();
+  bool              empty() const {return grid_.size() == 0;}
   unsigned long     height() const {return grid_.size();}
   unsigned long     width() const {return width_;}
   void              resize(unsigned long width);
