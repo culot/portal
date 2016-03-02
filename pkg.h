@@ -67,6 +67,7 @@ class Pkg {
 
   static Pkg&    instance() {static Pkg instance_; return instance_;}
 
+  bool                      isRepositoryEmpty() const {return pkgs_->empty();}
   std::vector<std::string>  getPkgOrigins() const;
   std::vector<std::string>  getPkgOrigins(const std::string& category) const;
   std::string               getNameFromOrigin(const std::string& origin) const;
