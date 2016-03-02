@@ -1,7 +1,8 @@
 Version 0.3 ():
 
   New features:
-    - new filter to only display packages having pending actions
+    - new filters to only display upgradable packages and packages
+      having pending actions
     - local and remote packages versions are now displayed
     - packages' status now shows the packages which are upgradable
 
