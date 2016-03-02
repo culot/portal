@@ -41,10 +41,12 @@ Panel::Panel(Point point, Size size)
 void Panel::draw() {
   if (needRedraw_) {
     clear();
-    drawContent();
-    highlightRow(absCursorRowNum_);
-    applyAttributes();
-    drawScrollBar();
+    if (!dataGrid_.empty()) {
+      drawContent();
+      highlightRow(absCursorRowNum_);
+      applyAttributes();
+      drawScrollBar();
+    }
     drawBorder();
     drawTitle();
     drawStatus();

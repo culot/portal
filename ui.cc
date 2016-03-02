@@ -66,7 +66,7 @@ Event::Type Ui::poll() const {
 void Ui::handleEvent(Event::Type event) {
   switch (event) {
     case Event::Type::select: {
-      if (gotCategorySelected())
+      if (!Pkg::instance().isRepositoryEmpty() && gotCategorySelected())
       {
         std::string category = getSelectedCategoryName();
         toggleCategoryFolding(category);
@@ -79,21 +79,27 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::keyDown:
     case Event::Type::pageUp:
     case Event::Type::pageDown:
-      panels_[pkgList].handleEvent(event);
-      updatePkgCommentPanel();
-      updatePkgDescrPanel();
+      if (!Pkg::instance().isRepositoryEmpty()) {
+        panels_[pkgList].handleEvent(event);
+        updatePkgCommentPanel();
+        updatePkgDescrPanel();
+      }
       break;
 
     case Event::Type::keyShiftUp:
     case Event::Type::keyShiftDown:
-      panels_[pkgDescr].handleEvent(event);
-      updatePkgDescrPanel();
+      if (!Pkg::instance().isRepositoryEmpty()) {
+        panels_[pkgDescr].handleEvent(event);
+        updatePkgDescrPanel();
+      }
       break;
 
     case Event::Type::flagInstall:
     case Event::Type::flagRemove:
-      registerPkgChange(event);
-      updatePkgListPanel();
+      if (!Pkg::instance().isRepositoryEmpty()) {
+        registerPkgChange(event);
+        updatePkgListPanel();
+      }
       break;
 
     case Event::Type::filter:
@@ -173,9 +179,17 @@ void Ui::setColumnsWidth() {
 }
 
 void Ui::updatePanels() {
-  updatePkgListPanel();
-  updatePkgCommentPanel();
-  updatePkgDescrPanel();
+  if (Pkg::instance().isRepositoryEmpty()) {
+    for (auto& panel : panels_) {
+      panel.eraseContent();
+      panel.resetPosition();
+      panel.requestRefresh();
+    }
+  } else {
+    updatePkgListPanel();
+    updatePkgCommentPanel();
+    updatePkgDescrPanel();
+  }
 }
 
 // Build a hierarchy of categories and ports:
