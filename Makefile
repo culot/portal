@@ -1,5 +1,5 @@
 PROG=		portal
-VERSION=	0.2
+VERSION=	0.3
 
 SRCS=		portal.cc pkg.cc ui.cc gfx.cc area.cc panel.cc form.cc event.cc prompt.cc
 TBSRCDIR=	termbox
