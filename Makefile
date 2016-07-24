@@ -2,16 +2,13 @@ PROG=		portal
 VERSION=	0.3
 
 SRCS=		portal.cc pkg.cc ui.cc gfx.cc area.cc panel.cc form.cc event.cc prompt.cc
-TBSRCDIR=	termbox
-TBSRCS=		${TBSRCDIR}/utf8.c ${TBSRCDIR}/termbox.c
-TBOBJS=		${TBSRCS:N*.h:R:S/$/.o/g} 
-OBJS=		${SRCS:N*.h:R:S/$/.o/g} ${TBOBJS}
+OBJS=		${SRCS:N*.h:R:S/$/.o/g}
 
 CC?=		cc
 CFLAGS+=	-g -Wall
 CXXFLAGS+=	-g -Wall -std=c++11
-CPPFLAGS+=	-I./termbox
-LDADD=		-lstdc++ -lpthread
+CPPFLAGS+=
+LDADD=		-lstdc++ -lpthread -lncurses
 DEFS=		-DVERSION=${VERSION}
 
 all:		${PROG}
