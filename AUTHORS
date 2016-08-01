@@ -1,9 +1,3 @@
 Authors:
 
 Frederic Culot <culot@FreeBSD.org>
-
-
-Portal makes use of the termbox library, which is distributed under the
-BSD license. More information can be found at:
-
-https://github.com/nsf/termbox
