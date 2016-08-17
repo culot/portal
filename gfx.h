@@ -55,15 +55,17 @@ extern const Attr ATTR_UNDERLINE;
 
 using Color = uint32_t;
 
-extern const Color COLOR_DEFAULT;
-extern const Color COLOR_BLACK;
-extern const Color COLOR_RED;
-extern const Color COLOR_GREEN;
-extern const Color COLOR_YELLOW;
-extern const Color COLOR_BLUE;
-extern const Color COLOR_MAGENTA;
-extern const Color COLOR_CYAN;
-extern const Color COLOR_WHITE;
+namespace color {
+  extern const Color DEFAULT;
+  extern const Color BLACK;
+  extern const Color RED;
+  extern const Color GREEN;
+  extern const Color YELLOW;
+  extern const Color BLUE;
+  extern const Color MAGENTA;
+  extern const Color CYAN;
+  extern const Color WHITE;
+}
 
 struct Point {
   unsigned long x;
@@ -83,17 +85,14 @@ class Gfx {
   void         refresh() const;
   void         reinit() const;
   struct Size  getScreenSize() const;
-  void         plot(Point point,
-                    uint32_t symbol,
-                    Attr fg = ATTR_NORMAL,
-                    Attr bg = ATTR_NORMAL) const;
-  void         write(Point point, 
-                     const std::string& str, 
-                     Attr fg = ATTR_NORMAL,
-                     Attr bg = ATTR_NORMAL) const;
+  void         plot(Point point, uint32_t symbol, Attr attr = ATTR_NORMAL) const;
+  void         write(Point point, const std::string& str, Attr attr = ATTR_NORMAL) const;
   void         setAttributes(Point point, Attr fg, Attr bg) const;
 
  private:
+  // XXX Record window size to avoid calling getScreenSize() all the time
+  struct Window*      mainWin_;
+
   Gfx();
   ~Gfx();
   Gfx(const Gfx&) = delete;

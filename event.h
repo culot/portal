@@ -52,8 +52,6 @@ class Event {
     quit
   };
 
-  Event();
-
   std::tuple<Type, char>    getRawInput() const;
   Type                      poll() const;
 

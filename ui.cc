@@ -36,6 +36,7 @@
 #include "area.h"
 #include "grid.h"
 #include "form.h"
+#include "event.h"
 
 #include "ui.h"
 
@@ -261,7 +262,7 @@ void Ui::updatePkgCommentPanel() {
   }
 
   panels_[pkgComment].content(dataGrid);
-  panels_[pkgComment].addRowColors(0, gfx::COLOR_DEFAULT, gfx::COLOR_BLUE);
+  panels_[pkgComment].addRowColors(0, gfx::color::DEFAULT, gfx::color::BLUE);
   panels_[pkgComment].requestRefresh();
 }
 
@@ -459,7 +460,7 @@ void Ui::busyStatus(gfx::Panel& panel) {
 
 void Ui::warningStatus(gfx::Panel& panel, const std::string& status) {
   std::string oldStatus = panel.getStatus();
-  panel.status(status, gfx::COLOR_RED);
+  panel.status(status, gfx::color::RED);
   panel.refreshStatus();
   std::this_thread::sleep_for(std::chrono::milliseconds(1500));
   panel.status(oldStatus);

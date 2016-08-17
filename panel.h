@@ -84,7 +84,7 @@ class Panel {
   void           requestRefresh() {needRedraw_ = true;}
   void           refreshStatus();
   Panel&         title(const std::string& title) {title_ = title; return *this;};
-  Panel&         status(const std::string& status, Color color = COLOR_DEFAULT);
+  Panel&         status(const std::string& status, Color color = gfx::color::DEFAULT);
   Panel&         layout(Point point, Size size);
   Panel&         content(portal::Grid<std::string>& content);
 
@@ -110,7 +110,7 @@ class Panel {
   Area                      area_;
   std::string               title_;
   std::string               status_;
-  Color                     statusColor_ {COLOR_DEFAULT};
+  Color                     statusColor_ {gfx::color::DEFAULT};
   unsigned long             absFirstRowNum_ {0};
   unsigned long             absCursorRowNum_ {0};
   std::vector<int>          colWidth_;

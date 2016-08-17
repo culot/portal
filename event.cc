@@ -24,98 +24,73 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdexcept>
+#include <curses.h>
 
-#include "termbox.h"
 #include "event.h"
 
 namespace portal {
 
-Event::Event() {
-  if (0 > tb_height())
-    throw std::runtime_error("Event::Event(): termbox library not initialized");
-}
-
 std::tuple<Event::Type, char> Event::getRawInput() const {
   char c = '\0';
-  struct tb_event event;
-  tb_poll_event(&event);
 
-  switch (event.type) {
-    case TB_EVENT_KEY:
-      switch (event.key) {
-        case 0:
-          c = event.ch;
-          return std::make_tuple(Type::keyPressed, c);
-        case TB_KEY_BACKSPACE:
-        case TB_KEY_BACKSPACE2:
-          return std::make_tuple(Type::keyBackspace, c);
-        case TB_KEY_ENTER:
-          return std::make_tuple(Type::select, c);
-        default:
-          return std::make_tuple(Type::unknown, c);
-      }
-      break;
+  int event = getch();
+  switch (event) {
+    case KEY_BACKSPACE:
+      return std::make_tuple(Type::keyBackspace, c);
+    case KEY_ENTER:
+      return std::make_tuple(Type::select, c);
     default:
-      return std::make_tuple(Type::unknown, c);
+      return std::make_tuple(Type::keyPressed, c);
   }
 }
 
 Event::Type Event::poll() const {
-  struct tb_event event;
-  tb_poll_event(&event);
-
-  switch (event.type) {
-    case TB_EVENT_KEY:
-      switch (event.key) {
-        case 0:
-          switch (event.ch) {
-            case '/':
-              return Type::search;
-            case 'f':
-              return Type::filter;
-            case 'g':
-              return Type::go;
-            case 'j':
-              return Type::keyDown;
-            case 'k':
-              return Type::keyUp;
-            case 'q':
-              return Type::quit;
-            case 'J':
-              return Type::keyShiftDown;
-            case 'K':
-              return Type::keyShiftUp;
-            case '+':
-              return Type::flagInstall;
-            case '-':
-              return Type::flagRemove;
-            default:
-              return Type::unknown;
-          }
-        case TB_KEY_BACKSPACE:
-          return Type::keyBackspace;
-        case TB_KEY_ARROW_DOWN:
-        case TB_KEY_MOUSE_WHEEL_DOWN:
-          return Type::keyDown;
-        case TB_KEY_ARROW_UP:
-        case TB_KEY_MOUSE_WHEEL_UP:
-          return Type::keyUp;
-        case TB_KEY_PGUP:
-        case TB_KEY_CTRL_B:
-          return Type::pageUp;
-        case TB_KEY_PGDN:
-        case TB_KEY_CTRL_F:
-          return Type::pageDown;
-        case TB_KEY_ENTER:
-        case TB_KEY_SPACE:
-          return Type::select;
-        case TB_KEY_CTRL_L:
-          return Type::redraw;
-        default:
-          return Type::unknown;
-      }
-    case TB_EVENT_MOUSE:
+  int event = getch();
+  switch (event) {
+    case '/':
+      return Type::search;
+    case 'f':
+      return Type::filter;
+    case 'g':
+      return Type::go;
+    case 'j':
+      return Type::keyDown;
+    case 'k':
+      return Type::keyUp;
+    case 'q':
+      return Type::quit;
+    case 'J':
+      return Type::keyShiftDown;
+    case 'K':
+      return Type::keyShiftUp;
+    case '+':
+      return Type::flagInstall;
+    case '-':
+      return Type::flagRemove;
+    case KEY_BACKSPACE:
+      return Type::keyBackspace;
+    case KEY_DOWN:
+      return Type::keyDown;
+    case KEY_UP:
+      return Type::keyUp;
+    case KEY_PPAGE:
+      //        case TB_KEY_CTRL_B:
+      return Type::pageUp;
+    case KEY_NPAGE:
+      //        case TB_KEY_CTRL_F:
+      return Type::pageDown;
+    case KEY_ENTER:
+    case ' ':
+      return Type::select;
+      /*
+         case TB_KEY_CTRL_L:
+         return Type::redraw;
+         */
+    default:
+      return Type::unknown;
+  }
+  /*
+  case TB_EVENT_MOUSE:
       switch (event.key)
       {
         case TB_KEY_MOUSE_WHEEL_DOWN:
@@ -126,7 +101,7 @@ Event::Type Event::poll() const {
       break;
     default:
       return Type::unknown;
-  }
+      */
 }
 
 }
