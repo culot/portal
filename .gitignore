@@ -1,3 +1,6 @@
 *.o
 portal
 tags
+GTAGS
+GPATH
+GRTAGS
