@@ -1,7 +1,7 @@
 PROG=		portal
 VERSION=	0.3
 
-SRCS=		portal.cc pkg.cc ui.cc gfx.cc area.cc panel.cc form.cc event.cc prompt.cc
+SRCS=		portal.cc pkg.cc ui.cc gfx.cc area.cc panel.cc form.cc event.cc prompt.cc window.cc
 OBJS=		${SRCS:N*.h:R:S/$/.o/g}
 
 CC?=		cc
