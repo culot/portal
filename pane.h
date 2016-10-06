@@ -29,9 +29,10 @@
 #include <memory>
 #include <string>
 
-namespace tui {
+namespace portal {
+namespace gfx {
 
-class Window {
+class Pane {
  public:
 
   struct Size {
@@ -44,24 +45,31 @@ class Window {
     int y;
   };
 
-  Window();
-  Window(const Size& size, const Pos& pos);
-  ~Window();
+  Pane();
+  Pane(const Size& size, const Pos& pos);
+  ~Pane();
 
-  void cursorLineHighlighted(bool highlight);
+  // XXX check which methods could be marked as const
+  void cursorLineHighlight(bool highlight);
+  void borders(bool borders);
+  int  getCursorRowNum() const;
   void draw();
+  void clear();
   void print(const std::string& line);
   void scrollDown();
   void scrollUp();
   void moveCursorDown();
   void moveCursorUp();
+  void resetCursorPosition();
+  void colorizeCurrentLine(short cursesColorNum) const;
 
  private:
   class Impl;
   std::unique_ptr<Impl> impl_;
 
-  Window(const Window&) = delete;
-  void operator=(const Window&) = delete;
+  Pane(const Pane&) = delete;
+  void operator=(const Pane&) = delete;
 };
 
+}
 }

@@ -29,22 +29,8 @@
 #include <cstdint>
 #include <string>
 
+namespace portal {
 namespace gfx {
-
-using Sprite = uint32_t;
-
-extern Sprite SP_BOT_LEFT;
-extern Sprite SP_BOT_RIGHT;
-extern Sprite SP_TOP_LEFT;
-extern Sprite SP_TOP_RIGHT;
-extern Sprite SP_HORIZ_BAR;
-extern Sprite SP_VERT_BAR;
-extern Sprite SP_DBLE_HORIZ_BAR;
-extern Sprite SP_DBLE_VERT_BAR;
-extern Sprite SP_HORIZ_OPENG_BAR;
-extern Sprite SP_HORIZ_CLOSEG_BAR;
-extern Sprite SP_SCROLL_ARROW_UP;
-extern Sprite SP_SCROLL_ARROW_DOWN;
 
 using Attr = uint32_t;
 
@@ -68,16 +54,14 @@ namespace color {
 }
 
 struct Point {
-  unsigned long x;
-  unsigned long y;
+  int x;
+  int y;
 };
 
 struct Size {
-  unsigned long height;
-  unsigned long width;
+  int height;
+  int width;
 };
-
-void useAsciiOnly();
 
 class Gfx {
  public:
@@ -101,4 +85,5 @@ class Gfx {
   uint32_t     getCharacter(Point point) const;
 };
 
+}
 }

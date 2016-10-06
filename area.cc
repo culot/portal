@@ -28,6 +28,7 @@
 
 #include "area.h"
 
+namespace portal {
 namespace gfx {
 
 Area::Area(Point point, Size size)
@@ -131,4 +132,5 @@ bool Area::hasEmptySize() const {
   return (size_.width == 0) && (size_.height == 0);
 }
 
+}
 }

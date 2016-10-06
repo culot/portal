@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -31,12 +31,9 @@
 #include <vector>
 #include <set>
 
-#include "gfx.h"
+#include <curses.h>
+
 #include "pkg.h"
-#include "area.h"
-#include "grid.h"
-#include "form.h"
-#include "event.h"
 
 #include "ui.h"
 
@@ -47,31 +44,53 @@ const std::string markerFolded("-");
 const std::string markerUnfolded("\\");
 
 Ui::Ui() {
-  setPanelsLayout();
-  setColumnsWidth();
-  updatePanels();
+  initscr();
+
+  // XXX more elegant color definitions to be used (enum?)
+  if (has_colors() && start_color() == OK) {
+    init_pair(1, COLOR_CYAN, COLOR_BLUE);
+  } else {
+    // XXX deal with b&w terminals
+  }
+
+  cbreak();
+  noecho();
+  keypad(stdscr, TRUE);
+  curs_set(0);
+  refresh();  // A refresh might seem unnecessary here, but user input is
+              // gathered from stdscr via a call to getch, which does an
+              // implicit refresh first (don't ask me why...). Hence doing
+              // this refresh explicitly avoids a black screen when portal
+              // starts. The black screen does not appear afterwards as
+              // stdscr is never touched by portal, so curses detects it
+              // does not need any subsequent refreshes.
+  createPanes();
+  updatePanes();
+}
+
+Ui::~Ui() {
+  // XXX simpler to use a shared ptr and remove the dctor
+  for (auto& pane : pane_) {
+    delete pane;
+  }
+  clear();
+  endwin();
 }
 
 void Ui::display() {
-  for (auto& panel : panels_)
-    panel.draw();
-
-  gfx::Gfx::instance().refresh();
-}
-
-Event::Type Ui::poll() const {
-  Event ev;
-  return ev.poll();
+  for (auto& pane : pane_) {
+    pane->draw();
+  }
+  doupdate();
 }
 
 void Ui::handleEvent(Event::Type event) {
   switch (event) {
     case Event::Type::select: {
-      if (!Pkg::instance().isRepositoryEmpty() && gotCategorySelected())
-      {
-        std::string category = getSelectedCategoryName();
+      if (!Pkg::instance().isRepositoryEmpty() && gotCategorySelected()) {
+        std::string category = getSelectedItemName();
         toggleCategoryFolding(category);
-        updatePanels();
+        updatePanes();
       }
       break;
     }
@@ -81,17 +100,25 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::pageUp:
     case Event::Type::pageDown:
       if (!Pkg::instance().isRepositoryEmpty()) {
-        panels_[pkgList].handleEvent(event);
-        updatePkgCommentPanel();
-        updatePkgDescrPanel();
+        if (event == Event::Type::keyUp) {
+          pane_[pkgList]->moveCursorUp();
+        } else if (event == Event::Type::keyDown) {
+          pane_[pkgList]->moveCursorDown();
+        }
+        // XXX Implement scroll up and down
+        updatePkgDescrPane();
       }
       break;
 
     case Event::Type::keyShiftUp:
     case Event::Type::keyShiftDown:
       if (!Pkg::instance().isRepositoryEmpty()) {
-        panels_[pkgDescr].handleEvent(event);
-        updatePkgDescrPanel();
+        if (event == Event::Type::keyShiftUp) {
+          pane_[pkgDescr]->moveCursorUp();
+        } else if (event == Event::Type::keyShiftDown) {
+          pane_[pkgDescr]->moveCursorDown();
+        }
+        updatePkgDescrPane();
       }
       break;
 
@@ -99,97 +126,99 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::flagRemove:
       if (!Pkg::instance().isRepositoryEmpty()) {
         registerPkgChange(event);
-        updatePkgListPanel();
+        updatePkgListPane();
       }
       break;
 
     case Event::Type::filter:
-      panels_[pkgList].status("filter");
-      panels_[pkgList].refreshStatus();
-      panels_[pkgList].resetPosition();
+      /* XXX Implement
+      pane_[pkgList]->status("filter");
+      pane_[pkgList]->refreshStatus();
+      pane_[pkgList]->resetPosition();
       promptFilter();
-      updatePanels();
+      updatePanes();
+      */
       break;
 
     case Event::Type::search:
-      panels_[pkgList].status("search");
-      panels_[pkgList].refreshStatus();
-      panels_[pkgList].resetPosition();
+      /* Implement
+      pane_[pkgList]->status("search");
+      pane_[pkgList]->refreshStatus();
+      pane_[pkgList]->resetPosition();
       promptSearch();
-      updatePanels();
+      updatePanes();
+      */
       break;
 
     case Event::Type::go:
       if (!Pkg::instance().gotRootPrivileges()) {
-        warningStatus(panels_[pkgList], "Insufficient privileges, please retry as root");
+//        warningStatus(pane_[pkgList], "Insufficient privileges, please retry as root");
       } else {
         performPending();
         closeAllFolds();
-        updatePkgListPanel();
+        updatePkgListPane();
       }
       break;
 
     case Event::Type::redraw:
-      gfx::Gfx::instance().reinit();
-      for (auto& panel : panels_)
-        panel.requestRefresh();
+      for (auto& pane : pane_)
+        //pane->requestRefresh();
+        pane->draw();
       break;
 
     default:
-      // forward the event to all panels
-      for (auto & panel : panels_)
-        panel.handleEvent(event);
       break;
   }
 }
 
-void Ui::setPanelsLayout() {
-  unsigned int screenHeight = gfx::Gfx::instance().getScreenSize().height;
-  unsigned int screenWidth = gfx::Gfx::instance().getScreenSize().width;
+/*
+    +------------------------------+
+    |                              | \
+    |                              | |
+    |                              | | pane_[pkgList]
+    |                              | |
+    |                              | /
+    +------------------------------+
+    |                              | \ <-- comment
+    |                              | | 
+    |                              | / pane_[pkgDescr]
+    +------------------------------+ 
+ */
+void Ui::createPanes() {
+  int screenHeight, screenWidth;
+  getmaxyx(stdscr, screenHeight, screenWidth);
+  int pkgPaneHeight = screenHeight * .6;
+  int descrPaneHeight = screenHeight - pkgPaneHeight - 1;
 
-  unsigned int pkgPanelHeight = screenHeight * .6;
-  unsigned int commentPanelHeight = 1;
-  unsigned int descrPanelHeight = screenHeight - pkgPanelHeight - commentPanelHeight;
-
-  gfx::Size pkgPanelSize = {pkgPanelHeight, screenWidth};
-  gfx::Size commentPanelSize = {commentPanelHeight, screenWidth};
-  gfx::Size descrPanelSize = {descrPanelHeight, screenWidth};
-
-  panels_[pkgList].layout({0, 0}, pkgPanelSize);
-  panels_[pkgList].drawBorder(true);
-
-  panels_[pkgComment].layout({0, pkgPanelHeight}, commentPanelSize);
-
-  panels_[pkgDescr].layout({0, pkgPanelHeight + commentPanelHeight}, descrPanelSize);
+  pane_[pkgList] = new gfx::Pane({screenWidth, pkgPaneHeight}, {0, 0});
+  pane_[pkgDescr] = new gfx::Pane({screenWidth, descrPaneHeight}, {0, pkgPaneHeight});
+  pane_[pkgDescr]->borders(false);
+  pane_[pkgDescr]->cursorLineHighlight(false);
 }
 
-// Set the column widths for the panel which displays the package list
-void Ui::setColumnsWidth() {
-  unsigned int screenWidth = gfx::Gfx::instance().getScreenSize().width - 2;
-  int markerColWidth = static_cast<int>(markerCategory.length() + 2);
-  int versionColWidth = 15;
-  int nameColWidth = screenWidth - markerColWidth - 2 * versionColWidth;
-
-  std::vector<int> widths;
-  widths.push_back(markerColWidth);
-  widths.push_back(nameColWidth);
-  widths.push_back(versionColWidth);
-  widths.push_back(versionColWidth);
-
-  panels_[pkgList].setFixedColWidth(widths);
-}
-
-void Ui::updatePanels() {
+void Ui::updatePanes() {
   if (Pkg::instance().isRepositoryEmpty()) {
-    for (auto& panel : panels_) {
-      panel.eraseContent();
-      panel.resetPosition();
-      panel.requestRefresh();
+    for (auto& pane : pane_) {
+      pane->clear();
+      pane->resetCursorPosition();
     }
   } else {
-    updatePkgListPanel();
-    updatePkgCommentPanel();
-    updatePkgDescrPanel();
+    updatePkgListPane();
+    updatePkgDescrPane();
+  }
+}
+
+void Ui::buildPkgList() {
+  pkgList_.clear();
+  std::vector<std::string> categories = Pkg::instance().getPkgCategories();
+  for (const auto& category : categories) {
+    pkgList_.push_back({pkgListItemType::category, category});
+    if (!isCategoryFolded(category)) {
+      std::vector<std::string> origins = Pkg::instance().getPkgOrigins(category);
+      for (const auto& origin : origins) {
+        pkgList_.push_back({pkgListItemType::pkg, origin});
+      }
+    }
   }
 }
 
@@ -200,157 +229,84 @@ void Ui::updatePanels() {
 // -    port1
 // +    port2
 // ---- category3
-void Ui::updatePkgListPanel() {
-  Grid<std::string> dataGrid(DataColumn::nbDataColumns);
-
-  panels_[pkgList].eraseContent();
-
-  std::vector<std::string> categories = Pkg::instance().getPkgCategories();
-  for (const auto & category : categories) {
-    std::string categorySize = "("
-        + std::to_string(Pkg::instance().getCategorySize(category))
-        + ")";
-
-    if (unfolded_.find(category) != unfolded_.end() && unfolded_[category] == true) {
-      dataGrid.set(DataColumn::categoryMarker, markerCategory + markerUnfolded);
-      dataGrid.set(DataColumn::category, category + " " + categorySize);
-
-      std::vector<std::string> origins = Pkg::instance().getPkgOrigins(category);
-      for (const auto& origin : origins) {
-        dataGrid.addRow();
-        std::string status = Pkg::instance().getCurrentStatusAsString(origin);
-
-        if (Pkg::instance().hasPendingActions(origin)) {
-          panels_[pkgList].addRowAttributes(dataGrid.height() - 1, gfx::ATTR_BOLD);
-          status.append("[");
-          status.append(Pkg::instance().getPendingStatusAsString(origin));
-          status.append("]");
-        } else if (Pkg::instance().isUpgradable(origin))
-          status.append("[^]");
-
-        dataGrid.set(DataColumn::portStatus, status);
-        dataGrid.set(DataColumn::portName, Pkg::instance().getNameFromOrigin(origin));
-        dataGrid.set(DataColumn::portLocalVersion, Pkg::instance().getLocalVersion(origin));
-        dataGrid.set(DataColumn::portRemoteVersion, Pkg::instance().getRemoteVersion(origin));
-      }
-    } else {
-      dataGrid.set(DataColumn::categoryMarker, markerCategory + markerFolded);
-      dataGrid.set(DataColumn::category, category + " " + categorySize);
+void Ui::updatePkgListPane() {
+  buildPkgList();
+  pane_[pkgList]->clear();
+  for (const auto& item : pkgList_) {
+    std::string itemString;
+    switch (item.type) {
+    case pkgListItemType::category:
+      itemString = getStringForCategory(item.name);
+      break;
+    case pkgListItemType::pkg:
+      itemString = getStringForPkg(item.name);
+      //if (Pkg::instance().hasPendingActions(item.name)) {
+        // XXX change attributes
+        //pane_[pkgList].addRowAttributes(dataGrid.height() - 1, gfx::ATTR_BOLD);
+      //}
+      break;
+    default:
+      break;
     }
-
-    dataGrid.addRow();
+    pane_[pkgList]->print(itemString);
   }
-
-  dataGrid.removeRow();
-  panels_[pkgList].content(dataGrid);
-  panels_[pkgList].highlightCursorLine(true);
-  panels_[pkgList].requestRefresh();
 }
 
-void Ui::updatePkgCommentPanel() {
-  panels_[pkgComment].setFixedColWidth(std::vector<int>(panels_[pkgComment].getWidth() - 2));
-  panels_[pkgComment].drawScrollBar(false);
-  panels_[pkgComment].eraseContent();
-
-  Grid<std::string> dataGrid(1);
+void Ui::updatePkgDescrPane() {
+  pane_[pkgDescr]->clear();
 
   if (!gotCategorySelected()) {
-    std::string origin = getSelectedPortOrigin();
+    std::string origin = getSelectedItemName();
     std::string comment = Pkg::instance().getPkgAttr(origin, Pkg::Attr::comment);
-
-    dataGrid.set(DataColumn::portComment, comment);
-  }
-
-  panels_[pkgComment].content(dataGrid);
-  panels_[pkgComment].addRowColors(0, gfx::color::DEFAULT, gfx::color::BLUE);
-  panels_[pkgComment].requestRefresh();
-}
-
-void Ui::updatePkgDescrPanel() {
-  panels_[pkgDescr].setFixedColWidth(std::vector<int>(panels_[pkgList].getWidth() - 2));
-  panels_[pkgDescr].eraseContent();
-
-  if (!gotCategorySelected()) {
-    Grid<std::string> dataGrid(1);
-
-    std::string origin = getSelectedPortOrigin();
+    pane_[pkgDescr]->print(comment);
+    pane_[pkgDescr]->colorizeCurrentLine(1);
+    
     std::string desc = Pkg::instance().getPkgAttr(origin, Pkg::Attr::description);
-
     std::stringstream commentStream(desc);
     std::string descLine;
     while (std::getline(commentStream, descLine, '\n')) {
-      dataGrid.set(DataColumn::portDescr, descLine);
-      dataGrid.addRow();
-      descLine.clear();
+      pane_[pkgDescr]->print(descLine);
     }
-
-    dataGrid.removeRow();
-    panels_[pkgDescr].content(dataGrid);
   }
 
-  panels_[pkgDescr].requestRefresh();
+  //pane_[pkgDescr].requestRefresh();
 }
 
-std::string Ui::getCategoryFromNameAndSize(const std::string& nameAndSize) const {
-  return nameAndSize.substr(0, nameAndSize.find(" "));
+const Ui::pkgListItem& Ui::getCurrentPkgListItem() const {
+  int index = pane_[pkgList]->getCursorRowNum();
+  return pkgList_[index];
 }
 
-std::string Ui::getSelectedCategoryName() {
-  std::string column = panels_[pkgList].getHighlightedRowContentAtCol(DataColumn::category);
-
-  return getCategoryFromNameAndSize(column);
-}
-
-std::string Ui::getSelectedPortOrigin() {
-  std::string name = getSelectedPortName();
-  std::string category = getSelectedPortCategory();
-
-  return std::string(category + "/" + name);
-}
-
-std::string Ui::getSelectedPortName() {
-  std::string name = panels_[pkgList].getHighlightedRowContentAtCol(DataColumn::portName);
-
-  return name;
-}
-
-std::string Ui::getSelectedPortCategory() {
-  for (long rowNum = panels_[pkgList].getCurrentRowNum(); rowNum >= 0; --rowNum)
-    if (isCategory(panels_[pkgList].getContentAt(rowNum, DataColumn::categoryMarker))) {
-      std::string column = panels_[pkgList].getContentAt(rowNum, DataColumn::category);
-      return getCategoryFromNameAndSize(column);
-    }
-
-  throw std::runtime_error("Ui::getSelectedPortCategory(): Unable to find category for port ["
-                           + getSelectedPortName()
-                           + "]");
+std::string Ui::getSelectedItemName() const {
+  const pkgListItem& item = getCurrentPkgListItem();
+  return item.name;
 }
 
 bool Ui::gotCategorySelected() {
-  std::string selected = panels_[pkgList].getHighlightedRowContentAtCol(DataColumn::categoryMarker);
-
-  return isCategory(selected);
+  const pkgListItem& item = getCurrentPkgListItem();
+  return isCategory(item);
 }
 
-bool Ui::isCategory(const std::string& str) const {
-  return str.find(markerCategory) != std::string::npos;
+bool Ui::isCategory(const pkgListItem& item) const {
+  return item.type == pkgListItemType::category;
 }
-
+  
 void Ui::toggleCategoryFolding(const std::string& category) {
-  if (unfolded_.find(category) != unfolded_.end())
+  if (unfolded_.find(category) != unfolded_.end()) {
     unfolded_[category] = unfolded_[category] == true ? false : true;
-  else
+  } else {
     unfolded_[category] = true;
+  }
 }
 
 void Ui::closeAllFolds() {
   unfolded_.clear();
-  panels_[pkgList].resetPosition();
+  pane_[pkgList]->resetCursorPosition();
 }
 
 void Ui::registerPkgChange(Event::Type event) {
   if (!gotCategorySelected()) {
-    std::string origin = getSelectedPortOrigin();
+    std::string origin = getSelectedItemName();
 
     switch (event) {
       case Event::Type::flagInstall:
@@ -369,17 +325,18 @@ void Ui::registerPkgChange(Event::Type event) {
 
 void Ui::performPending() {
   busy_ = true;
-  std::thread uiHint([this]() {busyStatus(panels_[pkgList]);});
-  uiHint.detach();
+  // XXX implement busy status
+//  std::thread uiHint([this]() {busyStatus(pane_[pkgList]);});
+//  uiHint.detach();
 
   std::thread pendingActions(&Pkg::performPending, &Pkg::instance());
   pendingActions.join();
   busy_ = false;
-  panels_[pkgList].clearStatus();
+//  pane_[pkgList].clearStatus();
 }
 
 void Ui::promptFilter() {
-  panels_[pkgList].clearStatus();
+//  pane_[pkgList].clearStatus();
 
   portal::Event ev;
   portal::Event::Type evType;
@@ -395,23 +352,23 @@ void Ui::promptFilter() {
 
         case 'i':
         case '+':
-          panels_[pkgList].status("Installed");
+//          pane_[pkgList].status("Installed");
           Pkg::instance().filterInstalled();
           break;
 
         case '-':
         case 'a':
-          panels_[pkgList].status("Available");
+//          pane_[pkgList].status("Available");
           Pkg::instance().filterAvailable();
           break;
 
         case 'p':
-          panels_[pkgList].status("Pending");
+//          pane_[pkgList].status("Pending");
           Pkg::instance().filterPending();
           break;
 
         case 'u':
-          panels_[pkgList].status("Upgradable");
+//          pane_[pkgList].status("Upgradable");
           Pkg::instance().filterUpgradable();
           break;
       }
@@ -419,10 +376,12 @@ void Ui::promptFilter() {
 
     default:
       break;
-  } 
+  }
 }
 
+  // XXX implement prompt
 void Ui::promptSearch() const {
+  /*
   gfx::Form form;
   form.label(" Input search pattern ");
   form.draw();
@@ -430,41 +389,87 @@ void Ui::promptSearch() const {
   form.erase();
 
   Pkg::instance().search(query);
+  */
 }
 
-void Ui::setBusyStatus(gfx::Panel& panel, const std::string& status) {
-  panel.status(status);
-  panel.refreshStatus();
+  // XXX implement busy status
+void Ui::setBusyStatus(gfx::Pane& pane, const std::string& status) {
+  /*
+  pane.status(status);
+  pane.refreshStatus();
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  */
 }
 
-void Ui::busyStatus(gfx::Panel& panel) {
+void Ui::busyStatus(gfx::Pane& pane) {
+  /*
   while (busy_) {
-    setBusyStatus(panel, "Please wait.  ");
+    setBusyStatus(pane, "Please wait.  ");
     if (!busy_)
       return;
-    setBusyStatus(panel, "Please wait.. ");
+    setBusyStatus(pane, "Please wait.. ");
     if (!busy_)
       return;
-    setBusyStatus(panel, "Please wait...");
+    setBusyStatus(pane, "Please wait...");
     if (!busy_)
       return;
-    setBusyStatus(panel, "Please wait ..");
+    setBusyStatus(pane, "Please wait ..");
     if (!busy_)
       return;
-    setBusyStatus(panel, "Please wait  .");
+    setBusyStatus(pane, "Please wait  .");
     if (!busy_)
       return;
   }
+  */
 }
 
-void Ui::warningStatus(gfx::Panel& panel, const std::string& status) {
-  std::string oldStatus = panel.getStatus();
-  panel.status(status, gfx::color::RED);
-  panel.refreshStatus();
+void Ui::warningStatus(gfx::Pane& pane, const std::string& status) {
+  /*
+  std::string oldStatus = pane.getStatus();
+  pane.status(status, gfx::color::RED);
+  pane.refreshStatus();
   std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-  panel.status(oldStatus);
-  panel.requestRefresh();
+  pane.status(oldStatus);
+  pane.requestRefresh();
+  */
+}
+
+bool Ui::isCategoryFolded(const std::string& category) const {
+  return unfolded_.find(category) == unfolded_.end() || unfolded_.at(category) == false;
+}
+
+std::string Ui::getStringForCategory(const std::string& category) const {
+  std::string categoryString(markerCategory);
+  if (isCategoryFolded(category)) {
+    categoryString.append(markerFolded);
+  } else {
+    categoryString.append(markerUnfolded);
+  }
+  categoryString.append(" ");
+  categoryString.append(category);
+  categoryString.append(" (");
+  categoryString.append(std::to_string(Pkg::instance().getCategorySize(category)));
+  categoryString.append(")");
+  
+  return categoryString;
+}
+
+std::string Ui::getStringForPkg(const std::string& origin) const {
+  std::string pkgString = Pkg::instance().getCurrentStatusAsString(origin);
+  if (Pkg::instance().hasPendingActions(origin)) {
+    pkgString.append("[");
+    pkgString.append(Pkg::instance().getPendingStatusAsString(origin));
+    pkgString.append("] ");
+  } else if (Pkg::instance().isUpgradable(origin)) {
+    pkgString.append("[^] ");
+  } else {
+    pkgString.append("    ");
+  }
+  pkgString.append(Pkg::instance().getNameFromOrigin(origin));
+  pkgString.append(Pkg::instance().getLocalVersion(origin));
+  pkgString.append(Pkg::instance().getRemoteVersion(origin));
+
+  return pkgString;
 }
 
 }

@@ -28,9 +28,10 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
-#include "panel.h"
 #include "event.h"
+#include "pane.h"
 
 namespace portal {
 
@@ -39,65 +40,60 @@ class Ui {
   static Ui&    instance() {static Ui instance_; return instance_;}
 
   void          display();
-  Event::Type   poll() const;
   void          handleEvent(Event::Type event);
 
  private:
   Ui();
+  ~Ui();
   Ui(const Ui&) = delete;
   void operator=(const Ui&) = delete;
 
-  enum PanelType {
+  enum PaneType {
     pkgList,
-    pkgComment,
     pkgDescr,
     nbtypes
   };
 
-  enum DataColumn {
-    categoryMarker           = 0,
-    portStatus               = 0,
-    portComment              = 0,
-    portDescr                = 0,
-
-    category                 = 1,
-    portName                 = 1,
-
-    portLocalVersion         = 2,
-
-    portRemoteVersion        = 3,
-
-    nbDataColumns            = 4
+  enum pkgListItemType {
+    category,
+    pkg,
+    nbPkgListItemTypes
   };
 
+  struct pkgListItem {
+    pkgListItemType type;
+    std::string     name;
+  };
+  
   bool                           busy_ {false};
 
-  gfx::Panel                     panels_[PanelType::nbtypes];
+  gfx::Pane*                     pane_[PaneType::nbtypes];
   std::map<std::string, bool>    unfolded_;
+  std::vector<pkgListItem>       pkgList_;
 
-  void          setPanelsLayout();
-  void          setColumnsWidth();
-  void          updatePanels();
-  void          updatePkgListPanel(const std::vector<std::string>& origins);
-  void          updatePkgListPanel();
-  void          updatePkgCommentPanel();
-  void          updatePkgDescrPanel();
-  std::string   getCategoryFromNameAndSize(const std::string& nameAndSize) const;
-  std::string   getSelectedCategoryName();
-  std::string   getSelectedPortOrigin();
-  std::string   getSelectedPortName();
-  std::string   getSelectedPortCategory();
-  bool          gotCategorySelected();
-  bool          isCategory(const std::string& str) const;
-  void          toggleCategoryFolding(const std::string& category);
-  void          closeAllFolds();
-  void          registerPkgChange(Event::Type event);
-  void          performPending();
-  void          promptFilter();
-  void          promptSearch() const;
-  void          setBusyStatus(gfx::Panel& panel, const std::string& status);
-  void          busyStatus(gfx::Panel& panel);
-  void          warningStatus(gfx::Panel& panel, const std::string& status);
+  
+  void                createPanes();
+  void                updatePanes();
+  void                buildPkgList();
+  void                updatePkgListPane(const std::vector<std::string>& origins);
+  void                updatePkgListPane();
+  void                updatePkgDescrPane();
+  const pkgListItem&  getCurrentPkgListItem() const;
+  std::string         getSelectedItemName() const;
+  bool                gotCategorySelected();
+  bool                isCategory(const pkgListItem& str) const;
+  void                toggleCategoryFolding(const std::string& category);
+  void                closeAllFolds();
+  void                registerPkgChange(Event::Type event);
+  void                performPending();
+  void                promptFilter();
+  void                promptSearch() const;
+  void                setBusyStatus(gfx::Pane& pane, const std::string& status);
+  void                busyStatus(gfx::Pane& pane);
+  void                warningStatus(gfx::Pane& pane, const std::string& status);
+  bool                isCategoryFolded(const std::string& category) const;
+  std::string         getStringForCategory(const std::string& category) const;
+  std::string         getStringForPkg(const std::string& origin) const;
 };
 
 }

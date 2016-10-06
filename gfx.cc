@@ -30,23 +30,9 @@
 
 #include "gfx.h"
 
+namespace portal {
 namespace gfx {
 
-// List of usable utf8 codes:
-// http://unicode-table.com/en/blocks/
-Sprite SP_BOT_LEFT          = 0x2570;
-Sprite SP_BOT_RIGHT         = 0x256F;
-Sprite SP_TOP_LEFT          = 0x256D;
-Sprite SP_TOP_RIGHT         = 0x256E;
-Sprite SP_HORIZ_BAR         = 0x2500;
-Sprite SP_VERT_BAR          = 0x2502;
-Sprite SP_DBLE_HORIZ_BAR    = 0x2550;
-Sprite SP_DBLE_VERT_BAR     = 0x2551;
-Sprite SP_HORIZ_OPENG_BAR   = 0x2524;
-Sprite SP_HORIZ_CLOSEG_BAR  = 0x251C;
-Sprite SP_SCROLL_ARROW_UP   = 0x1F879; // slim arrow: 0x1F845;
-Sprite SP_SCROLL_ARROW_DOWN = 0x1F87B; // slim arrow: 0x1F847;
- 
 const Attr ATTR_NORMAL            = A_NORMAL;
 const Attr ATTR_BOLD              = A_BOLD;
 const Attr ATTR_REVERSE           = A_REVERSE;
@@ -64,22 +50,6 @@ namespace color {
   const Color WHITE    = COLOR_WHITE;
 }
 
-void useAsciiOnly() {
-  SP_BOT_LEFT          = '\\';
-  SP_BOT_RIGHT         = '/';
-  SP_TOP_LEFT          = '/';
-  SP_TOP_RIGHT         = '\\';
-  SP_HORIZ_BAR         = '-';
-  SP_VERT_BAR          = '|';
-  SP_DBLE_HORIZ_BAR    = '=';
-  SP_DBLE_VERT_BAR     = '|';
-  SP_HORIZ_OPENG_BAR   = '|';
-  SP_HORIZ_CLOSEG_BAR  = '|';
-  SP_SCROLL_ARROW_UP   = '^';
-  SP_SCROLL_ARROW_DOWN = 'v';
-}
-
-// XXX overload dereference operator to get ptr
 struct Window {
   WINDOW* ptr;
 };
@@ -116,8 +86,7 @@ struct Size Gfx::getScreenSize() const {
   int height, width;
   getmaxyx(stdscr, height, width);
 
-  return {static_cast<unsigned long>(height),
-          static_cast<unsigned long>(width)};
+  return {height, width};
 }
 
 void Gfx::plot(Point point, uint32_t symbol, Attr attr) const {
@@ -125,7 +94,7 @@ void Gfx::plot(Point point, uint32_t symbol, Attr attr) const {
 }
 
 void Gfx::write(Point point, const std::string& str, Attr attr) const {
-  unsigned long x = point.x;
+  int x = point.x;
 
   for (const char& c : str) {
     plot({x++, point.y}, c, attr);
@@ -141,4 +110,5 @@ uint32_t Gfx::getCharacter(Point point) const {
   return mvwinch(mainWin_->ptr, point.y, point.x) | A_CHARTEXT;
 }
 
+}
 }

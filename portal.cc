@@ -31,7 +31,6 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "gfx.h"
 #include "ui.h"
 #include "event.h"
 #include "pkg.h"
@@ -44,17 +43,14 @@ void version(void) {
 }
 
 void usage(void) {
-  std::cerr << "usage: portal [-v] [-a]" << std::endl;
+  std::cerr << "usage: portal [-v]" << std::endl;
   exit(1);
 }
 
 int main(int argc, char** argv) {
   int opt;
-  while ((opt = getopt(argc, argv, "av")) != -1) {
+  while ((opt = getopt(argc, argv, "v")) != -1) {
     switch (opt) {
-      case 'a':
-        gfx::useAsciiOnly();
-        break;
       case 'v':
         version();
         break;
@@ -67,13 +63,14 @@ int main(int argc, char** argv) {
   Ui::instance().display();
 
   try {
-    Event::Type event;
-    while ((event = Ui::instance().poll()) != Event::Type::quit) {
-      Ui::instance().handleEvent(event);
+    Event::Type eventType;
+    Event event;
+    while ((eventType = event.poll()) != Event::Type::quit) {
+      Ui::instance().handleEvent(eventType);
       Ui::instance().display();
     }
   }
-  catch (std::exception & e) {
+  catch (std::exception& e) {
     syslog(LOG_ERR, "%s", e.what());
   }
 

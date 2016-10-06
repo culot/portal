@@ -348,11 +348,11 @@ const Pkg::Port& Pkg::getPort(const std::string& origin) const {
   throw std::runtime_error("Pkg::getPort(): port [" + origin + "] not found");
 }
 
-std::string Pkg::getCategoryFromOrigin(const std::string & origin) const {
+std::string Pkg::getCategoryFromOrigin(const std::string& origin) const {
   return std::string(origin, 0, origin.find('/'));
 }
 
-std::string Pkg::getNameFromOrigin(const std::string & origin) const {
+std::string Pkg::getNameFromOrigin(const std::string& origin) const {
   return std::string(origin, origin.find('/') + 1);
 }
 
