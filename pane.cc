@@ -60,13 +60,13 @@ class Pane::Impl {
      |                                   screen |
      +------------------------------------------+
   */
-  Size  sizePad    {LINES, COLS};
-  Size  sizeView   {LINES, COLS};
+  Size sizePad;
+  Size sizeView;
 
-  Pos   posPad     {0, 0};
-  Pos   posView    {0, 0};
-  Pos   posCursor  {0, 0};
-  Pos   posPrint   {0, 0};
+  Point posPad;
+  Point posView;
+  Point posCursor;
+  Point posPrint;
 
   bool cursorLineHighlight {true};
   bool borders             {true};
@@ -87,21 +87,23 @@ class Pane::Impl {
 };
 
 
+/*
 Pane::Pane() : impl_{new Impl} {
   impl_->createPane();
 }
+*/
 
-Pane::Pane(const Size& size, const Pos& pos) : impl_{new Impl} {
+Pane::Pane(const Size& size, const Point& pos) : impl_{new Impl} {
   impl_->sizeView = size;
-  impl_->sizePad.width = size.width - 2;
-  impl_->sizePad.height = size.width - 2;
+  impl_->sizePad.setWidth(size.width() - 2);
+  impl_->sizePad.setHeight(size.width() - 2);
   impl_->posView = pos;
   impl_->createPane();
 }
 
 void Pane::Impl::createPane() {
-  win = newwin(sizeView.height, sizeView.width, posView.y, posView.x);
-  pad = newpad(sizePad.height, sizePad.width);
+  win = newwin(sizeView.height(), sizeView.width(), posView.y(), posView.x());
+  pad = newpad(sizePad.height(), sizePad.width());
   box(win, 0, 0);
   wnoutrefresh(win);
 }
@@ -124,19 +126,19 @@ void Pane::borders(bool borders) {
 }
 
 int Pane::getCursorRowNum() const {
-  return impl_->posCursor.y;
+  return impl_->posCursor.y();
 }
 
 void Pane::draw() {
   impl_->highlightCursorLine();
   impl_->drawScrollBar();
   pnoutrefresh(impl_->pad,
-               impl_->posPad.y,
-               impl_->posPad.x,
-               impl_->posView.y + (impl_->borders ? 1 : 0),
-               impl_->posView.x + 1,
-               impl_->posView.y + impl_->sizeView.height - (impl_->borders ? 2 : 0),
-               impl_->posView.x + impl_->sizeView.width - 2);
+               impl_->posPad.y(),
+               impl_->posPad.x(),
+               impl_->posView.y() + (impl_->borders ? 1 : 0),
+               impl_->posView.x() + 1,
+               impl_->posView.y() + impl_->sizeView.height() - (impl_->borders ? 2 : 0),
+               impl_->posView.x() + impl_->sizeView.width() - 2);
   wnoutrefresh(impl_->win);
 }
 
@@ -146,42 +148,42 @@ void Pane::clear() {
 
 void Pane::newline() {
   impl_->extendPrintArea();
-  ++impl_->posPrint.y;
+  impl_->posPrint.setY(impl_->posPrint.y() + 1);
 }
 
 void Pane::print(const std::string& line, Align align) {
   int xpos;
   switch (align) {
   case Align::left:
-    xpos = impl_->posPad.x;
+    xpos = impl_->posPad.x();
     break;
   case Align::center:
-    xpos = (impl_->sizeView.width - line.length()) / 2;
+    xpos = (impl_->sizeView.width() - line.length()) / 2;
     break;
   case Align::right:
-    xpos = impl_->sizeView.width - line.length() - 2 - (impl_->borders ? 1 : 0);
+    xpos = impl_->sizeView.width() - line.length() - 2 - (impl_->borders ? 1 : 0);
     break;
   }
 
-  mvwaddstr(impl_->pad, impl_->posPrint.y, xpos, line.c_str());
+  mvwaddstr(impl_->pad, impl_->posPrint.y(), xpos, line.c_str());
 }
 
 void Pane::scrollDown() {
   if (impl_->isCursorOnLastVisibleLine()) {
-    ++impl_->posPad.y;
+    impl_->posPad.setY(impl_->posPad.y() + 1);
   }
 }
 
 void Pane::scrollUp() {
   if (impl_->isCursorOnFirstVisibleLine()) {
-    --impl_->posPad.y;
+    impl_->posPad.setY(impl_->posPad.y() - 1);
   }
 }
 
 void Pane::moveCursorDown() {
   if (!impl_->isCursorOnLastLine()) {
     impl_->unhighlightCursorLine();
-    ++impl_->posCursor.y;
+    impl_->posCursor.setY(impl_->posCursor.y() + 1);
     scrollDown();    
   }
 }
@@ -189,21 +191,21 @@ void Pane::moveCursorDown() {
 void Pane::moveCursorUp() {
   if (!impl_->isCursorOnFirstLine()) {
     impl_->unhighlightCursorLine();
-    --impl_->posCursor.y;
+    impl_->posCursor.setY(impl_->posCursor.y() - 1);
     scrollUp();    
   }
 }
 
 void Pane::resetCursorPosition() {
-  impl_->posCursor.y = 0;
-  impl_->posPad.y = 0;
+  impl_->posCursor.setY(0);
+  impl_->posPad.setY(0);
 }
 
 void Pane::colorizeCurrentLine(short cursesColorNum) const {
   mvwchgat(impl_->pad,
-           impl_->posCursor.y,
+           impl_->posCursor.y(),
            0,
-           impl_->sizePad.width,
+           impl_->sizePad.width(),
            A_NORMAL,
            cursesColorNum,
            nullptr);
@@ -211,40 +213,40 @@ void Pane::colorizeCurrentLine(short cursesColorNum) const {
 
 void Pane::Impl::clearPrintArea() {
   werase(pad);
-  posPrint.y = 0;
+  posPrint.setY(0);
 }
 
 void Pane::Impl::drawScrollBar() {
   if (canScrollUp()) {
     mvwaddch(win,
              (borders ? 1 : 0),
-             sizeView.width - 1 - (borders ? 1 : 0),
+             sizeView.width() - 1 - (borders ? 1 : 0),
              ACS_UARROW | A_BOLD);
   }
   if (canScrollDown()) {
     mvwaddch(win,
-             sizeView.height - 1 - (borders ? 1 : 0),
-             sizeView.width - 1 - (borders ? 1 : 0),
+             sizeView.height() - 1 - (borders ? 1 : 0),
+             sizeView.width() - 1 - (borders ? 1 : 0),
              ACS_DARROW | A_BOLD);
   }
 }
 
 void Pane::Impl::extendPrintArea() {
-  if (posPrint.y >= sizePad.height) {
-    sizePad.height *= 2;
-    wresize(pad, sizePad.height, sizePad.width);
+  if (posPrint.y() >= sizePad.height()) {
+    sizePad.setHeight(sizePad.height() * 2);
+    wresize(pad, sizePad.height(), sizePad.width());
   }
 }
 
 void Pane::Impl::highlightCursorLine() {
   if (cursorLineHighlight) {
-    mvwchgat(pad, posCursor.y, 0, sizePad.width, A_REVERSE, 0, nullptr);
+    mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_REVERSE, 0, nullptr);
   }
 }
 
 void Pane::Impl::unhighlightCursorLine() {
   if (cursorLineHighlight) {
-    mvwchgat(pad, posCursor.y, 0, sizePad.width, A_NORMAL, 0, nullptr);
+    mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_NORMAL, 0, nullptr);
   }
 }
 
@@ -266,27 +268,27 @@ void Pane::Impl::toggleBorders() {
 }
 
 bool Pane::Impl::isCursorOnFirstLine() const {
-  return posCursor.y == 0;
+  return posCursor.y() == 0;
 }
 
 bool Pane::Impl::isCursorOnLastLine() const {
-  return posCursor.y == posPrint.y - (borders ? 2 : 0) - 1;
+  return posCursor.y() == posPrint.y() - (borders ? 2 : 0) - 1;
 }
 
 bool Pane::Impl::isCursorOnFirstVisibleLine() const {
-  return posCursor.y == posPad.y - (borders ? 1 : 0);
+  return posCursor.y() == posPad.y() - (borders ? 1 : 0);
 }
 
 bool Pane::Impl::isCursorOnLastVisibleLine() const {
-  return posCursor.y == sizeView.height + posPad.y - (borders ? 2 : 0);
+  return posCursor.y() == sizeView.height() + posPad.y() - (borders ? 2 : 0);
 }
 
 bool Pane::Impl::canScrollUp() const {
-  return posPad.y > 0;
+  return posPad.y() > 0;
 }
 
 bool Pane::Impl::canScrollDown() const {
-  return posPrint.y - posPad.y > sizeView.height;
+  return posPrint.y() - posPad.y() > sizeView.height();
 }
 
 }

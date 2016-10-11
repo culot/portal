@@ -26,63 +26,19 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-
 namespace portal {
 namespace gfx {
 
-using Attr = uint32_t;
+class Point {
+public:
+  void setX(int x) {x_ = x;}
+  void setY(int y) {y_ = y;}
+  int  x() const {return x_;}
+  int  y() const {return y_;}
 
-extern const Attr ATTR_NORMAL;
-extern const Attr ATTR_BOLD;
-extern const Attr ATTR_REVERSE;
-extern const Attr ATTR_UNDERLINE;
-
-using Color = uint32_t;
-
-namespace color {
-  extern const Color DEFAULT;
-  extern const Color BLACK;
-  extern const Color RED;
-  extern const Color GREEN;
-  extern const Color YELLOW;
-  extern const Color BLUE;
-  extern const Color MAGENTA;
-  extern const Color CYAN;
-  extern const Color WHITE;
-}
-
-struct Point {
-  int x;
-  int y;
-};
-
-struct Size {
-  int height;
-  int width;
-};
-
-class Gfx {
- public:
-  static Gfx&  instance() {static Gfx instance_; return instance_;}
-  void         refresh() const;
-  void         reinit() const;
-  struct Size  getScreenSize() const;
-  void         plot(Point point, uint32_t symbol, Attr attr = ATTR_NORMAL) const;
-  void         write(Point point, const std::string& str, Attr attr = ATTR_NORMAL) const;
-  void         setAttributes(Point point, Attr fg, Attr bg) const;
-
- private:
-  // XXX Record window size to avoid calling getScreenSize() all the time
-  struct Window*      mainWin_;
-
-  Gfx();
-  ~Gfx();
-  Gfx(const Gfx&) = delete;
-  void operator=(const Gfx&) = delete;
-
-  uint32_t     getCharacter(Point point) const;
+private:
+  int x_ {0};
+  int y_ {0};
 };
 
 }

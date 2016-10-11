@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -26,49 +26,19 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "point.h"
-#include "size.h"
-
 namespace portal {
 namespace gfx {
 
-class Pane {
- public:
+class Size {
+public:
+  void setWidth(int width) {width_ = width;}
+  void setHeight(int height) {height_ = height;}
+  int  width() const {return width_;}
+  int  height() const {return height_;}
 
-  enum class Align {
-    left,
-    center,
-    right
-  };
-
-//  Pane();
-  Pane(const Size& size, const Point& pos);
-  ~Pane();
-
-  // XXX check which methods could be marked as const
-  void cursorLineHighlight(bool highlight);
-  void borders(bool borders);
-  int  getCursorRowNum() const;
-  void draw();
-  void clear();
-  void newline();
-  void print(const std::string& line, Align align = Align::left);
-  void scrollDown();
-  void scrollUp();
-  void moveCursorDown();
-  void moveCursorUp();
-  void resetCursorPosition();
-  void colorizeCurrentLine(short cursesColorNum) const;
-
- private:
-  class Impl;
-  std::unique_ptr<Impl> impl_;
-
-  Pane(const Pane&) = delete;
-  void operator=(const Pane&) = delete;
+private:
+  int width_  {0};
+  int height_ {0};
 };
 
 }

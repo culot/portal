@@ -34,7 +34,8 @@
 #include <curses.h>
 
 #include "pkg.h"
-
+#include "point.h"
+#include "size.h"
 #include "ui.h"
 
 namespace portal {
@@ -185,13 +186,20 @@ void Ui::handleEvent(Event::Type event) {
     +------------------------------+ 
  */
 void Ui::createPanes() {
-  int screenHeight, screenWidth;
-  getmaxyx(stdscr, screenHeight, screenWidth);
-  int pkgPaneHeight = screenHeight * .6;
-  int descrPaneHeight = screenHeight - pkgPaneHeight - 1;
+  int pkgPaneHeight = LINES * .6;
+  int descrPaneHeight = LINES - pkgPaneHeight - 1;
 
-  pane_[pkgList] = new gfx::Pane({screenWidth, pkgPaneHeight}, {0, 0});
-  pane_[pkgDescr] = new gfx::Pane({screenWidth, descrPaneHeight}, {0, pkgPaneHeight});
+  gfx::Size listSize, descrSize;
+  listSize.setWidth(COLS);
+  listSize.setHeight(pkgPaneHeight);
+  descrSize.setWidth(COLS);
+  descrSize.setHeight(descrPaneHeight);
+
+  gfx::Point listPos, descrPos;
+  descrPos.setY(pkgPaneHeight);
+
+  pane_[pkgList] = new gfx::Pane(listSize, listPos);
+  pane_[pkgDescr] = new gfx::Pane(descrSize, descrPos);
   pane_[pkgDescr]->borders(false);
   pane_[pkgDescr]->cursorLineHighlight(false);
 }
@@ -456,7 +464,7 @@ std::string Ui::getStringForCategory(const std::string& category) const {
   categoryString.append(" (");
   categoryString.append(std::to_string(Pkg::instance().getCategorySize(category)));
   categoryString.append(")");
-  
+
   return categoryString;
 }
 
