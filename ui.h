@@ -94,6 +94,7 @@ class Ui {
   bool                isCategoryFolded(const std::string& category) const;
   std::string         getStringForCategory(const std::string& category) const;
   std::string         getStringForPkg(const std::string& origin) const;
+  std::string         getVersionsForPkg(const std::string& origin) const;
 };
 
 }

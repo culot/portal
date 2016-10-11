@@ -233,22 +233,27 @@ void Ui::updatePkgListPane() {
   buildPkgList();
   pane_[pkgList]->clear();
   for (const auto& item : pkgList_) {
-    std::string itemString;
     switch (item.type) {
-    case pkgListItemType::category:
-      itemString = getStringForCategory(item.name);
-      break;
-    case pkgListItemType::pkg:
-      itemString = getStringForPkg(item.name);
+    case pkgListItemType::category: {
+      std::string categoryString = getStringForCategory(item.name);
+      pane_[pkgList]->print(categoryString);
+    }
+    break;
+    case pkgListItemType::pkg: {
+      std::string pkgString = getStringForPkg(item.name);
+      pane_[pkgList]->print(pkgString);
+      std::string pkgVersions = getVersionsForPkg(item.name);
+      pane_[pkgList]->print(pkgVersions, gfx::Pane::Align::right);
       //if (Pkg::instance().hasPendingActions(item.name)) {
         // XXX change attributes
         //pane_[pkgList].addRowAttributes(dataGrid.height() - 1, gfx::ATTR_BOLD);
       //}
-      break;
+    }
+    break;
     default:
       break;
     }
-    pane_[pkgList]->print(itemString);
+    pane_[pkgList]->newline();
   }
 }
 
@@ -265,6 +270,7 @@ void Ui::updatePkgDescrPane() {
     std::stringstream commentStream(desc);
     std::string descLine;
     while (std::getline(commentStream, descLine, '\n')) {
+      pane_[pkgDescr]->newline();
       pane_[pkgDescr]->print(descLine);
     }
   }
@@ -466,10 +472,18 @@ std::string Ui::getStringForPkg(const std::string& origin) const {
     pkgString.append("    ");
   }
   pkgString.append(Pkg::instance().getNameFromOrigin(origin));
-  pkgString.append(Pkg::instance().getLocalVersion(origin));
-  pkgString.append(Pkg::instance().getRemoteVersion(origin));
 
   return pkgString;
+}
+
+std::string Ui::getVersionsForPkg(const std::string& origin) const {
+  std::string pkgVersions = Pkg::instance().getLocalVersion(origin);
+  if (!pkgVersions.empty()) {
+    pkgVersions.append("    ");
+  }
+  pkgVersions.append(Pkg::instance().getRemoteVersion(origin));
+
+  return pkgVersions;
 }
 
 }

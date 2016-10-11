@@ -35,6 +35,12 @@ namespace gfx {
 class Pane {
  public:
 
+  enum class Align {
+    left,
+    center,
+    right
+  };
+
   struct Size {
     int width;
     int height;
@@ -55,7 +61,8 @@ class Pane {
   int  getCursorRowNum() const;
   void draw();
   void clear();
-  void print(const std::string& line);
+  void newline();
+  void print(const std::string& line, Align align = Align::left);
   void scrollDown();
   void scrollUp();
   void moveCursorDown();

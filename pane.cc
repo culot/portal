@@ -144,9 +144,26 @@ void Pane::clear() {
   impl_->clearPrintArea();
 }
 
-void Pane::print(const std::string& line) {
+void Pane::newline() {
   impl_->extendPrintArea();
-  mvwaddstr(impl_->pad, impl_->posPrint.y++, impl_->posPad.x, line.c_str());
+  ++impl_->posPrint.y;
+}
+
+void Pane::print(const std::string& line, Align align) {
+  int xpos;
+  switch (align) {
+  case Align::left:
+    xpos = impl_->posPad.x;
+    break;
+  case Align::center:
+    xpos = (impl_->sizeView.width - line.length()) / 2;
+    break;
+  case Align::right:
+    xpos = impl_->sizeView.width - line.length() - 2 - (impl_->borders ? 1 : 0);
+    break;
+  }
+
+  mvwaddstr(impl_->pad, impl_->posPrint.y, xpos, line.c_str());
 }
 
 void Pane::scrollDown() {
