@@ -47,12 +47,11 @@ class Pane {
   Pane(const Size& size, const Point& pos);
   ~Pane();
 
-  // XXX check which methods could be marked as const
   void cursorLineHighlight(bool highlight);
   void cursorLineUnderline(bool underline);
   void borders(bool borders);
   int  getCursorRowNum() const;
-  void draw();
+  void draw() const;
   void clear();
   void newline();
   void print(const std::string& line, Align align = Align::left);

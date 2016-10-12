@@ -76,8 +76,8 @@ class Pane::Impl {
   void extendPrintArea();
   void clearPrintArea();
   void drawScrollBar();
-  void applyCursorLineStyle();
-  void resetCursorLineStyle();
+  void applyCursorLineStyle() const;
+  void resetCursorLineStyle() const;
   void toggleBorders();
   bool isCursorOnFirstLine() const;
   bool isCursorOnLastLine() const;
@@ -128,7 +128,7 @@ int Pane::getCursorRowNum() const {
   return impl_->posCursor.y();
 }
 
-void Pane::draw() {
+void Pane::draw() const {
   impl_->applyCursorLineStyle();
   impl_->drawScrollBar();
   pnoutrefresh(impl_->pad,
@@ -241,7 +241,7 @@ void Pane::Impl::extendPrintArea() {
   }
 }
 
-void Pane::Impl::applyCursorLineStyle() {
+void Pane::Impl::applyCursorLineStyle() const {
   if (cursorLineHighlight) {
     mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_REVERSE, 0, nullptr);
   }
@@ -250,7 +250,7 @@ void Pane::Impl::applyCursorLineStyle() {
   }
 }
 
-void Pane::Impl::resetCursorLineStyle() {
+void Pane::Impl::resetCursorLineStyle() const {
   mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_NORMAL, 0, nullptr);
 }
 
