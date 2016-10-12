@@ -69,14 +69,15 @@ class Pane::Impl {
   Point posPrint;
 
   bool cursorLineHighlight {true};
+  bool cursorLineUnderline {false};
   bool borders             {true};
 
   void createPane();
   void extendPrintArea();
   void clearPrintArea();
   void drawScrollBar();
-  void highlightCursorLine();
-  void unhighlightCursorLine();
+  void applyCursorLineStyle();
+  void resetCursorLineStyle();
   void toggleBorders();
   bool isCursorOnFirstLine() const;
   bool isCursorOnLastLine() const;
@@ -86,12 +87,6 @@ class Pane::Impl {
   bool canScrollDown() const;
 };
 
-
-/*
-Pane::Pane() : impl_{new Impl} {
-  impl_->createPane();
-}
-*/
 
 Pane::Pane(const Size& size, const Point& pos) : impl_{new Impl} {
   impl_->sizeView = size;
@@ -117,6 +112,10 @@ void Pane::cursorLineHighlight(bool highlight) {
   impl_->cursorLineHighlight = highlight;
 }
 
+void Pane::cursorLineUnderline(bool underline) {
+  impl_->cursorLineUnderline = underline;
+}
+
 void Pane::borders(bool borders) {
   if (impl_->borders != borders) {
     werase(impl_->win);
@@ -130,7 +129,7 @@ int Pane::getCursorRowNum() const {
 }
 
 void Pane::draw() {
-  impl_->highlightCursorLine();
+  impl_->applyCursorLineStyle();
   impl_->drawScrollBar();
   pnoutrefresh(impl_->pad,
                impl_->posPad.y(),
@@ -180,9 +179,13 @@ void Pane::scrollUp() {
   }
 }
 
+void Pane::moveCursor(const Point& pos) {
+  impl_->posCursor = pos;
+}
+
 void Pane::moveCursorDown() {
   if (!impl_->isCursorOnLastLine()) {
-    impl_->unhighlightCursorLine();
+    impl_->resetCursorLineStyle();
     impl_->posCursor.setY(impl_->posCursor.y() + 1);
     scrollDown();    
   }
@@ -190,7 +193,7 @@ void Pane::moveCursorDown() {
 
 void Pane::moveCursorUp() {
   if (!impl_->isCursorOnFirstLine()) {
-    impl_->unhighlightCursorLine();
+    impl_->resetCursorLineStyle();
     impl_->posCursor.setY(impl_->posCursor.y() - 1);
     scrollUp();    
   }
@@ -238,16 +241,17 @@ void Pane::Impl::extendPrintArea() {
   }
 }
 
-void Pane::Impl::highlightCursorLine() {
+void Pane::Impl::applyCursorLineStyle() {
   if (cursorLineHighlight) {
     mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_REVERSE, 0, nullptr);
   }
+  if (cursorLineUnderline) {
+    mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_UNDERLINE, 0, nullptr);
+  }
 }
 
-void Pane::Impl::unhighlightCursorLine() {
-  if (cursorLineHighlight) {
-    mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_NORMAL, 0, nullptr);
-  }
+void Pane::Impl::resetCursorLineStyle() {
+  mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_NORMAL, 0, nullptr);
 }
 
 void Pane::Impl::toggleBorders() {

@@ -44,12 +44,12 @@ class Pane {
     right
   };
 
-//  Pane();
   Pane(const Size& size, const Point& pos);
   ~Pane();
 
   // XXX check which methods could be marked as const
   void cursorLineHighlight(bool highlight);
+  void cursorLineUnderline(bool underline);
   void borders(bool borders);
   int  getCursorRowNum() const;
   void draw();
@@ -58,6 +58,7 @@ class Pane {
   void print(const std::string& line, Align align = Align::left);
   void scrollDown();
   void scrollUp();
+  void moveCursor(const Point& pos);
   void moveCursorDown();
   void moveCursorUp();
   void resetCursorPosition();
