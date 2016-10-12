@@ -47,11 +47,12 @@ const std::string markerUnfolded("\\");
 Ui::Ui() {
   initscr();
 
-  // XXX more elegant color definitions to be used (enum?)
+  // XXX Need more elegant color definitions (enum?)
+  // XXX Need to deal with B&W terminals
   if (has_colors() && start_color() == OK) {
     init_pair(1, COLOR_CYAN, COLOR_BLUE);
   } else {
-    // XXX deal with b&w terminals
+    throw std::runtime_error("Sorry, B&W terminals not supported yet");
   }
 
   cbreak();
@@ -158,9 +159,7 @@ void Ui::handleEvent(Event::Type event) {
       break;
 
     case Event::Type::redraw:
-      for (auto& pane : pane_)
-        //pane->requestRefresh();
-        pane->draw();
+      display();
       break;
 
     default:

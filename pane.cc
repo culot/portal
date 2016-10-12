@@ -255,19 +255,6 @@ void Pane::Impl::resetCursorLineStyle() const {
 }
 
 void Pane::Impl::toggleBorders() {
-  /*
-  if (borders) {
-    // You're right, borders are overrated, let's get rid of those
-    sizePad.width += 2;
-    sizePad.height += 2;
-    borders = false;
-  } else {
-    // Gimme back my borders, you punk!
-    sizePad.width -= 2;
-    sizePad.height -= 2;
-    borders = true;
-  }
-  */
   borders = !borders;
 }
 
@@ -276,7 +263,7 @@ bool Pane::Impl::isCursorOnFirstLine() const {
 }
 
 bool Pane::Impl::isCursorOnLastLine() const {
-  return posCursor.y() == posPrint.y() - (borders ? 2 : 0) - 1;
+return posCursor.y() == posPrint.y() - (borders ? 1 : 0);
 }
 
 bool Pane::Impl::isCursorOnFirstVisibleLine() const {
@@ -292,7 +279,7 @@ bool Pane::Impl::canScrollUp() const {
 }
 
 bool Pane::Impl::canScrollDown() const {
-  return posPrint.y() - posPad.y() > sizeView.height();
+return posPrint.y() - posPad.y() > sizeView.height() - (borders ? 2 : 0);
 }
 
 }
