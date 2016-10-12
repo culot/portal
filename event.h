@@ -52,10 +52,8 @@ class Event {
     quit
   };
 
-  std::tuple<Type, char>    getRawInput() const;
-  Type                      poll() const;
-
- private:
+  std::tuple<Type, int>  getRawInput() const;
+  Type                   poll() const;
 };
 
 }

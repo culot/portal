@@ -30,17 +30,16 @@
 
 namespace portal {
 
-std::tuple<Event::Type, char> Event::getRawInput() const {
-  char c = '\0';
-
-  int event = getch();
-  switch (event) {
+std::tuple<Event::Type, int> Event::getRawInput() const {
+  int ch = getch();
+  switch (ch) {
     case KEY_BACKSPACE:
-      return std::make_tuple(Type::keyBackspace, c);
+      return std::make_tuple(Type::keyBackspace, ch);
     case KEY_ENTER:
-      return std::make_tuple(Type::select, c);
+    case '\n':
+      return std::make_tuple(Type::select, ch);
     default:
-      return std::make_tuple(Type::keyPressed, c);
+      return std::make_tuple(Type::keyPressed, ch);
   }
 }
 
@@ -80,6 +79,7 @@ Event::Type Event::poll() const {
       //        case TB_KEY_CTRL_F:
       return Type::pageDown;
     case KEY_ENTER:
+    case '\n':
     case ' ':
       return Type::select;
       /*
