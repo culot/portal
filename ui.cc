@@ -70,10 +70,6 @@ Ui::Ui() {
 }
 
 Ui::~Ui() {
-  // XXX simpler to use a shared ptr and remove the dctor
-  for (auto& pane : pane_) {
-    delete pane;
-  }
   clear();
   endwin();
 }
@@ -198,8 +194,8 @@ void Ui::createPanes() {
   gfx::Point listPos, descrPos;
   descrPos.setY(pkgPaneHeight);
 
-  pane_[pkgList] = new gfx::Pane(listSize, listPos);
-  pane_[pkgDescr] = new gfx::Pane(descrSize, descrPos);
+  pane_[pkgList] = std::unique_ptr<gfx::Pane>(new gfx::Pane(listSize, listPos));
+  pane_[pkgDescr] = std::unique_ptr<gfx::Pane>(new gfx::Pane(descrSize, descrPos));
   pane_[pkgDescr]->borders(false);
   pane_[pkgDescr]->cursorLineHighlight(false);
 }

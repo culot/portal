@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "pane.h"
@@ -37,14 +38,13 @@ namespace gfx {
 class Prompt {
  public:
   Prompt(const Point& y, int len);
-  ~Prompt();
 
   std::string getInput();
 
  private:
-  Pane*  pane_;
+  std::unique_ptr<Pane> pane_;
 
-  void   draw();
+  void draw();
 };
 
 }

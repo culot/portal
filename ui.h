@@ -26,9 +26,10 @@
 
 #pragma once
 
-#include <map>
+#include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "event.h"
 #include "pane.h"
@@ -67,7 +68,7 @@ class Ui {
   
   bool                           busy_ {false};
 
-  gfx::Pane*                     pane_[PaneType::nbtypes];
+  std::unique_ptr<gfx::Pane>     pane_[PaneType::nbtypes];
   std::map<std::string, bool>    unfolded_;
   std::vector<pkgListItem>       pkgList_;
 

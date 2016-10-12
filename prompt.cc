@@ -42,15 +42,11 @@ Prompt::Prompt(const Point& pos, int len) {
   panePos.setX(pos.x() - 1);
   panePos.setY(pos.y() - 1);
 
-  pane_ = new Pane(paneSize, panePos);
+  pane_ = std::unique_ptr<Pane>(new Pane(paneSize, panePos));
   pane_->borders(false);
   pane_->cursorLineHighlight(false);
   pane_->cursorLineUnderline(true);
   draw();
-}
-
-Prompt::~Prompt() {
-  delete pane_;
 }
 
 std::string Prompt::getInput() {
