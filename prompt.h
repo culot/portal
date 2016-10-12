@@ -28,23 +28,24 @@
 
 #include <string>
 
-#include "gfx.h"
+#include "pane.h"
+#include "point.h"
 
+namespace portal {
 namespace gfx {
 
 class Prompt {
  public:
-  Prompt(Point pos, unsigned long len);
-  std::string    getInput();
+  Prompt(const Point& y, int len);
+  ~Prompt();
+
+  std::string getInput();
 
  private:
-  Point          origin_;
-  Point          cursorPos_;
-  unsigned long  length_;
+  Pane*  pane_;
 
-  void           drawCursor() const;
-  void           moveCursorForward();
-  void           moveCursorBackward();
+  void   draw();
 };
 
+}
 }

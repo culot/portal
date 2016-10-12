@@ -25,62 +25,63 @@
  */
 
 #include <tuple>
+#include <curses.h>
 
 #include "event.h"
-
+#include "size.h"
 #include "prompt.h"
 
+namespace portal {
 namespace gfx {
 
-Prompt::Prompt(Point pos, unsigned long len)
-    : origin_(pos),
-      cursorPos_(pos),
-      length_(len) {}
+Prompt::Prompt(const Point& pos, int len) {
+  Size paneSize;
+  paneSize.setHeight(3);
+  paneSize.setWidth(len + 2);
+  Point panePos;
+  panePos.setX(pos.x() - 1);
+  panePos.setY(pos.y() - 1);
+
+  pane_ = new Pane(paneSize, panePos);
+  pane_->borders(false);
+  pane_->cursorLineHighlight(false);
+  pane_->cursorLineUnderline(true);
+  draw();
+}
+
+Prompt::~Prompt() {
+  delete pane_;
+}
 
 std::string Prompt::getInput() {
-  for (unsigned long x = origin_.x; x < origin_.x + length_; ++x)
-    Gfx::instance().setAttributes({x, origin_.y}, ' ', ATTR_UNDERLINE);
-  drawCursor();
-
   portal::Event ev;
   std::string input;
 
   for (;;) {
-    gfx::Gfx::instance().refresh();
-
     portal::Event::Type evType;
     char c;
-
     std::tie(evType, c) = ev.getRawInput();
+    pane_->clear();
     switch (evType) {
       case portal::Event::Type::select:
         return input;
       case portal::Event::Type::keyBackspace:
         input.pop_back();
-        moveCursorBackward();
+        pane_->print(input);
         break;
       default:
         input.push_back(c);
-        Gfx::instance().plot(cursorPos_, c);
-        moveCursorForward();
+        pane_->print(input);
         break;
-    } 
+    }
+    draw();
   }
 }
 
-void Prompt::drawCursor() const {
-  Gfx::instance().plot(cursorPos_, ' ', ATTR_REVERSE);
+void Prompt::draw() {
+  pane_->draw();
+  refresh();
 }
 
-void Prompt::moveCursorForward() {
-  ++cursorPos_.x;
-  drawCursor();
 }
-
-void Prompt::moveCursorBackward() {
-  Gfx::instance().plot(cursorPos_, ' ', ATTR_NORMAL);
-  --cursorPos_.x;
-  drawCursor();
-}
-
 }
