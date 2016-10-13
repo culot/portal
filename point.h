@@ -26,11 +26,47 @@
 
 #pragma once
 
+#include <curses.h>
+
 namespace portal {
 namespace gfx {
 
 class Point {
 public:
+  enum class Label {
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight,
+    center
+  };
+
+  Point() {}
+  Point(Label label) {
+    switch (label) {
+    case Label::topLeft:
+      x_ = 0;
+      y_ = 0;
+      break;
+    case Label::topRight:
+      x_ = COLS;
+      y_ = 0;
+      break;
+    case Label::bottomLeft:
+      x_ = 0;
+      y_ = LINES;
+      break;
+    case Label::bottomRight:
+      x_ = COLS;
+      y_ = LINES;
+      break;
+    case Label::center:
+      x_ = COLS / 2;
+      y_ = LINES / 2;
+      break;
+    }
+  }
+
   void setX(int x) {x_ = x;}
   void setY(int y) {y_ = y;}
   int  x() const {return x_;}
