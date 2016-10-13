@@ -36,6 +36,7 @@
 #include "pkg.h"
 #include "point.h"
 #include "size.h"
+#include "popup.h"
 #include "ui.h"
 
 namespace portal {
@@ -51,6 +52,11 @@ Ui::Ui() {
   // XXX Need to deal with B&W terminals
   if (has_colors() && start_color() == OK) {
     init_pair(1, COLOR_CYAN, COLOR_BLUE);
+
+    init_pair(4, COLOR_MAGENTA, 0);
+    init_pair(5, COLOR_RED, 0);
+    init_pair(6, COLOR_YELLOW, 0);
+    init_pair(7, COLOR_BLUE, 0);
   } else {
     throw std::runtime_error("Sorry, B&W terminals not supported yet");
   }
@@ -76,7 +82,7 @@ Ui::~Ui() {
 }
 
 void Ui::display() {
-  for (auto& pane : pane_) {
+  for (const auto& pane : pane_) {
     pane->draw();
   }
   doupdate();
@@ -150,7 +156,7 @@ void Ui::handleEvent(Event::Type event) {
 
     case Event::Type::go:
       if (!Pkg::instance().gotRootPrivileges()) {
-//        warningStatus(pane_[pkgList], "Insufficient privileges, please retry as root");
+        gfx::Popup("Insufficient privileges, please retry as root", gfx::Popup::Type::warning);
       } else {
         performPending();
         closeAllFolds();
