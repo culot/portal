@@ -47,6 +47,7 @@ class Pane {
   Pane(const Size& size, const Point& pos);
   ~Pane();
 
+  // XXX define a bitset with all possible styles
   void cursorLineHighlight(bool highlight);
   void cursorLineUnderline(bool underline);
   void borders(bool borders);
