@@ -37,6 +37,7 @@
 #include "point.h"
 #include "size.h"
 #include "popup.h"
+#include "prompt.h"
 #include "ui.h"
 
 namespace portal {
@@ -145,13 +146,9 @@ void Ui::handleEvent(Event::Type event) {
       break;
 
     case Event::Type::search:
-      /* Implement
-      pane_[pkgList]->status("search");
-      pane_[pkgList]->refreshStatus();
-      pane_[pkgList]->resetPosition();
+      pane_[pkgList]->resetCursorPosition();
       promptSearch();
       updatePanes();
-      */
       break;
 
     case Event::Type::go:
@@ -394,17 +391,11 @@ void Ui::promptFilter() {
   }
 }
 
-  // XXX implement prompt
 void Ui::promptSearch() const {
-  /*
-  gfx::Form form;
-  form.label(" Input search pattern ");
-  form.draw();
-  std::string query = form.getInput();
-  form.erase();
-
+  gfx::Point pos = gfx::Point::Label::center;
+  gfx::Prompt prompt(pos, 20);
+  std::string query = prompt.getInput();
   Pkg::instance().search(query);
-  */
 }
 
   // XXX implement busy status
