@@ -136,13 +136,9 @@ void Ui::handleEvent(Event::Type event) {
       break;
 
     case Event::Type::filter:
-      /* XXX Implement
-      pane_[pkgList]->status("filter");
-      pane_[pkgList]->refreshStatus();
-      pane_[pkgList]->resetPosition();
+      pane_[pkgList]->resetCursorPosition();
       promptFilter();
       updatePanes();
-      */
       break;
 
     case Event::Type::search:
@@ -348,8 +344,6 @@ void Ui::performPending() {
 }
 
 void Ui::promptFilter() {
-//  pane_[pkgList].clearStatus();
-
   portal::Event ev;
   portal::Event::Type evType;
   char c;
