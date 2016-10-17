@@ -30,78 +30,70 @@
 
 namespace portal {
 
-std::tuple<Event::Type, int> Event::getRawInput() const {
-  int ch = getch();
-  switch (ch) {
-    case KEY_BACKSPACE:
-      return std::make_tuple(Type::keyBackspace, ch);
-    case KEY_ENTER:
-    case '\n':
-      return std::make_tuple(Type::select, ch);
-    default:
-      return std::make_tuple(Type::keyPressed, ch);
-  }
-}
+static constexpr int ctrl(int c) {return 0x1F & c;}
 
-Event::Type Event::poll() const {
-  int event = getch();
-  switch (event) {
-    case '/':
-      return Type::search;
-    case 'f':
-      return Type::filter;
-    case 'g':
-      return Type::go;
-    case 'j':
-      return Type::keyDown;
-    case 'k':
-      return Type::keyUp;
+bool Event::poll() {
+  character_ = getch();
+  switch (character_) {
+    case '\t':
+      type_ = Type::nextMode;
+      break;
+    case ctrl('X'):
+      type_ = Type::go;
+      break;
+    case ctrl('N'):
+      type_ = Type::keyDown;
+      break;
+    case ctrl('P'):
+      type_ = Type::keyUp;
+      break;
     case 'q':
-      return Type::quit;
+      type_ = Type::quit;
+      break;
     case 'J':
-      return Type::keyShiftDown;
+      type_ = Type::keyShiftDown;
+      break;
     case 'K':
-      return Type::keyShiftUp;
-    case '+':
-      return Type::flagInstall;
-    case '-':
-      return Type::flagRemove;
+      type_ = Type::keyShiftUp;
+      break;
+    case ctrl(' '):
+      type_ = Type::flagInstall;
+      break;
+    case ctrl('D'):
+      type_ = Type::flagRemove;
+      break;
     case KEY_BACKSPACE:
-      return Type::keyBackspace;
+      type_ = Type::keyBackspace;
+      break;
     case KEY_DOWN:
-      return Type::keyDown;
+      type_ = Type::keyDown;
+      break;
     case KEY_UP:
-      return Type::keyUp;
+      type_ = Type::keyUp;
+      break;
     case KEY_PPAGE:
       //        case TB_KEY_CTRL_B:
-      return Type::pageUp;
+      type_ = Type::pageUp;
+      break;
     case KEY_NPAGE:
       //        case TB_KEY_CTRL_F:
-      return Type::pageDown;
+      type_ = Type::pageDown;
+      break;
     case KEY_ENTER:
     case '\n':
     case ' ':
-      return Type::select;
+      type_ = Type::select;
+      break;
       /*
          case TB_KEY_CTRL_L:
          return Type::redraw;
          */
     default:
-      return Type::unknown;
-  }
-  /*
-  case TB_EVENT_MOUSE:
-      switch (event.key)
-      {
-        case TB_KEY_MOUSE_WHEEL_DOWN:
-          return Type::keyDown;
-        default:
-          return Type::unknown;
-      }
+      type_ = Type::character;
       break;
-    default:
-      return Type::unknown;
-      */
+  }
+
+  return type_ != Type::quit;
 }
 
 }

@@ -63,10 +63,9 @@ int main(int argc, char** argv) {
   Ui::instance().display();
 
   try {
-    Event::Type eventType;
     Event event;
-    while ((eventType = event.poll()) != Event::Type::quit) {
-      Ui::instance().handleEvent(eventType);
+    while (event.poll()) {
+      Ui::instance().handleEvent(event);
       Ui::instance().display();
     }
   }

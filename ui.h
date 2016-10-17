@@ -33,6 +33,7 @@
 
 #include "event.h"
 #include "pane.h"
+#include "tray.h"
 
 namespace portal {
 
@@ -41,7 +42,7 @@ class Ui {
   static Ui&    instance() {static Ui instance_; return instance_;}
 
   void          display();
-  void          handleEvent(Event::Type event);
+  void          handleEvent(const Event& event);
 
  private:
   Ui();
@@ -65,15 +66,26 @@ class Ui {
     pkgListItemType type;
     std::string     name;
   };
+
+  enum Mode {
+    browse,
+    search,
+    filter,
+//    dashboard,
+    nbModes
+  };
+
+  std::string                    modeName_[nbModes] {"Browse", "Search", "Filter"};
   
   bool                           busy_ {false};
 
   std::unique_ptr<gfx::Pane>     pane_[PaneType::nbtypes];
+  std::unique_ptr<gfx::Tray>     tray_;
   std::map<std::string, bool>    unfolded_;
   std::vector<pkgListItem>       pkgList_;
-
+  int                            currentMode_ {Mode::browse};
   
-  void                createPanes();
+  void                createInterface();
   void                updatePanes();
   void                buildPkgList();
   void                updatePkgListPane(const std::vector<std::string>& origins);
@@ -87,8 +99,8 @@ class Ui {
   void                closeAllFolds();
   void                registerPkgChange(Event::Type event);
   void                performPending();
-  void                promptFilter();
-  void                promptSearch() const;
+  void                promptFilter(int character);
+  void                promptSearch(int character) const;
   void                setBusyStatus(gfx::Pane& pane, const std::string& status);
   void                busyStatus(gfx::Pane& pane);
   void                warningStatus(gfx::Pane& pane, const std::string& status);
@@ -96,6 +108,8 @@ class Ui {
   std::string         getStringForCategory(const std::string& category) const;
   std::string         getStringForPkg(const std::string& origin) const;
   std::string         getVersionsForPkg(const std::string& origin) const;
+  void                selectNextMode();
+  void                updateTray();
 };
 
 }

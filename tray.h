@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -35,19 +35,21 @@
 namespace portal {
 namespace gfx {
 
-class Popup {
+class Tray {
  public:
-  enum class Type {
-    brief,
-    info,
-    warning,
-    error
-  };
+  Tray(const Point& center, int nbSlots);
 
-  Popup(const std::string& msg, Type = Type::info, const Point& center = Point::Label::center);
+  void draw() const;
+  void selectSlot(int slotNum);
+  void selectNextSlot();
+  void selectPreviousSlot();
 
  private:
-  std::unique_ptr<Pane> pane_;
+  int                    nbSlots_ {0};
+  int                    selectedSlotNum_ {0};
+  std::unique_ptr<Pane>  pane_;
+
+  void                   drawSlots() const;
 };
 
 }

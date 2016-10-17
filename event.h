@@ -34,26 +34,31 @@ class Event {
  public:
   enum class Type {
     unknown,
+    character,
     keyPressed,
     keyDown,
     keyShiftDown,
     keyUp,
     keyShiftUp,
+    nextMode,
     keyBackspace,
     flagInstall,
     flagRemove,
     select,
     go,
-    filter,
-    search,
     redraw,
     pageDown,
     pageUp,
     quit
   };
 
-  std::tuple<Type, int>  getRawInput() const;
-  Type                   poll() const;
+  Type  type() const {return type_;}
+  int   character() const {return character_;}
+  bool  poll();
+
+ private:
+  Type type_ {Type::unknown};
+  int  character_;
 };
 
 }

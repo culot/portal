@@ -40,9 +40,11 @@ class Prompt {
   Prompt(const Point& y, int len);
 
   std::string getInput();
+  void setContent(const std::string& content);
 
  private:
   std::unique_ptr<Pane> pane_;
+  std::string           content_;
 
   void draw();
 };

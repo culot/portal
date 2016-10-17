@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -24,31 +24,69 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include <stdexcept>
 
-#include <memory>
-#include <string>
+#include <curses.h>
 
-#include "pane.h"
-#include "point.h"
+#include "size.h"
+#include "tray.h"
 
 namespace portal {
 namespace gfx {
 
-class Popup {
- public:
-  enum class Type {
-    brief,
-    info,
-    warning,
-    error
-  };
+Tray::Tray(const Point& center, int nbSlots)
+  : nbSlots_(nbSlots) {
+  Size paneSize;
+  paneSize.setHeight(1);
+  paneSize.setWidth(nbSlots * 2 + 1);
+  Point panePos;
+  panePos.setX(center.x() - paneSize.width() / 2);
+  panePos.setY(center.y() - 1);
 
-  Popup(const std::string& msg, Type = Type::info, const Point& center = Point::Label::center);
+  pane_ = std::unique_ptr<Pane>(new Pane(paneSize, panePos));
+  pane_->borders(false);
+  pane_->cursorLineHighlight(false);
+  pane_->cursorLineUnderline(false);
+  draw();
+}
 
- private:
-  std::unique_ptr<Pane> pane_;
-};
+void Tray::draw() const {
+  pane_->clear();
+  drawSlots();
+  pane_->draw();
+}
+
+void Tray::drawSlots() const {
+  for (int i = 0; i < nbSlots_; ++i) {
+    pane_->printChar(ACS_DIAMOND, (i == selectedSlotNum_ ? 2 : 0));
+    pane_->printChar(' ');
+  }
+}
+
+void Tray::selectSlot(int slotNum) {
+  if (slotNum >= nbSlots_ || slotNum < 0) {
+    throw std::out_of_range("Tray::selectSlot(): invalid slotNum ["
+                            + std::to_string(slotNum) + "]");
+  }
+  selectedSlotNum_ = slotNum;
+  draw();
+}
+
+void Tray::selectNextSlot() {
+  ++selectedSlotNum_;
+  if (selectedSlotNum_ >= nbSlots_) {
+    selectedSlotNum_ = 0;
+  }
+  draw();
+}
+
+void Tray::selectPreviousSlot() {
+  --selectedSlotNum_;
+  if (selectedSlotNum_ < 0) {
+    selectedSlotNum_ = nbSlots_ - 1;
+  }
+  draw();
+}
 
 }
 }

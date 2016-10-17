@@ -90,8 +90,8 @@ class Pane::Impl {
 
 Pane::Pane(const Size& size, const Point& pos) : impl_{new Impl} {
   impl_->sizeView = size;
-  impl_->sizePad.setWidth(size.width() - 2);
-  impl_->sizePad.setHeight(size.width() - 2);
+  impl_->sizePad.setWidth(size.width());
+  impl_->sizePad.setHeight(size.height());
   impl_->posView = pos;
   impl_->createPane();
 }
@@ -106,6 +106,10 @@ void Pane::Impl::createPane() {
 Pane::~Pane() {
   delwin(impl_->pad);
   delwin(impl_->win);
+}
+
+Size Pane::size() const {
+  return impl_->sizeView;
 }
 
 void Pane::cursorLineHighlight(bool highlight) {
@@ -167,6 +171,10 @@ void Pane::print(const std::string& line, Align align) {
   mvwaddstr(impl_->pad, impl_->posPrint.y(), xpos, line.c_str());
 }
 
+void Pane::printChar(int c, int cursesColorNum) {
+  waddch(impl_->pad, c | COLOR_PAIR(cursesColorNum));
+}
+
 void Pane::scrollDown() {
   if (impl_->isCursorOnLastVisibleLine()) {
     impl_->posPad.setY(impl_->posPad.y() + 1);
@@ -200,6 +208,7 @@ void Pane::moveCursorUp() {
 }
 
 void Pane::resetCursorPosition() {
+  impl_->posCursor.setX(0);
   impl_->posCursor.setY(0);
   impl_->posPad.setY(0);
 }
@@ -235,7 +244,7 @@ void Pane::Impl::drawScrollBar() {
 }
 
 void Pane::Impl::extendPrintArea() {
-  if (posPrint.y() >= sizePad.height()) {
+  if (posPrint.y() == sizePad.height() - 1) {
     sizePad.setHeight(sizePad.height() * 2);
     wresize(pad, sizePad.height(), sizePad.width());
   }

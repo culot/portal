@@ -50,15 +50,16 @@ Ui::Ui() {
   initscr();
 
   // XXX Need more elegant color definitions (enum?)
-  // XXX Need to deal with B&W terminals
   if (has_colors() && start_color() == OK) {
     init_pair(1, COLOR_CYAN, COLOR_BLUE);
 
+    init_pair(2, COLOR_CYAN, 0);
     init_pair(4, COLOR_MAGENTA, 0);
     init_pair(5, COLOR_RED, 0);
     init_pair(6, COLOR_YELLOW, 0);
     init_pair(7, COLOR_BLUE, 0);
   } else {
+    // XXX Need to deal with B&W terminals
     throw std::runtime_error("Sorry, B&W terminals not supported yet");
   }
 
@@ -73,7 +74,7 @@ Ui::Ui() {
               // starts. The black screen does not appear afterwards as
               // stdscr is never touched by portal, so curses detects it
               // does not need any subsequent refreshes.
-  createPanes();
+  createInterface();
   updatePanes();
 }
 
@@ -86,11 +87,21 @@ void Ui::display() {
   for (const auto& pane : pane_) {
     pane->draw();
   }
+  tray_->draw();
   doupdate();
 }
 
-void Ui::handleEvent(Event::Type event) {
-  switch (event) {
+void Ui::handleEvent(const Event& event) {
+  switch (event.type()) {
+    case Event::Type::nextMode:
+      selectNextMode();
+      if (currentMode_ == Mode::browse) {
+        Pkg::instance().resetFilter();
+        updatePanes();
+      }
+      updateTray();
+    break;
+
     case Event::Type::select: {
       if (!Pkg::instance().isRepositoryEmpty() && gotCategorySelected()) {
         std::string category = getSelectedItemName();
@@ -105,9 +116,9 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::pageUp:
     case Event::Type::pageDown:
       if (!Pkg::instance().isRepositoryEmpty()) {
-        if (event == Event::Type::keyUp) {
+        if (event.type() == Event::Type::keyUp) {
           pane_[pkgList]->moveCursorUp();
-        } else if (event == Event::Type::keyDown) {
+        } else if (event.type() == Event::Type::keyDown) {
           pane_[pkgList]->moveCursorDown();
         }
         // XXX Implement scroll up and down
@@ -118,9 +129,9 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::keyShiftUp:
     case Event::Type::keyShiftDown:
       if (!Pkg::instance().isRepositoryEmpty()) {
-        if (event == Event::Type::keyShiftUp) {
+        if (event.type() == Event::Type::keyShiftUp) {
           pane_[pkgDescr]->moveCursorUp();
-        } else if (event == Event::Type::keyShiftDown) {
+        } else if (event.type() == Event::Type::keyShiftDown) {
           pane_[pkgDescr]->moveCursorDown();
         }
         updatePkgDescrPane();
@@ -130,21 +141,27 @@ void Ui::handleEvent(Event::Type event) {
     case Event::Type::flagInstall:
     case Event::Type::flagRemove:
       if (!Pkg::instance().isRepositoryEmpty()) {
-        registerPkgChange(event);
+        registerPkgChange(event.type());
         updatePkgListPane();
       }
       break;
 
-    case Event::Type::filter:
-      pane_[pkgList]->resetCursorPosition();
-      promptFilter();
-      updatePanes();
-      break;
-
-    case Event::Type::search:
-      pane_[pkgList]->resetCursorPosition();
-      promptSearch();
-      updatePanes();
+    case Event::Type::character:
+      switch (currentMode_) {
+      case Mode::browse :
+        // DO NOTHING
+        break;
+      case Mode::search :
+        pane_[pkgList]->resetCursorPosition();
+        promptSearch(event.character());
+        updatePanes();
+        break;
+      case Mode::filter :
+        pane_[pkgList]->resetCursorPosition();
+        promptFilter(event.character());
+        updatePanes();
+        break;
+      }
       break;
 
     case Event::Type::go:
@@ -175,11 +192,11 @@ void Ui::handleEvent(Event::Type event) {
     |                              | /
     +------------------------------+
     |                              | \ <-- comment
-    |                              | | 
+    |                              | |
     |                              | / pane_[pkgDescr]
-    +------------------------------+ 
+    +------------------------------+
  */
-void Ui::createPanes() {
+void Ui::createInterface() {
   int pkgPaneHeight = LINES * .6;
   int descrPaneHeight = LINES - pkgPaneHeight - 1;
 
@@ -196,6 +213,11 @@ void Ui::createPanes() {
   pane_[pkgDescr] = std::unique_ptr<gfx::Pane>(new gfx::Pane(descrSize, descrPos));
   pane_[pkgDescr]->borders(false);
   pane_[pkgDescr]->cursorLineHighlight(false);
+
+  gfx::Point trayPos;
+  trayPos.setY(pkgPaneHeight);
+  trayPos.setX(COLS / 2);
+  tray_ = std::unique_ptr<gfx::Tray>(new gfx::Tray(trayPos, Mode::nbModes));
 }
 
 void Ui::updatePanes() {
@@ -267,7 +289,7 @@ void Ui::updatePkgDescrPane() {
     std::string comment = Pkg::instance().getPkgAttr(origin, Pkg::Attr::comment);
     pane_[pkgDescr]->print(comment);
     pane_[pkgDescr]->colorizeCurrentLine(1);
-    
+
     std::string desc = Pkg::instance().getPkgAttr(origin, Pkg::Attr::description);
     std::stringstream commentStream(desc);
     std::string descLine;
@@ -298,7 +320,7 @@ bool Ui::gotCategorySelected() {
 bool Ui::isCategory(const pkgListItem& item) const {
   return item.type == pkgListItemType::category;
 }
-  
+
 void Ui::toggleCategoryFolding(const std::string& category) {
   if (unfolded_.find(category) != unfolded_.end()) {
     unfolded_[category] = unfolded_[category] == true ? false : true;
@@ -343,51 +365,44 @@ void Ui::performPending() {
 //  pane_[pkgList].clearStatus();
 }
 
-void Ui::promptFilter() {
-  portal::Event ev;
-  portal::Event::Type evType;
-  char c;
+void Ui::promptFilter(int character) {
+  switch (character) {
+  case 'n':
+    Pkg::instance().resetFilter();
+    break;
 
-  std::tie(evType, c) = ev.getRawInput();
-  switch (evType) {
-    case portal::Event::Type::keyPressed:
-      switch (c) {
-        case 'n':
-          Pkg::instance().resetFilter();
-          break;
-
-        case 'i':
-        case '+':
+  case 'i':
+  case '+':
 //          pane_[pkgList].status("Installed");
-          Pkg::instance().filterInstalled();
-          break;
+    Pkg::instance().filterInstalled();
+    break;
 
-        case '-':
-        case 'a':
+  case '-':
+  case 'a':
 //          pane_[pkgList].status("Available");
-          Pkg::instance().filterAvailable();
-          break;
+    Pkg::instance().filterAvailable();
+    break;
 
-        case 'p':
+  case 'p':
 //          pane_[pkgList].status("Pending");
-          Pkg::instance().filterPending();
-          break;
+    Pkg::instance().filterPending();
+    break;
 
-        case 'u':
+  case 'u':
 //          pane_[pkgList].status("Upgradable");
-          Pkg::instance().filterUpgradable();
-          break;
-      }
-      break;
+    Pkg::instance().filterUpgradable();
+    break;
 
-    default:
-      break;
+  default:
+    // DO NOTHING
+    break;
   }
 }
 
-void Ui::promptSearch() const {
+void Ui::promptSearch(int character) const {
   gfx::Point pos = gfx::Point::Label::center;
-  gfx::Prompt prompt(pos, 20);
+  gfx::Prompt prompt(pos, 40);
+  prompt.setContent(std::string(1, static_cast<char>(character)));
   std::string query = prompt.getInput();
   Pkg::instance().search(query);
 }
@@ -478,6 +493,21 @@ std::string Ui::getVersionsForPkg(const std::string& origin) const {
   pkgVersions.append(Pkg::instance().getRemoteVersion(origin));
 
   return pkgVersions;
+}
+
+void Ui::selectNextMode() {
+  ++currentMode_;
+  if (currentMode_ == Mode::nbModes) {
+    currentMode_ = 0;
+  }
+}
+
+void Ui::updateTray() {
+  tray_->selectSlot(currentMode_);
+  gfx::Point center;
+  center.setX(COLS / 2);
+  center.setY(pane_[pkgList]->size().height() - 2);
+  gfx::Popup(modeName_[currentMode_], gfx::Popup::Type::brief, center);
 }
 
 }

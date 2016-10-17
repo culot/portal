@@ -47,6 +47,8 @@ class Pane {
   Pane(const Size& size, const Point& pos);
   ~Pane();
 
+  Size size() const;
+
   // XXX define a bitset with all possible styles
   void cursorLineHighlight(bool highlight);
   void cursorLineUnderline(bool underline);
@@ -56,6 +58,7 @@ class Pane {
   void clear();
   void newline();
   void print(const std::string& line, Align align = Align::left);
+  void printChar(int c, int cursesColorNum = 0);
   void scrollDown();
   void scrollUp();
   void moveCursor(const Point& pos);

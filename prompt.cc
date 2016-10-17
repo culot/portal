@@ -50,31 +50,31 @@ Prompt::Prompt(const Point& pos, int len) {
 }
 
 std::string Prompt::getInput() {
-  portal::Event ev;
-  std::string input;
-
   for (;;) {
-    portal::Event::Type evType;
-    char c;
-    std::tie(evType, c) = ev.getRawInput();
+    portal::Event event;
+    event.poll();
     pane_->clear();
-    switch (evType) {
+    switch (event.type()) {
       case portal::Event::Type::select:
-        return input;
+        return content_;
       case portal::Event::Type::keyBackspace:
-        input.pop_back();
-        pane_->print(input);
+        content_.pop_back();
         break;
       default:
-        input.push_back(c);
-        pane_->print(input);
+        content_.push_back(event.character());
         break;
     }
     draw();
   }
 }
 
+void Prompt::setContent(const std::string& content) {
+  content_ = content;
+  draw();
+}
+
 void Prompt::draw() {
+  pane_->print(content_);
   pane_->draw();
   refresh();
 }

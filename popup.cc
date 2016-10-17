@@ -35,7 +35,7 @@ namespace gfx {
 
 Popup::Popup(const std::string& msg, Type type, const Point& center) {
   Size paneSize;
-  paneSize.setHeight(3);
+  paneSize.setHeight(1);
   paneSize.setWidth(msg.length() + 2);
   Point panePos;
   panePos.setX(center.x() - msg.length() / 2);
@@ -47,6 +47,9 @@ Popup::Popup(const std::string& msg, Type type, const Point& center) {
   pane_->print(msg);
 
   switch (type) {
+  case Type::brief:
+    pane_->colorizeCurrentLine(2);
+    break;
   case Type::info:
     pane_->colorizeCurrentLine(7);
     break;
@@ -60,8 +63,17 @@ Popup::Popup(const std::string& msg, Type type, const Point& center) {
 
   pane_->draw();
   refresh();
-  // XXX adapt delay based on severity type
-  std::this_thread::sleep_for(std::chrono::milliseconds(1400));
+
+  int duration;
+  switch (type) {
+  case Type::brief:
+    duration = 500;
+    break;
+  default:
+    duration = 1400;
+    break;
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 }
 
 }
