@@ -75,6 +75,7 @@ class Pane::Impl {
   void createPane();
   void extendPrintArea();
   void clearPrintArea();
+  void drawBorders();
   void drawScrollBar();
   void applyCursorLineStyle() const;
   void resetCursorLineStyle() const;
@@ -94,13 +95,6 @@ Pane::Pane(const Size& size, const Point& pos) : impl_{new Impl} {
   impl_->sizePad.setHeight(size.height());
   impl_->posView = pos;
   impl_->createPane();
-}
-
-void Pane::Impl::createPane() {
-  win = newwin(sizeView.height(), sizeView.width(), posView.y(), posView.x());
-  pad = newpad(sizePad.height(), sizePad.width());
-  box(win, 0, 0);
-  wnoutrefresh(win);
 }
 
 Pane::~Pane() {
@@ -171,8 +165,26 @@ void Pane::print(const std::string& line, Align align) {
   mvwaddstr(impl_->pad, impl_->posPrint.y(), xpos, line.c_str());
 }
 
-void Pane::printChar(int c, int cursesColorNum) {
+void Pane::print(int c, int cursesColorNum) {
   waddch(impl_->pad, c | COLOR_PAIR(cursesColorNum));
+}
+
+void Pane::printStatus(const std::string& status, int cursesColorNum) const {
+  int statusLength = status.length();
+  int xpos = impl_->sizeView.width() - statusLength - 8;
+  int ypos = impl_->sizeView.height() - 1;
+  mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
+  mvwaddch(impl_->win, ypos, xpos++, ' ');
+  wattron(impl_->win, COLOR_PAIR(cursesColorNum));
+  mvwaddstr(impl_->win, ypos, xpos, status.c_str());
+  wattroff(impl_->win, COLOR_PAIR(cursesColorNum));
+  xpos += statusLength;
+  mvwaddch(impl_->win, ypos, xpos++, ' ');
+  mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);
+}
+
+void Pane::clearStatus() const {
+  impl_->drawBorders();
 }
 
 void Pane::scrollDown() {
@@ -195,7 +207,7 @@ void Pane::moveCursorDown() {
   if (!impl_->isCursorOnLastLine()) {
     impl_->resetCursorLineStyle();
     impl_->posCursor.setY(impl_->posCursor.y() + 1);
-    scrollDown();    
+    scrollDown();
   }
 }
 
@@ -203,7 +215,7 @@ void Pane::moveCursorUp() {
   if (!impl_->isCursorOnFirstLine()) {
     impl_->resetCursorLineStyle();
     impl_->posCursor.setY(impl_->posCursor.y() - 1);
-    scrollUp();    
+    scrollUp();
   }
 }
 
@@ -223,9 +235,30 @@ void Pane::colorizeCurrentLine(short cursesColorNum) const {
            nullptr);
 }
 
+void Pane::Impl::createPane() {
+  win = newwin(sizeView.height(), sizeView.width(), posView.y(), posView.x());
+  pad = newpad(sizePad.height(), sizePad.width());
+  drawBorders();
+  wnoutrefresh(win);
+}
+
+void Pane::Impl::extendPrintArea() {
+  if (posPrint.y() == sizePad.height() - 1) {
+    sizePad.setHeight(sizePad.height() * 2);
+    wresize(pad, sizePad.height(), sizePad.width());
+  }
+}
+
 void Pane::Impl::clearPrintArea() {
   werase(pad);
   posPrint.setY(0);
+}
+
+void Pane::Impl::drawBorders() {
+  if (borders) {
+    box(win, 0, 0);
+    wnoutrefresh(win);
+  }
 }
 
 void Pane::Impl::drawScrollBar() {
@@ -240,13 +273,6 @@ void Pane::Impl::drawScrollBar() {
              sizeView.height() - 1 - (borders ? 1 : 0),
              sizeView.width() - 1 - (borders ? 1 : 0),
              ACS_DARROW | A_BOLD);
-  }
-}
-
-void Pane::Impl::extendPrintArea() {
-  if (posPrint.y() == sizePad.height() - 1) {
-    sizePad.setHeight(sizePad.height() * 2);
-    wresize(pad, sizePad.height(), sizePad.width());
   }
 }
 

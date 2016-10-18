@@ -409,6 +409,8 @@ void Ui::promptSearch(int character) const {
   prompt.setContent(std::string(1, static_cast<char>(character)));
   std::string query = prompt.getInput();
   Pkg::instance().search(query);
+  pane_[pkgList]->clearStatus();
+  pane_[pkgList]->printStatus(query, 2);
 }
 
   // XXX implement busy status

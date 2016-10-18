@@ -58,7 +58,9 @@ class Pane {
   void clear();
   void newline();
   void print(const std::string& line, Align align = Align::left);
-  void printChar(int c, int cursesColorNum = 0);
+  void print(int c, int cursesColorNum = 0);
+  void printStatus(const std::string& status, int cursesColorNum = 0) const;
+  void clearStatus() const;
   void scrollDown();
   void scrollUp();
   void moveCursor(const Point& pos);
