@@ -55,13 +55,16 @@ std::string Prompt::getInput() {
     event.poll();
     pane_->clear();
     switch (event.type()) {
-      case portal::Event::Type::select:
+      case portal::Event::Type::enter:
         return content_;
       case portal::Event::Type::keyBackspace:
         content_.pop_back();
         break;
-      default:
+      case portal::Event::Type::character:
         content_.push_back(event.character());
+        break;
+      default:
+        // DO NOTHING
         break;
     }
     draw();

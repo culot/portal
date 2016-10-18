@@ -103,13 +103,25 @@ void Ui::handleEvent(const Event& event) {
     break;
 
     case Event::Type::select: {
-      if (!Pkg::instance().isRepositoryEmpty() && gotCategorySelected()) {
-        std::string category = getSelectedItemName();
-        toggleCategoryFolding(category);
-        updatePanes();
+      if (!Pkg::instance().isRepositoryEmpty()) {
+        if (gotCategorySelected()) {
+          std::string category = getSelectedItemName();
+          toggleCategoryFolding(category);
+          updatePanes();
+        } else {
+          registerPkgChange(event.type());
+          updatePkgListPane();
+        }
       }
       break;
     }
+
+    case Event::Type::deselect:
+      if (!Pkg::instance().isRepositoryEmpty()) {
+        registerPkgChange(event.type());
+        updatePkgListPane();
+      }
+      break;
 
     case Event::Type::keyUp:
     case Event::Type::keyDown:
@@ -135,14 +147,6 @@ void Ui::handleEvent(const Event& event) {
           pane_[pkgDescr]->moveCursorDown();
         }
         updatePkgDescrPane();
-      }
-      break;
-
-    case Event::Type::flagInstall:
-    case Event::Type::flagRemove:
-      if (!Pkg::instance().isRepositoryEmpty()) {
-        registerPkgChange(event.type());
-        updatePkgListPane();
       }
       break;
 
@@ -339,11 +343,11 @@ void Ui::registerPkgChange(Event::Type event) {
     std::string origin = getSelectedItemName();
 
     switch (event) {
-      case Event::Type::flagInstall:
+      case Event::Type::select:
         Pkg::instance().registerInstall(origin);
         break;
 
-      case Event::Type::flagRemove:
+      case Event::Type::deselect:
         Pkg::instance().registerRemoval(origin);
         break;
 

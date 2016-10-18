@@ -47,20 +47,23 @@ bool Event::poll() {
     case ctrl('P'):
       type_ = Type::keyUp;
       break;
-    case 'q':
+      // XXX handle SIGINT
+    case ctrl('C'):
       type_ = Type::quit;
       break;
+      /* XXX handle lower-panel scrolling
     case 'J':
       type_ = Type::keyShiftDown;
       break;
     case 'K':
       type_ = Type::keyShiftUp;
       break;
+      */
     case ctrl(' '):
-      type_ = Type::flagInstall;
+      type_ = Type::select;
       break;
     case ctrl('D'):
-      type_ = Type::flagRemove;
+      type_ = Type::deselect;
       break;
     case KEY_BACKSPACE:
       type_ = Type::keyBackspace;
@@ -72,22 +75,18 @@ bool Event::poll() {
       type_ = Type::keyUp;
       break;
     case KEY_PPAGE:
-      //        case TB_KEY_CTRL_B:
       type_ = Type::pageUp;
       break;
     case KEY_NPAGE:
-      //        case TB_KEY_CTRL_F:
       type_ = Type::pageDown;
       break;
     case KEY_ENTER:
     case '\n':
-    case ' ':
-      type_ = Type::select;
+      type_ = Type::enter;
       break;
-      /*
-         case TB_KEY_CTRL_L:
-         return Type::redraw;
-         */
+    case ctrl('L'):
+      type_ = Type::redraw;
+      break;
     default:
       type_ = Type::character;
       break;
