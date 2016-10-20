@@ -33,19 +33,22 @@
 namespace portal {
 namespace gfx {
 
-Popup::Popup(const std::string& msg, Type type, const Point& center) {
-  Size paneSize;
-  paneSize.setHeight(1);
-  paneSize.setWidth(msg.length() + 2);
-  Point panePos;
-  panePos.setX(center.x() - msg.length() / 2);
-  panePos.setY(center.y() - 1);
+Popup::Popup(const std::string& msg, Type type, const Point& center)
+  : Window() {
+  Size size;
+  size.setHeight(3);
+  size.setWidth(msg.length() + 2);
+  setSize(size);
 
-  pane_ = std::unique_ptr<Pane>(new Pane(paneSize, panePos));
-  pane_->borders(false);
-  pane_->cursorLineHighlight(false);
-  pane_->print(msg);
+  Point pos;
+  pos.setX(center.x() - msg.length() / 2);
+  pos.setY(center.y());
+  setPosition(pos);
 
+//  showBorders(false);
+  print(msg);
+
+  /*
   switch (type) {
   case Type::brief:
     pane_->colorizeCurrentLine(2);
@@ -60,8 +63,9 @@ Popup::Popup(const std::string& msg, Type type, const Point& center) {
     pane_->colorizeCurrentLine(5);
     break;
   }
+  */
 
-  pane_->draw();
+  draw();
   refresh();
 
   int duration;

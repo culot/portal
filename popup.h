@@ -29,13 +29,13 @@
 #include <memory>
 #include <string>
 
-#include "pane.h"
+#include "window.h"
 #include "point.h"
 
 namespace portal {
 namespace gfx {
 
-class Popup {
+class Popup : public Window {
  public:
   enum class Type {
     brief,
@@ -45,9 +45,6 @@ class Popup {
   };
 
   Popup(const std::string& msg, Type = Type::info, const Point& center = Point::Label::center);
-
- private:
-  std::unique_ptr<Pane> pane_;
 };
 
 }
