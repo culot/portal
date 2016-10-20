@@ -41,9 +41,12 @@ namespace gfx {
   // redrawn
 class Window {
  public:
+  Window();
   Window(const Size& size, const Point& pos);
   ~Window();
 
+  void   setSize(const Size& size);
+  void   setPosition(const Point& pos);
   Size   size() const;
   Point  position() const;
 

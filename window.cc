@@ -24,6 +24,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdexcept>
 #include <curses.h>
 
 #include "window.h"
@@ -40,7 +41,10 @@ class Window::Impl {
   Point pos;
   bool  borders {true};
 
+  bool initialized() const;
   void create();
+  void resize();
+  void move();
   void destroy();
   void toggleBorders();
   void draw();
@@ -49,7 +53,11 @@ class Window::Impl {
 };
 
 
-Window::Window(const Size& size, const Point& pos) : impl_{new Impl} {
+Window::Window() : impl_{new Impl} {
+  impl_->create();
+}
+
+Window::Window(const Size& size, const Point& pos): impl_{new Impl} {
   impl_->size = size;
   impl_->pos = pos;
   impl_->create();
@@ -58,6 +66,20 @@ Window::Window(const Size& size, const Point& pos) : impl_{new Impl} {
 
 Window::~Window() {
   impl_->destroy();
+}
+
+void Window::setSize(const Size& size) {
+  if (impl_->size != size) {
+    impl_->size = size;
+    impl_->resize();
+  }
+}
+
+void Window::setPosition(const Point& pos) {
+  if (impl_->pos != pos) {
+    impl_->pos = pos;
+    impl_->move();
+  }
 }
 
 Size Window::size() const {
@@ -76,18 +98,35 @@ void Window::showBorders(bool borders) {
 
 void Window::print(const std::string& msg) {
   impl_->print(msg);
-  draw();
 }
 
 void Window::draw() {
   impl_->draw();
 }
 
+bool Window::Impl::initialized() const {
+  return win != nullptr;
+}
+
 void Window::Impl::create() {
+  if (initialized()) {
+    throw std::runtime_error("Window::Impl::create() - Object already initialized");
+  }
   win = newwin(size.height(), size.width(), pos.y(), pos.x());
 }
 
+void Window::Impl::resize() {
+  wresize(win, size.height(), size.width());
+}
+
+void Window::Impl::move() {
+  mvwin(win, pos.y(), pos.x());
+}
+
 void Window::Impl::destroy() {
+  if (!initialized()) {
+    throw std::runtime_error("Window::Impl::destroy() - Object already destroyed");
+  }
   delwin(win);
 }
 
@@ -108,8 +147,9 @@ void Window::Impl::drawBorders() {
 }
 
 void Window::Impl::print(const std::string& msg) {
-  int x = pos.x() + (borders ? 1 : 0);
-  mvwaddstr(win, pos.y(), x, msg.c_str());
+  int offset = borders ? 1 : 0;
+  mvwaddstr(win, offset, offset, msg.c_str());
+  wnoutrefresh(win);
 }
 
 }
