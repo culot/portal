@@ -72,6 +72,11 @@ public:
   int  x() const {return x_;}
   int  y() const {return y_;}
 
+  bool operator==(const Point& other) const {
+    return y() == other.y() && x() == other.x();
+  }
+  bool operator!=(const Point& other) const {return !(*this == other);}
+
 private:
   int x_ {0};
   int y_ {0};

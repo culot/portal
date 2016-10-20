@@ -35,6 +35,12 @@ public:
   void setHeight(int height) {height_ = height;}
   int  width() const {return width_;}
   int  height() const {return height_;}
+  bool isNull() const {return width_ == 0 && height_ == 0;}
+
+  bool operator==(const Size& other) const {
+    return height() == other.height() && width() == other.width();
+  }
+  bool operator!=(const Size& other) const {return !(*this == other);}
 
 private:
   int width_  {0};
