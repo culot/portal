@@ -39,7 +39,10 @@ class Window::Impl {
 
   Size  size;
   Point pos;
+  Style style;
   bool  borders {true};
+
+  // XXX Add a Point posCursor to allow for multi lines text
 
   bool initialized() const;
   void create();
@@ -48,6 +51,7 @@ class Window::Impl {
   void destroy();
   void toggleBorders();
   void draw();
+  void applyStyle();
   void drawBorders();
   void print(const std::string& msg);
 };
@@ -80,6 +84,10 @@ void Window::setPosition(const Point& pos) {
     impl_->pos = pos;
     impl_->move();
   }
+}
+
+void Window::setStyle(const Style& style) {
+  impl_->style = style;
 }
 
 Size Window::size() const {
@@ -141,8 +149,19 @@ void Window::Impl::toggleBorders() {
 }
 
 void Window::Impl::draw() {
+  applyStyle();
   drawBorders();
   wrefresh(win);
+}
+
+void Window::Impl::applyStyle() {
+  // XXX use posCursor
+  if (style.underline) {
+    mvwchgat(win, 0, 0, size.width(), A_UNDERLINE, 0, nullptr);
+  }
+  if (style.highlight) {
+    mvwchgat(win, 0, 0, size.width(), A_STANDOUT, 0, nullptr);
+  }
 }
 
 void Window::Impl::drawBorders() {

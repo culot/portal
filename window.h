@@ -31,14 +31,12 @@
 
 #include "point.h"
 #include "size.h"
+#include "style.h"
 
 namespace portal {
 namespace gfx {
 
-  // XXX add a member Style, which defines the formatting style
-  // such as alignment, color, underlying, highlight...
-  // In case the style is changed, than the window has to be
-  // redrawn
+
 class Window {
  public:
   Window();
@@ -47,6 +45,7 @@ class Window {
 
   void   setSize(const Size& size);
   void   setPosition(const Point& pos);
+  void   setStyle(const Style& style);
   Size   size() const;
   Point  position() const;
 
