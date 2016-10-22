@@ -38,6 +38,7 @@
 #include "size.h"
 #include "popup.h"
 #include "prompt.h"
+#include "style.h"
 #include "ui.h"
 
 namespace portal {
@@ -49,15 +50,13 @@ const std::string markerUnfolded("\\");
 Ui::Ui() {
   initscr();
 
-  // XXX Need more elegant color definitions (enum?)
   if (has_colors() && start_color() == OK) {
-    init_pair(1, COLOR_CYAN, COLOR_BLUE);
-
-    init_pair(2, COLOR_CYAN, 0);
-    init_pair(4, COLOR_MAGENTA, 0);
-    init_pair(5, COLOR_RED, 0);
-    init_pair(6, COLOR_YELLOW, 0);
-    init_pair(7, COLOR_BLUE, 0);
+    init_pair(gfx::Style::Color::cyan, COLOR_CYAN, 0);
+    init_pair(gfx::Style::Color::magenta, COLOR_MAGENTA, 0);
+    init_pair(gfx::Style::Color::red, COLOR_RED, 0);
+    init_pair(gfx::Style::Color::yellow, COLOR_YELLOW, 0);
+    init_pair(gfx::Style::Color::blue, COLOR_BLUE, 0);
+    init_pair(gfx::Style::Color::cyanOnBlue, COLOR_CYAN, COLOR_BLUE);
   } else {
     // XXX Need to deal with B&W terminals
     throw std::runtime_error("Sorry, B&W terminals not supported yet");
@@ -512,7 +511,7 @@ void Ui::updateTray() {
   tray_->selectSlot(currentMode_);
   gfx::Point center;
   center.setX(COLS / 2);
-  center.setY(pane_[pkgList]->size().height() - 2);
+  center.setY(pane_[pkgList]->size().height() - 4);
   gfx::Popup(modeName_[currentMode_], gfx::Popup::Type::brief, center);
 }
 
