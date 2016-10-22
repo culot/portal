@@ -46,11 +46,13 @@ Prompt::Prompt(const Point& pos, int len)
   position.setY(pos.y() - 1);
   setPosition(position);
 
+  Style style;
+  style.highlight = false;
+  style.underline = true;
+  setStyle(style);
+
   showBorders(false);
-  /*
-  pane_->cursorLineHighlight(false);
-  pane_->cursorLineUnderline(true);
-  */
+
   draw();
 }
 
