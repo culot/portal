@@ -142,7 +142,7 @@ void Window::Impl::toggleBorders() {
 
 void Window::Impl::draw() {
   drawBorders();
-  wnoutrefresh(win);
+  wrefresh(win);
 }
 
 void Window::Impl::drawBorders() {
