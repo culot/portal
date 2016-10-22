@@ -34,18 +34,23 @@
 namespace portal {
 namespace gfx {
 
-Prompt::Prompt(const Point& pos, int len) {
-  Size paneSize;
-  paneSize.setHeight(3);
-  paneSize.setWidth(len + 2);
-  Point panePos;
-  panePos.setX(pos.x() - 1);
-  panePos.setY(pos.y() - 1);
+Prompt::Prompt(const Point& pos, int len)
+  : Window() {
+  Size size;
+  size.setHeight(3);
+  size.setWidth(len + 2);
+  setSize(size);
 
-  pane_ = std::unique_ptr<Pane>(new Pane(paneSize, panePos));
-  pane_->borders(false);
+  Point position;
+  position.setX(pos.x() - 1);
+  position.setY(pos.y() - 1);
+  setPosition(position);
+
+  showBorders(false);
+  /*
   pane_->cursorLineHighlight(false);
   pane_->cursorLineUnderline(true);
+  */
   draw();
 }
 
@@ -53,7 +58,7 @@ std::string Prompt::getInput() {
   for (;;) {
     portal::Event event;
     event.poll();
-    pane_->clear();
+    clear();
     switch (event.type()) {
       case portal::Event::Type::enter:
         return content_;
@@ -67,19 +72,16 @@ std::string Prompt::getInput() {
         // DO NOTHING
         break;
     }
+    print(content_);
     draw();
+    doupdate();
   }
 }
 
 void Prompt::setContent(const std::string& content) {
   content_ = content;
+  print(content_);
   draw();
-}
-
-void Prompt::draw() {
-  pane_->print(content_);
-  pane_->draw();
-  refresh();
 }
 
 }

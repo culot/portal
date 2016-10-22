@@ -26,16 +26,15 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
-#include "pane.h"
+#include "window.h"
 #include "point.h"
 
 namespace portal {
 namespace gfx {
 
-class Prompt {
+class Prompt : public Window {
  public:
   Prompt(const Point& y, int len);
 
@@ -43,10 +42,7 @@ class Prompt {
   void setContent(const std::string& content);
 
  private:
-  std::unique_ptr<Pane> pane_;
   std::string           content_;
-
-  void draw();
 };
 
 }
