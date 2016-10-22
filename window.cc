@@ -104,6 +104,11 @@ void Window::draw() {
   impl_->draw();
 }
 
+void Window::clear() {
+  werase(impl_->win);
+  impl_->draw();
+}
+
 bool Window::Impl::initialized() const {
   return win != nullptr;
 }

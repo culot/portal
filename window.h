@@ -54,6 +54,7 @@ class Window {
 
   virtual void   print(const std::string& msg);
   virtual void   draw();
+  virtual void   clear();
 
  private:
   class Impl;
