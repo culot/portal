@@ -50,14 +50,6 @@ bool Event::poll() {
     case ctrl('C'):
       type_ = Type::quit;
       break;
-      /* XXX handle lower-panel scrolling
-    case 'J':
-      type_ = Type::keyShiftDown;
-      break;
-    case 'K':
-      type_ = Type::keyShiftUp;
-      break;
-      */
     case ctrl(' '):
       type_ = Type::select;
       break;
