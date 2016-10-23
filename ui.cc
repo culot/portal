@@ -37,7 +37,7 @@
 #include "point.h"
 #include "size.h"
 #include "popupwindow.h"
-#include "prompt.h"
+#include "inputwindow.h"
 #include "style.h"
 #include "ui.h"
 
@@ -405,9 +405,9 @@ void Ui::promptFilter(int character) {
 
 void Ui::promptSearch(int character) const {
   gfx::Point pos = gfx::Point::Label::center;
-  gfx::Prompt prompt(pos, 40);
-  prompt.setContent(std::string(1, static_cast<char>(character)));
-  std::string query = prompt.getInput();
+  gfx::InputWindow inputWindow(pos, 40);
+  inputWindow.setContent(std::string(1, static_cast<char>(character)));
+  std::string query = inputWindow.getInput();
   Pkg::instance().search(query);
   pane_[pkgList]->clearStatus();
   pane_[pkgList]->printStatus(query, 2);

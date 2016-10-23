@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -29,12 +29,12 @@
 
 #include "event.h"
 #include "size.h"
-#include "prompt.h"
+#include "inputwindow.h"
 
 namespace portal {
 namespace gfx {
 
-Prompt::Prompt(const Point& pos, int len)
+InputWindow::InputWindow(const Point& pos, int len)
   : Window() {
   Size size;
   size.setHeight(3);
@@ -56,7 +56,7 @@ Prompt::Prompt(const Point& pos, int len)
   draw();
 }
 
-std::string Prompt::getInput() {
+std::string InputWindow::getInput() {
   for (;;) {
     portal::Event event;
     event.poll();
@@ -80,7 +80,7 @@ std::string Prompt::getInput() {
   }
 }
 
-void Prompt::setContent(const std::string& content) {
+void InputWindow::setContent(const std::string& content) {
   content_ = content;
   print(content_);
   draw();

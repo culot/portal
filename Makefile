@@ -5,9 +5,9 @@ SRCS=		portal.cc        \
 		pkg.cc           \
 		event.cc         \
 		window.cc        \
-		pane.cc          \
-		prompt.cc        \
+		inputwindow.cc   \
 		popupwindow.cc   \
+		pane.cc          \
 		tray.cc          \
                 ui.cc
 
