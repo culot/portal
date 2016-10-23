@@ -40,7 +40,6 @@ class Window::Impl {
   Size  size;
   Point pos;
   Style style;
-  bool  borders {true};
 
   // XXX Add a Point posCursor to allow for text spanning multi lines
 
@@ -49,7 +48,6 @@ class Window::Impl {
   void resize();
   void move();
   void destroy();
-  void toggleBorders();
   void draw();
   void applyStyle();
   void drawBorders();
@@ -98,14 +96,14 @@ Point Window::position() const {
   return impl_->pos;
 }
 
-void Window::showBorders(bool borders) {
-  if (impl_->borders != borders) {
-    impl_->toggleBorders();
-  }
-}
-
 void Window::print(const std::string& msg) {
+  if (impl_->style.color != Style::Color::none) {
+    wattron(impl_->win, COLOR_PAIR(impl_->style.color));
+  }
   impl_->print(msg);
+  if (impl_->style.color != Style::Color::none) {
+    wattroff(impl_->win, COLOR_PAIR(impl_->style.color));
+  }
 }
 
 void Window::draw() {
@@ -143,18 +141,15 @@ void Window::Impl::destroy() {
   delwin(win);
 }
 
-void Window::Impl::toggleBorders() {
-  borders = !borders;
-  draw();
-}
-
 void Window::Impl::draw() {
   applyStyle();
-  drawBorders();
   wrefresh(win);
 }
 
 void Window::Impl::applyStyle() {
+  if (style.borders) {
+    drawBorders();
+  }
   if (style.underline) {
     mvwchgat(win, 0, 0, size.width(), A_UNDERLINE, 0, nullptr);
   }
@@ -164,13 +159,11 @@ void Window::Impl::applyStyle() {
 }
 
 void Window::Impl::drawBorders() {
-  if (borders) {
-    box(win, 0, 0);
-  }
+  box(win, 0, 0);
 }
 
 void Window::Impl::print(const std::string& msg) {
-  int offset = borders ? 1 : 0;
+  int offset = style.borders ? 1 : 0;
   mvwaddstr(win, offset, offset, msg.c_str());
   wnoutrefresh(win);
 }

@@ -49,8 +49,6 @@ class Window {
   Size   size() const;
   Point  position() const;
 
-  void   showBorders(bool borders);
-
   virtual void   print(const std::string& msg);
   virtual void   draw();
   virtual void   clear();
