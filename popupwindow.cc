@@ -28,6 +28,7 @@
 #include <chrono>
 #include <curses.h>
 
+#include "style.h"
 #include "popupwindow.h"
 
 namespace portal {
@@ -36,7 +37,7 @@ namespace gfx {
 PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
   : Window() {
   Size size;
-  size.setHeight(3);
+  size.setHeight(1);
   size.setWidth(msg.length() + 2);
   setSize(size);
 
@@ -45,26 +46,24 @@ PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
   pos.setY(center.y());
   setPosition(pos);
 
-//  showBorders(false);
-  print(msg);
-
-  /*
+  Style style;
   switch (type) {
   case Type::brief:
-    pane_->colorizeCurrentLine(2);
+    style.color = Style::Color::magenta;
     break;
   case Type::info:
-    pane_->colorizeCurrentLine(7);
+    style.color = Style::Color::blue;
     break;
   case Type::warning:
-    pane_->colorizeCurrentLine(4);
+    style.color = Style::Color::yellow;
     break;
   case Type::error:
-    pane_->colorizeCurrentLine(5);
+    style.color = Style::Color::red;
     break;
   }
-  */
+  setStyle(style);
 
+  print(msg);
   draw();
   refresh();
 
