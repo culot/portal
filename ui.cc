@@ -36,7 +36,7 @@
 #include "pkg.h"
 #include "point.h"
 #include "size.h"
-#include "popup.h"
+#include "popupwindow.h"
 #include "prompt.h"
 #include "style.h"
 #include "ui.h"
@@ -169,7 +169,8 @@ void Ui::handleEvent(const Event& event) {
 
     case Event::Type::go:
       if (!Pkg::instance().gotRootPrivileges()) {
-        gfx::Popup("Insufficient privileges, please retry as root", gfx::Popup::Type::warning);
+        gfx::PopupWindow("Insufficient privileges, please retry as root",
+                         gfx::PopupWindow::Type::warning);
       } else {
         performPending();
         closeAllFolds();
@@ -512,7 +513,7 @@ void Ui::updateTray() {
   gfx::Point center;
   center.setX(COLS / 2);
   center.setY(pane_[pkgList]->size().height() - 4);
-  gfx::Popup(modeName_[currentMode_], gfx::Popup::Type::brief, center);
+  gfx::PopupWindow(modeName_[currentMode_], gfx::PopupWindow::Type::brief, center);
 }
 
 }

@@ -35,7 +35,7 @@
 namespace portal {
 namespace gfx {
 
-class Popup : public Window {
+class PopupWindow : public Window {
  public:
   enum class Type {
     brief,
@@ -44,7 +44,7 @@ class Popup : public Window {
     error
   };
 
-  Popup(const std::string& msg, Type = Type::info, const Point& center = Point::Label::center);
+  PopupWindow(const std::string& msg, Type = Type::info, const Point& center = Point::Label::center);
 };
 
 }

@@ -28,12 +28,12 @@
 #include <chrono>
 #include <curses.h>
 
-#include "popup.h"
+#include "popupwindow.h"
 
 namespace portal {
 namespace gfx {
 
-Popup::Popup(const std::string& msg, Type type, const Point& center)
+PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
   : Window() {
   Size size;
   size.setHeight(3);
