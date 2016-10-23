@@ -509,7 +509,7 @@ void Ui::updateTray() {
   tray_->selectSlot(currentMode_);
   gfx::Point center;
   center.setX(COLS / 2);
-  center.setY(pane_[pkgList]->size().height() - 4);
+  center.setY(pane_[pkgList]->size().height() - 3);
   gfx::PopupWindow(modeName_[currentMode_], gfx::PopupWindow::Type::brief, center);
 }
 
