@@ -42,7 +42,7 @@ class Window::Impl {
   Style style;
   bool  borders {true};
 
-  // XXX Add a Point posCursor to allow for multi lines text
+  // XXX Add a Point posCursor to allow for text spanning multi lines
 
   bool initialized() const;
   void create();
@@ -155,7 +155,6 @@ void Window::Impl::draw() {
 }
 
 void Window::Impl::applyStyle() {
-  // XXX use posCursor
   if (style.underline) {
     mvwchgat(win, 0, 0, size.width(), A_UNDERLINE, 0, nullptr);
   }
