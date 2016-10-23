@@ -47,11 +47,8 @@ InputWindow::InputWindow(const Point& pos, int len)
   setPosition(position);
 
   Style style;
-  style.highlight = false;
   style.underline = true;
   setStyle(style);
-
-  showBorders(false);
 
   draw();
 }
