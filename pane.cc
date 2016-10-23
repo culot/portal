@@ -188,13 +188,13 @@ void Pane::clearStatus() const {
 }
 
 void Pane::scrollDown() {
-  if (impl_->isCursorOnLastVisibleLine()) {
+  if (impl_->canScrollDown()) {
     impl_->posPad.setY(impl_->posPad.y() + 1);
   }
 }
 
 void Pane::scrollUp() {
-  if (impl_->isCursorOnFirstVisibleLine()) {
+  if (impl_->canScrollUp()) {
     impl_->posPad.setY(impl_->posPad.y() - 1);
   }
 }
@@ -207,7 +207,9 @@ void Pane::moveCursorDown() {
   if (!impl_->isCursorOnLastLine()) {
     impl_->resetCursorLineStyle();
     impl_->posCursor.setY(impl_->posCursor.y() + 1);
-    scrollDown();
+    if (impl_->isCursorOnLastVisibleLine()) {
+      scrollDown();
+    }
   }
 }
 
@@ -215,7 +217,9 @@ void Pane::moveCursorUp() {
   if (!impl_->isCursorOnFirstLine()) {
     impl_->resetCursorLineStyle();
     impl_->posCursor.setY(impl_->posCursor.y() - 1);
-    scrollUp();
+    if (impl_->isCursorOnFirstVisibleLine()) {
+      scrollUp();
+    }
   }
 }
 

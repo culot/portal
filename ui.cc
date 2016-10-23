@@ -124,26 +124,23 @@ void Ui::handleEvent(const Event& event) {
 
     case Event::Type::keyUp:
     case Event::Type::keyDown:
-    case Event::Type::pageUp:
-    case Event::Type::pageDown:
       if (!Pkg::instance().isRepositoryEmpty()) {
         if (event.type() == Event::Type::keyUp) {
           pane_[pkgList]->moveCursorUp();
         } else if (event.type() == Event::Type::keyDown) {
           pane_[pkgList]->moveCursorDown();
         }
-        // XXX Implement scroll up and down
         updatePkgDescrPane();
       }
       break;
 
-    case Event::Type::keyShiftUp:
-    case Event::Type::keyShiftDown:
+    case Event::Type::pageUp:
+    case Event::Type::pageDown:
       if (!Pkg::instance().isRepositoryEmpty()) {
-        if (event.type() == Event::Type::keyShiftUp) {
-          pane_[pkgDescr]->moveCursorUp();
-        } else if (event.type() == Event::Type::keyShiftDown) {
-          pane_[pkgDescr]->moveCursorDown();
+        if (event.type() == Event::Type::pageUp) {
+          pane_[pkgDescr]->scrollUp();
+        } else if (event.type() == Event::Type::pageDown) {
+          pane_[pkgDescr]->scrollDown();
         }
         updatePkgDescrPane();
       }
