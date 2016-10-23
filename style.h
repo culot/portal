@@ -32,7 +32,8 @@ namespace gfx {
 struct Style {
 
    enum Color {
-     cyan = 1,
+     none,
+     cyan,
      magenta,
      red,
      yellow,
@@ -40,8 +41,10 @@ struct Style {
      cyanOnBlue
   };
 
-  bool underline {false};
-  bool highlight {false};
+  bool   underline {false};
+  bool   highlight {false};
+  bool   borders   {false};
+  Color  color     {Color::none};
 };
 
 }
