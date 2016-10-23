@@ -62,7 +62,7 @@ Ui::Ui() {
     throw std::runtime_error("Sorry, B&W terminals not supported yet");
   }
 
-  cbreak();
+  raw();
   noecho();
   keypad(stdscr, TRUE);
   curs_set(0);
