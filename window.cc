@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <curses.h>
 
+#include "gfx.h"
 #include "window.h"
 
 
@@ -143,7 +144,8 @@ void Window::Impl::destroy() {
 
 void Window::Impl::draw() {
   applyStyle();
-  wrefresh(win);
+  wnoutrefresh(win);
+  Gfx::instance().update();
 }
 
 void Window::Impl::applyStyle() {
@@ -166,6 +168,7 @@ void Window::Impl::print(const std::string& msg) {
   int offset = style.borders ? 1 : 0;
   mvwaddstr(win, offset, offset, msg.c_str());
   wnoutrefresh(win);
+  Gfx::instance().update();
 }
 
 }

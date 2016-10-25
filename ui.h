@@ -110,6 +110,7 @@ class Ui {
   std::string         getVersionsForPkg(const std::string& origin) const;
   void                selectNextMode();
   void                updateTray();
+  void                showCurrentModeName();
 };
 
 }

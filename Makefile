@@ -3,6 +3,7 @@ VERSION=	0.4
 
 SRCS=		portal.cc        \
 		pkg.cc           \
+		gfx.cc           \
 		event.cc         \
 		window.cc        \
 		inputwindow.cc   \

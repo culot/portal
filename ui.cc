@@ -26,7 +26,6 @@
 
 #include <thread>
 #include <chrono>
-#include <stdexcept>
 #include <sstream>
 #include <vector>
 #include <set>
@@ -39,6 +38,7 @@
 #include "popupwindow.h"
 #include "inputwindow.h"
 #include "style.h"
+#include "gfx.h"
 #include "ui.h"
 
 namespace portal {
@@ -48,38 +48,13 @@ const std::string markerFolded("-");
 const std::string markerUnfolded("\\");
 
 Ui::Ui() {
-  initscr();
-
-  if (has_colors() && start_color() == OK) {
-    init_pair(gfx::Style::Color::cyan, COLOR_CYAN, 0);
-    init_pair(gfx::Style::Color::magenta, COLOR_MAGENTA, 0);
-    init_pair(gfx::Style::Color::red, COLOR_RED, 0);
-    init_pair(gfx::Style::Color::yellow, COLOR_YELLOW, 0);
-    init_pair(gfx::Style::Color::blue, COLOR_BLUE, 0);
-    init_pair(gfx::Style::Color::cyanOnBlue, COLOR_CYAN, COLOR_BLUE);
-  } else {
-    // XXX Need to deal with B&W terminals
-    throw std::runtime_error("Sorry, B&W terminals not supported yet");
-  }
-
-  raw();
-  noecho();
-  keypad(stdscr, TRUE);
-  curs_set(0);
-  refresh();  // A refresh might seem unnecessary here, but user input is
-              // gathered from stdscr via a call to getch, which does an
-              // implicit refresh first (don't ask me why...). Hence doing
-              // this refresh explicitly avoids a black screen when portal
-              // starts. The black screen does not appear afterwards as
-              // stdscr is never touched by portal, so curses detects it
-              // does not need any subsequent refreshes.
+  gfx::Gfx::instance().init();
   createInterface();
   updatePanes();
 }
 
 Ui::~Ui() {
-  clear();
-  endwin();
+  gfx::Gfx::instance().terminate();
 }
 
 void Ui::display() {
@@ -87,7 +62,7 @@ void Ui::display() {
     pane->draw();
   }
   tray_->draw();
-  doupdate();
+  gfx::Gfx::instance().update();
 }
 
 void Ui::handleEvent(const Event& event) {
@@ -507,6 +482,11 @@ void Ui::selectNextMode() {
 
 void Ui::updateTray() {
   tray_->selectSlot(currentMode_);
+  std::thread popupModeName([this](){showCurrentModeName();});
+  popupModeName.detach();
+}
+
+void Ui::showCurrentModeName() {
   gfx::Point center;
   center.setX(COLS / 2);
   center.setY(pane_[pkgList]->size().height() - 3);

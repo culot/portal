@@ -72,15 +72,12 @@ std::string InputWindow::getInput() {
         break;
     }
     print(content_);
-    draw();
-    doupdate();
   }
 }
 
 void InputWindow::setContent(const std::string& content) {
   content_ = content;
   print(content_);
-  draw();
 }
 
 }

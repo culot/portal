@@ -64,8 +64,6 @@ PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
   setStyle(style);
 
   print(msg);
-  draw();
-  refresh();
 
   int duration;
   switch (type) {
