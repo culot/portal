@@ -29,9 +29,7 @@
 #include <memory>
 #include <string>
 
-#include "point.h"
-#include "size.h"
-#include "style.h"
+#include "gfx.h"
 
 namespace portal {
 namespace gfx {

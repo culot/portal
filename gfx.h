@@ -27,9 +27,100 @@
 #pragma once
 
 #include <thread>
+#include <curses.h>
 
 namespace portal {
 namespace gfx {
+
+struct Point {
+public:
+  enum class Label {
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight,
+    center
+  };
+
+  Point() {}
+  Point(Label label) {
+    switch (label) {
+    case Label::topLeft:
+      x_ = 0;
+      y_ = 0;
+      break;
+    case Label::topRight:
+      x_ = COLS;
+      y_ = 0;
+      break;
+    case Label::bottomLeft:
+      x_ = 0;
+      y_ = LINES;
+      break;
+    case Label::bottomRight:
+      x_ = COLS;
+      y_ = LINES;
+      break;
+    case Label::center:
+      x_ = COLS / 2;
+      y_ = LINES / 2;
+      break;
+    }
+  }
+
+  void setX(int x) {x_ = x;}
+  void setY(int y) {y_ = y;}
+  int  x() const {return x_;}
+  int  y() const {return y_;}
+
+  bool operator==(const Point& other) const {
+    return y() == other.y() && x() == other.x();
+  }
+  bool operator!=(const Point& other) const {return !(*this == other);}
+
+private:
+  int x_ {0};
+  int y_ {0};
+};
+
+
+struct Size {
+public:
+  void setWidth(int width) {width_ = width;}
+  void setHeight(int height) {height_ = height;}
+  int  width() const {return width_;}
+  int  height() const {return height_;}
+  bool isNull() const {return width_ == 0 && height_ == 0;}
+
+  bool operator==(const Size& other) const {
+    return height() == other.height() && width() == other.width();
+  }
+  bool operator!=(const Size& other) const {return !(*this == other);}
+
+private:
+  int width_  {0};
+  int height_ {0};
+};
+
+
+struct Style {
+
+   enum Color {
+     none,
+     cyan,
+     magenta,
+     red,
+     yellow,
+     blue,
+     cyanOnBlue
+  };
+
+  bool   underline {false};
+  bool   highlight {false};
+  bool   borders   {false};
+  Color  color     {Color::none};
+};
+
 
 class Gfx {
  public:

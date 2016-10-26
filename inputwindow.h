@@ -28,8 +28,8 @@
 
 #include <string>
 
+#include "gfx.h"
 #include "window.h"
-#include "point.h"
 
 namespace portal {
 namespace gfx {

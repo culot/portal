@@ -33,11 +33,8 @@
 #include <curses.h>
 
 #include "pkg.h"
-#include "point.h"
-#include "size.h"
 #include "popupwindow.h"
 #include "inputwindow.h"
-#include "style.h"
 #include "gfx.h"
 #include "ui.h"
 

@@ -28,7 +28,6 @@
 #include <chrono>
 #include <curses.h>
 
-#include "style.h"
 #include "popupwindow.h"
 
 namespace portal {

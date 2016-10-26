@@ -28,7 +28,6 @@
 
 #include <curses.h>
 
-#include "size.h"
 #include "tray.h"
 
 namespace portal {

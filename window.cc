@@ -27,7 +27,6 @@
 #include <stdexcept>
 #include <curses.h>
 
-#include "gfx.h"
 #include "window.h"
 
 

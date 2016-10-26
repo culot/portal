@@ -25,9 +25,7 @@
  */
 
 #include <stdexcept>
-#include <curses.h>
 
-#include "style.h"
 #include "gfx.h"
 
 namespace portal {

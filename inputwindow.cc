@@ -28,7 +28,6 @@
 #include <curses.h>
 
 #include "event.h"
-#include "size.h"
 #include "inputwindow.h"
 
 namespace portal {
