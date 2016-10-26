@@ -382,7 +382,7 @@ void Ui::promptSearch(int character) const {
   std::string query = inputWindow.getInput();
   Pkg::instance().search(query);
   pane_[pkgList]->clearStatus();
-  pane_[pkgList]->printStatus(query, 2);
+  pane_[pkgList]->printStatus(query, gfx::Style::Color::magenta);
 }
 
   // XXX implement busy status

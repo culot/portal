@@ -31,6 +31,7 @@
 
 #include "point.h"
 #include "size.h"
+#include "style.h"
 
 namespace portal {
 namespace gfx {
@@ -59,7 +60,7 @@ class Pane {
   void newline();
   void print(const std::string& line, Align align = Align::left);
   void print(int c, int cursesColorNum = 0);
-  void printStatus(const std::string& status, int cursesColorNum = 0) const;
+  void printStatus(const std::string& status, int cursesColorNum = Style::Color::none) const;
   void clearStatus() const;
   void scrollDown();
   void scrollUp();
