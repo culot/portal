@@ -120,15 +120,15 @@ void Ui::handleEvent(const Event& event) {
 
     case Event::Type::character:
       switch (currentMode_) {
-      case Mode::browse :
+      case Mode::browse:
         // DO NOTHING
         break;
-      case Mode::search :
+      case Mode::search:
         pane_[pkgList]->resetCursorPosition();
         promptSearch(event.character());
         updatePanes();
         break;
-      case Mode::filter :
+      case Mode::filter:
         pane_[pkgList]->resetCursorPosition();
         promptFilter(event.character());
         updatePanes();
@@ -339,30 +339,29 @@ void Ui::performPending() {
 }
 
 void Ui::promptFilter(int character) {
+  pane_[pkgList]->clearStatus();
   switch (character) {
   case 'n':
     Pkg::instance().resetFilter();
     break;
 
   case 'i':
-  case '+':
-//          pane_[pkgList].status("Installed");
+    pane_[pkgList]->printStatus("Installed", gfx::Style::Color::magenta);
     Pkg::instance().filterInstalled();
     break;
 
-  case '-':
   case 'a':
-//          pane_[pkgList].status("Available");
+    pane_[pkgList]->printStatus("Available", gfx::Style::Color::magenta);
     Pkg::instance().filterAvailable();
     break;
 
   case 'p':
-//          pane_[pkgList].status("Pending");
+    pane_[pkgList]->printStatus("Pending", gfx::Style::Color::magenta);
     Pkg::instance().filterPending();
     break;
 
   case 'u':
-//          pane_[pkgList].status("Upgradable");
+    pane_[pkgList]->printStatus("Upgradable", gfx::Style::Color::magenta);
     Pkg::instance().filterUpgradable();
     break;
 
