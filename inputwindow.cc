@@ -36,13 +36,13 @@ namespace gfx {
 InputWindow::InputWindow(const Point& pos, int len)
   : Window() {
   Size size;
-  size.setHeight(3);
+  size.setHeight(1);
   size.setWidth(len + 2);
   setSize(size);
 
   Point position;
-  position.setX(pos.x() - 1);
-  position.setY(pos.y() - 1);
+  position.setX(pos.x() - len / 2);
+  position.setY(pos.y());
   setPosition(position);
 
   Style style;
