@@ -118,7 +118,6 @@ void Pane::borders(bool borders) {
   if (impl_->borders != borders) {
     werase(impl_->win);
     impl_->toggleBorders();
-    draw();
   }
 }
 
@@ -137,6 +136,7 @@ void Pane::draw() const {
                impl_->posView.y() + impl_->sizeView.height() - (impl_->borders ? 2 : 0),
                impl_->posView.x() + impl_->sizeView.width() - 2);
   wnoutrefresh(impl_->win);
+  Gfx::instance().update();
 }
 
 void Pane::clear() {
@@ -163,10 +163,12 @@ void Pane::print(const std::string& line, Align align) {
   }
 
   mvwaddstr(impl_->pad, impl_->posPrint.y(), xpos, line.c_str());
+  draw();
 }
 
 void Pane::print(int c, int cursesColorNum) {
   waddch(impl_->pad, c | COLOR_PAIR(cursesColorNum));
+  draw();
 }
 
 void Pane::printStatus(const std::string& status, int cursesColorNum) const {
@@ -181,6 +183,7 @@ void Pane::printStatus(const std::string& status, int cursesColorNum) const {
   xpos += statusLength;
   mvwaddch(impl_->win, ypos, xpos++, ' ');
   mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);
+  draw();
 }
 
 void Pane::clearStatus() const {
