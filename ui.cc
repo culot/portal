@@ -328,14 +328,13 @@ void Ui::registerPkgChange(Event::Type event) {
 
 void Ui::performPending() {
   busy_ = true;
-  // XXX implement busy status
-//  std::thread uiHint([this]() {busyStatus(pane_[pkgList]);});
-//  uiHint.detach();
+  std::thread uiHint([this]() {busyStatus(*pane_[pkgList]);});
+  uiHint.detach();
 
   std::thread pendingActions(&Pkg::performPending, &Pkg::instance());
   pendingActions.join();
   busy_ = false;
-//  pane_[pkgList].clearStatus();
+  pane_[pkgList]->clearStatus();
 }
 
 void Ui::promptFilter(int character) {
@@ -381,17 +380,13 @@ void Ui::promptSearch(int character) const {
   pane_[pkgList]->printStatus(query, gfx::Style::Color::magenta);
 }
 
-  // XXX implement busy status
 void Ui::setBusyStatus(gfx::Pane& pane, const std::string& status) {
-  /*
-  pane.status(status);
-  pane.refreshStatus();
+  pane.printStatus(status, gfx::Style::Color::magenta);
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  */
 }
 
 void Ui::busyStatus(gfx::Pane& pane) {
-  /*
+  pane.clearStatus();
   while (busy_) {
     setBusyStatus(pane, "Please wait.  ");
     if (!busy_)
@@ -409,7 +404,6 @@ void Ui::busyStatus(gfx::Pane& pane) {
     if (!busy_)
       return;
   }
-  */
 }
 
 void Ui::warningStatus(gfx::Pane& pane, const std::string& status) {
