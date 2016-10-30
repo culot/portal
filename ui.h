@@ -31,6 +31,7 @@
 #include <vector>
 #include <map>
 
+#include "pkg.h"
 #include "event.h"
 #include "pane.h"
 #include "tray.h"
@@ -84,6 +85,7 @@ class Ui {
   std::map<std::string, bool>    unfolded_;
   std::vector<pkgListItem>       pkgList_;
   int                            currentMode_ {Mode::browse};
+  Pkg::Status                    filteringStatuses_;
   
   void                createInterface();
   void                updatePanes();

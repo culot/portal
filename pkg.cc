@@ -422,47 +422,15 @@ void Pkg::resetFilter() {
   switchToReferenceRepository();
 }
 
-void Pkg::filterAvailable() {
+void Pkg::applyFilter(const Status& wantedStatuses) {
   std::vector<Port> pkgs;
-
-  for (const auto& category : refPkgs_)
-    for (const auto& pkg : category.second)
-      if (!pkg.status[installed])
+  for (const auto& category : refPkgs_) {
+    for (const auto& pkg : category.second) {
+      if ((pkg.status & wantedStatuses).any()) {
         pkgs.push_back(pkg);
-
-  fillTmpRepo(pkgs);
-}
-
-void Pkg::filterInstalled() {
-  std::vector<Port> pkgs;
-
-  for (const auto& category : refPkgs_)
-    for (const auto& pkg : category.second)
-      if (pkg.status[installed])
-        pkgs.push_back(pkg);
-
-  fillTmpRepo(pkgs);
-}
-
-void Pkg::filterUpgradable() {
-  std::vector<Port> pkgs;
-
-  for (const auto& category : refPkgs_)
-    for (const auto& pkg : category.second)
-      if (pkg.status[upgradable])
-        pkgs.push_back(pkg);
-
-  fillTmpRepo(pkgs);
-}
-
-void Pkg::filterPending() {
-  std::vector<Port> pkgs;
-
-  for (const auto& category : refPkgs_)
-    for (const auto& pkg : category.second)
-      if (pkg.status[pendingInstall] || pkg.status[pendingRemoval])
-        pkgs.push_back(pkg);
-
+      }
+    }
+  }
   fillTmpRepo(pkgs);
 }
 

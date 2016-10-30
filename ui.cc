@@ -32,7 +32,6 @@
 
 #include <curses.h>
 
-#include "pkg.h"
 #include "popupwindow.h"
 #include "inputwindow.h"
 #include "gfx.h"
@@ -45,6 +44,7 @@ const std::string markerFolded("-");
 const std::string markerUnfolded("\\");
 
 Ui::Ui() {
+  filteringStatuses_.set();
   gfx::Gfx::instance().init();
   createInterface();
   updatePanes();
@@ -341,33 +341,30 @@ void Ui::promptFilter(int character) {
   pane_[pkgList]->clearStatus();
   switch (character) {
   case 'n':
+    filteringStatuses_.reset();
     Pkg::instance().resetFilter();
     break;
 
   case 'i':
     pane_[pkgList]->printStatus("Installed", gfx::Style::Color::magenta);
-    Pkg::instance().filterInstalled();
-    break;
-
-  case 'a':
-    pane_[pkgList]->printStatus("Available", gfx::Style::Color::magenta);
-    Pkg::instance().filterAvailable();
+    filteringStatuses_.flip(Pkg::Statuses::installed);
     break;
 
   case 'p':
     pane_[pkgList]->printStatus("Pending", gfx::Style::Color::magenta);
-    Pkg::instance().filterPending();
+    filteringStatuses_.flip(Pkg::Statuses::pendingInstall);
     break;
 
   case 'u':
     pane_[pkgList]->printStatus("Upgradable", gfx::Style::Color::magenta);
-    Pkg::instance().filterUpgradable();
+    filteringStatuses_.flip(Pkg::Statuses::upgradable);
     break;
 
   default:
     // DO NOTHING
     break;
   }
+  Pkg::instance().applyFilter(filteringStatuses_);
 }
 
 void Ui::promptSearch(int character) const {

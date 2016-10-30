@@ -56,6 +56,7 @@ class Pkg {
   };
 
   enum Statuses {
+    none,
     installed,
     upgradable,
     pendingInstall,
@@ -83,10 +84,7 @@ class Pkg {
   void                      performPending();
   void                      search(const std::string& args);
   void                      resetFilter();
-  void                      filterAvailable();
-  void                      filterInstalled();
-  void                      filterUpgradable();
-  void                      filterPending();
+  void                      applyFilter(const Status& wantedStatuses);
   std::string               getCurrentStatusAsString(const std::string& origin) const;
   std::string               getPendingStatusAsString(const std::string& origin) const;
   bool                      hasPendingActions(const std::string& origin) const;
