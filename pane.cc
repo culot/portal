@@ -67,6 +67,7 @@ class Pane::Impl {
   Point posView;
   Point posCursor;
   Point posPrint;
+  Point posStatus;
 
   bool cursorLineHighlight {true};
   bool cursorLineUnderline {false};
@@ -175,6 +176,9 @@ void Pane::printStatus(const std::string& status, int cursesColorNum) const {
   int statusLength = status.length();
   int xpos = impl_->sizeView.width() - statusLength - 8;
   int ypos = impl_->sizeView.height() - 1;
+  impl_->posStatus.setX(xpos);
+  impl_->posStatus.setY(ypos);
+
   mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
   mvwaddch(impl_->win, ypos, xpos++, ' ');
   wattron(impl_->win, COLOR_PAIR(cursesColorNum));
@@ -186,7 +190,19 @@ void Pane::printStatus(const std::string& status, int cursesColorNum) const {
   draw();
 }
 
+void Pane::setStatusStyle(int xpos, int len, const Style& style) const {
+  mvwchgat(impl_->win,
+           impl_->posStatus.y(),
+           impl_->posStatus.x() + xpos + 2,
+           len,
+           style.bold ? A_BOLD : A_NORMAL,
+           style.color,
+           nullptr);
+  wnoutrefresh(impl_->win);
+}
+
 void Pane::clearStatus() const {
+  impl_->posStatus.reset();
   impl_->drawBorders();
 }
 
