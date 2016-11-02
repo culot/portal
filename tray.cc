@@ -57,7 +57,7 @@ void Tray::draw() const {
 
 void Tray::drawSlots() const {
   for (int i = 0; i < nbSlots_; ++i) {
-    pane_->print(ACS_DIAMOND, (i == selectedSlotNum_ ? 2 : 0));
+    pane_->print(ACS_DIAMOND, (i == selectedSlotNum_ ? Style::Color::magenta : 0));
     pane_->print(' ');
   }
 }
