@@ -338,31 +338,53 @@ void Ui::performPending() {
 }
 
 void Ui::promptFilter(int character) {
+  static const std::string installedStatus = "(I)nstalled";
+  static const std::string pendingStatus = "(P)ending";
+  static const std::string upgradableStatus = "(U)pgradable";
+  static const std::string statusString =
+    installedStatus + " / " + pendingStatus + " / " + upgradableStatus;
+
   pane_[pkgList]->clearStatus();
+  pane_[pkgList]->printStatus(statusString);
+  gfx::Style unselectedStyle;
+  unselectedStyle.color = gfx::Style::Color::black;
+  unselectedStyle.bold = true;
+  pane_[pkgList]->setStatusStyle(0, statusString.length(), unselectedStyle);
+
   switch (character) {
   case 'n':
     filteringStatuses_.reset();
     Pkg::instance().resetFilter();
     break;
-
   case 'i':
-    pane_[pkgList]->printStatus("Installed", gfx::Style::Color::magenta);
     filteringStatuses_.flip(Pkg::Statuses::installed);
     break;
-
   case 'p':
-    pane_[pkgList]->printStatus("Pending", gfx::Style::Color::magenta);
     filteringStatuses_.flip(Pkg::Statuses::pendingInstall);
     break;
-
   case 'u':
-    pane_[pkgList]->printStatus("Upgradable", gfx::Style::Color::magenta);
     filteringStatuses_.flip(Pkg::Statuses::upgradable);
     break;
-
   default:
     // DO NOTHING
     break;
+  }
+
+  gfx::Style selectedStyle;
+  selectedStyle.color = gfx::Style::Color::magenta;
+
+  if (filteringStatuses_[Pkg::Statuses::installed]) {
+    pane_[pkgList]->setStatusStyle(0, installedStatus.length(), selectedStyle);
+  }
+  if (filteringStatuses_[Pkg::Statuses::pendingInstall]) {
+    pane_[pkgList]->setStatusStyle(installedStatus.length() + 3,
+                                   pendingStatus.length(),
+                                   selectedStyle);
+  }
+  if (filteringStatuses_[Pkg::Statuses::upgradable]) {
+    pane_[pkgList]->setStatusStyle(installedStatus.length() + pendingStatus.length() + 6,
+                                   upgradableStatus.length(),
+                                   selectedStyle);
   }
   Pkg::instance().applyFilter(filteringStatuses_);
 }
