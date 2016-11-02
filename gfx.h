@@ -70,6 +70,8 @@ public:
 
   void setX(int x) {x_ = x;}
   void setY(int y) {y_ = y;}
+  void reset() {x_ = 0; y_ = 0;}
+  bool isNull() const {return x_ == 0 && y_ == 0;}
   int  x() const {return x_;}
   int  y() const {return y_;}
 
@@ -88,6 +90,7 @@ struct Size {
 public:
   void setWidth(int width) {width_ = width;}
   void setHeight(int height) {height_ = height;}
+  void reset() {height_ = 0; width_ = 0;}
   int  width() const {return width_;}
   int  height() const {return height_;}
   bool isNull() const {return width_ == 0 && height_ == 0;}
@@ -107,6 +110,7 @@ struct Style {
 
    enum Color {
      none,
+     black,
      cyan,
      magenta,
      red,
@@ -115,6 +119,7 @@ struct Style {
      cyanOnBlue
   };
 
+  bool   bold      {false};
   bool   underline {false};
   bool   highlight {false};
   bool   borders   {false};
