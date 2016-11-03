@@ -396,11 +396,15 @@ void Ui::promptSearch(int character) const {
   std::string query = inputWindow.getInput();
   Pkg::instance().search(query);
   pane_[pkgList]->clearStatus();
-  pane_[pkgList]->printStatus(query, gfx::Style::Color::magenta);
+  gfx::Style promptStyle;
+  promptStyle.color = gfx::Style::Color::magenta;
+  pane_[pkgList]->printStatus(query, promptStyle);
 }
 
 void Ui::setBusyStatus(gfx::Pane& pane, const std::string& status) {
-  pane.printStatus(status, gfx::Style::Color::magenta);
+  gfx::Style busyStyle;
+  busyStyle.color = gfx::Style::Color::magenta;
+  pane.printStatus(status, busyStyle);
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 

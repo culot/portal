@@ -172,7 +172,7 @@ void Pane::print(int c, int cursesColorNum) {
   draw();
 }
 
-void Pane::printStatus(const std::string& status, int cursesColorNum) const {
+void Pane::printStatus(const std::string& status, const Style& style) const {
   int statusLength = status.length();
   int xpos = impl_->sizeView.width() - statusLength - 8;
   int ypos = impl_->sizeView.height() - 1;
@@ -181,9 +181,9 @@ void Pane::printStatus(const std::string& status, int cursesColorNum) const {
 
   mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
   mvwaddch(impl_->win, ypos, xpos++, ' ');
-  wattron(impl_->win, COLOR_PAIR(cursesColorNum));
+  wattron(impl_->win, COLOR_PAIR(style.color));
   mvwaddstr(impl_->win, ypos, xpos, status.c_str());
-  wattroff(impl_->win, COLOR_PAIR(cursesColorNum));
+  wattroff(impl_->win, COLOR_PAIR(style.color));
   xpos += statusLength;
   mvwaddch(impl_->win, ypos, xpos++, ' ');
   mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);
