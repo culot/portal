@@ -181,9 +181,10 @@ void Pane::printStatus(const std::string& status, const Style& style) const {
 
   mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
   mvwaddch(impl_->win, ypos, xpos++, ' ');
-  wattron(impl_->win, COLOR_PAIR(style.color));
+
+  wattron(impl_->win, style.cursesAttrs());
   mvwaddstr(impl_->win, ypos, xpos, status.c_str());
-  wattroff(impl_->win, COLOR_PAIR(style.color));
+  wattroff(impl_->win, style.cursesAttrs());
   xpos += statusLength;
   mvwaddch(impl_->win, ypos, xpos++, ' ');
   mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);

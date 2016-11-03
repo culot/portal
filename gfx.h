@@ -120,10 +120,20 @@ struct Style {
   };
 
   bool   bold      {false};
+  bool   reverse   {false};
   bool   underline {false};
   bool   highlight {false};
   bool   borders   {false};
   Color  color     {Color::none};
+
+  int    cursesAttrs() const {
+    int s = COLOR_PAIR(color);
+    s |= bold ? A_BOLD : 0;
+    s |= reverse ? A_REVERSE : 0;
+    s |= underline ? A_UNDERLINE : 0;
+    s |= highlight ? A_STANDOUT : 0;
+    return s;
+  };
 };
 
 
