@@ -66,10 +66,17 @@ void Ui::handleEvent(const Event& event) {
   switch (event.type()) {
     case Event::Type::nextMode:
       selectNextMode();
-      if (currentMode_ == Mode::browse) {
+      switch (currentMode_) {
+      case Mode::browse:
         Pkg::instance().resetFilter();
-        updatePanes();
+        break;
+      case Mode::search:
+        applySearch();
+        break;
+      case Mode::filter:
+        break;
       }
+      updatePanes();
       updateTray();
     break;
 
@@ -126,6 +133,7 @@ void Ui::handleEvent(const Event& event) {
       case Mode::search:
         pane_[pkgList]->resetCursorPosition();
         promptSearch(event.character());
+        applySearch();
         updatePanes();
         break;
       case Mode::filter:
@@ -388,16 +396,21 @@ void Ui::promptFilter(int character) {
   Pkg::instance().applyFilter(filteringStatuses_);
 }
 
-void Ui::promptSearch(int character) const {
+void Ui::promptSearch(int character) {
   gfx::Point pos = gfx::Point::Label::center;
   gfx::InputWindow inputWindow(pos, 40);
   inputWindow.setContent(std::string(1, static_cast<char>(character)));
-  std::string query = inputWindow.getInput();
-  Pkg::instance().search(query);
-  pane_[pkgList]->clearStatus();
-  gfx::Style promptStyle;
-  promptStyle.color = gfx::Style::Color::magenta;
-  pane_[pkgList]->printStatus(query, promptStyle);
+  searchString_ = inputWindow.getInput();
+}
+
+void Ui::applySearch() const {
+  if (!searchString_.empty()) {
+    Pkg::instance().search(searchString_);
+    pane_[pkgList]->clearStatus();
+    gfx::Style promptStyle;
+    promptStyle.color = gfx::Style::Color::magenta;
+    pane_[pkgList]->printStatus(searchString_, promptStyle);
+  }
 }
 
 void Ui::busyStatus(gfx::Pane& pane) {

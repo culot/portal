@@ -77,7 +77,7 @@ class Ui {
   };
 
   std::string                    modeName_[nbModes] {"Browse", "Search", "Filter"};
-  
+  std::string                    searchString_;
   bool                           busy_ {false};
 
   std::unique_ptr<gfx::Pane>     pane_[PaneType::nbtypes];
@@ -86,7 +86,7 @@ class Ui {
   std::vector<pkgListItem>       pkgList_;
   int                            currentMode_ {Mode::browse};
   Pkg::Status                    filteringStatuses_;
-  
+
   void                createInterface();
   void                updatePanes();
   void                buildPkgList();
@@ -102,7 +102,8 @@ class Ui {
   void                registerPkgChange(Event::Type event);
   void                performPending();
   void                promptFilter(int character);
-  void                promptSearch(int character) const;
+  void                promptSearch(int character);
+  void                applySearch() const;
   void                busyStatus(gfx::Pane& pane);
   bool                isCategoryFolded(const std::string& category) const;
   std::string         getStringForCategory(const std::string& category) const;
