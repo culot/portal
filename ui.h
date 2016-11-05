@@ -103,7 +103,6 @@ class Ui {
   void                performPending();
   void                promptFilter(int character);
   void                promptSearch(int character) const;
-  void                setBusyStatus(gfx::Pane& pane, const std::string& status);
   void                busyStatus(gfx::Pane& pane);
   void                warningStatus(gfx::Pane& pane, const std::string& status);
   bool                isCategoryFolded(const std::string& category) const;

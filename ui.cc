@@ -334,7 +334,6 @@ void Ui::performPending() {
   std::thread pendingActions(&Pkg::performPending, &Pkg::instance());
   pendingActions.join();
   busy_ = false;
-  pane_[pkgList]->clearStatus();
 }
 
 void Ui::promptFilter(int character) {
@@ -401,31 +400,27 @@ void Ui::promptSearch(int character) const {
   pane_[pkgList]->printStatus(query, promptStyle);
 }
 
-void Ui::setBusyStatus(gfx::Pane& pane, const std::string& status) {
-  gfx::Style busyStyle;
-  busyStyle.color = gfx::Style::Color::magenta;
-  pane.printStatus(status, busyStyle);
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-}
-
 void Ui::busyStatus(gfx::Pane& pane) {
   pane.clearStatus();
-  while (busy_) {
-    setBusyStatus(pane, "Please wait.  ");
-    if (!busy_)
-      return;
-    setBusyStatus(pane, "Please wait.. ");
-    if (!busy_)
-      return;
-    setBusyStatus(pane, "Please wait...");
-    if (!busy_)
-      return;
-    setBusyStatus(pane, "Please wait ..");
-    if (!busy_)
-      return;
-    setBusyStatus(pane, "Please wait  .");
-    if (!busy_)
-      return;
+  gfx::Style busyStyle;
+  busyStyle.color = gfx::Style::Color::magenta;
+  busyStyle.reverse = true;
+  std::string busyString("     ");
+  int busyStringLen = busyString.length();
+  pane.printStatus(busyString);
+  for (;;) {
+    for (int x = 0; x < busyStringLen; ++x) {
+      if (!busy_) {
+        pane.clearStatus();
+        pane.draw();
+        return;
+      } else {
+        pane.setStatusStyle(0, busyStringLen, {});
+        pane.setStatusStyle(x, 1, busyStyle);
+        pane.draw();
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+      }
+    }
   }
 }
 
