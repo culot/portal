@@ -424,17 +424,6 @@ void Ui::busyStatus(gfx::Pane& pane) {
   }
 }
 
-void Ui::warningStatus(gfx::Pane& pane, const std::string& status) {
-  /*
-  std::string oldStatus = pane.getStatus();
-  pane.status(status, gfx::color::RED);
-  pane.refreshStatus();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-  pane.status(oldStatus);
-  pane.requestRefresh();
-  */
-}
-
 bool Ui::isCategoryFolded(const std::string& category) const {
   return unfolded_.find(category) == unfolded_.end() || unfolded_.at(category) == false;
 }

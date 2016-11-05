@@ -104,7 +104,6 @@ class Ui {
   void                promptFilter(int character);
   void                promptSearch(int character) const;
   void                busyStatus(gfx::Pane& pane);
-  void                warningStatus(gfx::Pane& pane, const std::string& status);
   bool                isCategoryFolded(const std::string& category) const;
   std::string         getStringForCategory(const std::string& category) const;
   std::string         getStringForPkg(const std::string& origin) const;
