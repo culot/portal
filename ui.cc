@@ -44,7 +44,7 @@ const std::string markerFolded("-");
 const std::string markerUnfolded("\\");
 
 Ui::Ui() {
-  filteringStatuses_.set();
+  filters_.set();
   gfx::Gfx::instance().init();
   createInterface();
   updatePanes();
@@ -74,6 +74,7 @@ void Ui::handleEvent(const Event& event) {
         applySearch();
         break;
       case Mode::filter:
+        applyFilter();
         break;
       }
       updatePanes();
@@ -139,6 +140,7 @@ void Ui::handleEvent(const Event& event) {
       case Mode::filter:
         pane_[pkgList]->resetCursorPosition();
         promptFilter(event.character());
+        applyFilter();
         updatePanes();
         break;
       }
@@ -345,11 +347,34 @@ void Ui::performPending() {
 }
 
 void Ui::promptFilter(int character) {
+  switch (character) {
+  case 'n':
+    filters_.reset();
+    Pkg::instance().resetFilter();
+    break;
+  case 'i':
+    filters_.flip(Pkg::Statuses::installed);
+    break;
+  case 'p':
+    filters_.flip(Pkg::Statuses::pendingInstall);
+    break;
+  case 'u':
+    filters_.flip(Pkg::Statuses::upgradable);
+    break;
+  default:
+    // DO NOTHING
+    break;
+  }
+}
+
+void Ui::applyFilter() const {
   static const std::string installedStatus = "(I)nstalled";
   static const std::string pendingStatus = "(P)ending";
   static const std::string upgradableStatus = "(U)pgradable";
   static const std::string statusString =
     installedStatus + " / " + pendingStatus + " / " + upgradableStatus;
+
+  Pkg::instance().applyFilter(filters_);
 
   pane_[pkgList]->clearStatus();
   pane_[pkgList]->printStatus(statusString);
@@ -358,42 +383,21 @@ void Ui::promptFilter(int character) {
   unselectedStyle.bold = true;
   pane_[pkgList]->setStatusStyle(0, statusString.length(), unselectedStyle);
 
-  switch (character) {
-  case 'n':
-    filteringStatuses_.reset();
-    Pkg::instance().resetFilter();
-    break;
-  case 'i':
-    filteringStatuses_.flip(Pkg::Statuses::installed);
-    break;
-  case 'p':
-    filteringStatuses_.flip(Pkg::Statuses::pendingInstall);
-    break;
-  case 'u':
-    filteringStatuses_.flip(Pkg::Statuses::upgradable);
-    break;
-  default:
-    // DO NOTHING
-    break;
-  }
-
   gfx::Style selectedStyle;
   selectedStyle.color = gfx::Style::Color::magenta;
-
-  if (filteringStatuses_[Pkg::Statuses::installed]) {
+  if (filters_[Pkg::Statuses::installed]) {
     pane_[pkgList]->setStatusStyle(0, installedStatus.length(), selectedStyle);
   }
-  if (filteringStatuses_[Pkg::Statuses::pendingInstall]) {
+  if (filters_[Pkg::Statuses::pendingInstall]) {
     pane_[pkgList]->setStatusStyle(installedStatus.length() + 3,
                                    pendingStatus.length(),
                                    selectedStyle);
   }
-  if (filteringStatuses_[Pkg::Statuses::upgradable]) {
+  if (filters_[Pkg::Statuses::upgradable]) {
     pane_[pkgList]->setStatusStyle(installedStatus.length() + pendingStatus.length() + 6,
                                    upgradableStatus.length(),
                                    selectedStyle);
   }
-  Pkg::instance().applyFilter(filteringStatuses_);
 }
 
 void Ui::promptSearch(int character) {
