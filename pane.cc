@@ -182,9 +182,9 @@ void Pane::printStatus(const std::string& status, const Style& style) const {
   mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
   mvwaddch(impl_->win, ypos, xpos++, ' ');
 
-  wattron(impl_->win, style.cursesAttrs());
+  wattron(impl_->win, COLOR_PAIR(style.color) | style.cursesAttrs());
   mvwaddstr(impl_->win, ypos, xpos, status.c_str());
-  wattroff(impl_->win, style.cursesAttrs());
+  wattroff(impl_->win, COLOR_PAIR(style.color) | style.cursesAttrs());
   xpos += statusLength;
   mvwaddch(impl_->win, ypos, xpos++, ' ');
   mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);
@@ -196,7 +196,7 @@ void Pane::setStatusStyle(int xpos, int len, const Style& style) const {
            impl_->posStatus.y(),
            impl_->posStatus.x() + xpos + 2,
            len,
-           style.bold ? A_BOLD : A_NORMAL,
+           style.cursesAttrs(),
            style.color,
            nullptr);
   wnoutrefresh(impl_->win);
