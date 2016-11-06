@@ -104,6 +104,8 @@ void Window::print(const std::string& msg) {
   if (impl_->style.color != Style::Color::none) {
     wattroff(impl_->win, COLOR_PAIR(impl_->style.color));
   }
+  wnoutrefresh(impl_->win);
+  Gfx::instance().update();
 }
 
 void Window::draw() {
@@ -166,8 +168,6 @@ void Window::Impl::drawBorders() {
 void Window::Impl::print(const std::string& msg) {
   int offset = style.borders ? 1 : 0;
   mvwaddstr(win, offset, offset, msg.c_str());
-  wnoutrefresh(win);
-  Gfx::instance().update();
 }
 
 }
