@@ -74,6 +74,7 @@ PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
     break;
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(duration));
+  clear();
 }
 
 }
