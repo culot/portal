@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include <thread>
+#include <mutex>
 #include <curses.h>
 
 namespace portal {
