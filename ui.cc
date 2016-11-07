@@ -349,9 +349,8 @@ void Ui::performPending() {
 
 void Ui::promptFilter(int character) {
   switch (character) {
-  case 'n':
-    filters_.reset();
-    Pkg::instance().resetFilter();
+  case 'a':
+    filters_.flip(Pkg::Statuses::available);
     break;
   case 'i':
     filters_.flip(Pkg::Statuses::installed);
@@ -369,11 +368,12 @@ void Ui::promptFilter(int character) {
 }
 
 void Ui::applyFilter() const {
+  static const std::string availableStatus = "(A)vailable";
   static const std::string installedStatus = "(I)nstalled";
   static const std::string pendingStatus = "(P)ending";
   static const std::string upgradableStatus = "(U)pgradable";
   static const std::string statusString =
-    installedStatus + " / " + pendingStatus + " / " + upgradableStatus;
+    availableStatus + " / " + installedStatus + " / " + pendingStatus + " / " + upgradableStatus;
 
   Pkg::instance().applyFilter(filters_);
 
@@ -386,18 +386,21 @@ void Ui::applyFilter() const {
 
   gfx::Style selectedStyle;
   selectedStyle.color = gfx::Style::Color::magenta;
+  int pos = 0;
+  if (filters_[Pkg::Statuses::available]) {
+    pane_[pkgList]->setStatusStyle(0, availableStatus.length(), selectedStyle);
+  }
+  pos += availableStatus.length() + 3;
   if (filters_[Pkg::Statuses::installed]) {
-    pane_[pkgList]->setStatusStyle(0, installedStatus.length(), selectedStyle);
+    pane_[pkgList]->setStatusStyle(pos, installedStatus.length(), selectedStyle);
   }
+  pos += installedStatus.length() + 3;
   if (filters_[Pkg::Statuses::pendingInstall]) {
-    pane_[pkgList]->setStatusStyle(installedStatus.length() + 3,
-                                   pendingStatus.length(),
-                                   selectedStyle);
+    pane_[pkgList]->setStatusStyle(pos, pendingStatus.length(), selectedStyle);
   }
+  pos += pendingStatus.length() + 3;
   if (filters_[Pkg::Statuses::upgradable]) {
-    pane_[pkgList]->setStatusStyle(installedStatus.length() + pendingStatus.length() + 6,
-                                   upgradableStatus.length(),
-                                   selectedStyle);
+    pane_[pkgList]->setStatusStyle(pos, upgradableStatus.length(), selectedStyle);
   }
 }
 
