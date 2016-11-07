@@ -66,6 +66,7 @@ void Ui::handleEvent(const Event& event) {
   switch (event.type()) {
     case Event::Type::nextMode:
       selectNextMode();
+      pane_[pkgList]->clearStatus();
       switch (currentMode_) {
       case Mode::browse:
         Pkg::instance().resetFilter();
