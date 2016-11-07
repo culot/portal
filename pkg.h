@@ -57,6 +57,7 @@ class Pkg {
 
   enum Statuses {
     none,
+    available,
     installed,
     upgradable,
     pendingInstall,

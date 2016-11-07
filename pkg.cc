@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -284,6 +284,8 @@ void Pkg::fillPkgRepo(Repo repo, std::vector<Port>& pkgs) {
     if (repo == Repo::local) {
       port.status.set(Statuses::installed);
       port.localVersion = port.remoteVersion;
+    } else {
+      port.status.set(Statuses::available);
     }
 
     std::string portCategory = getCategoryFromOrigin(port.origin);
@@ -302,10 +304,12 @@ void Pkg::fillPkgRepo(Repo repo, std::vector<Port>& pkgs) {
       // of the software newer than the one available in
       // remote repositories. I expect this case to be an
       // exception to avoid costly comparisons.
-      if (it->localVersion != it->remoteVersion)
+      if (it->localVersion != it->remoteVersion) {
         it->status.set(Statuses::upgradable);
-    } else
+      }
+    } else {
       (*pkgs_)[portCategory].insert(port);
+    }
   }
 }
 
