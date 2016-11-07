@@ -108,12 +108,24 @@ void Window::print(const std::string& msg) {
   Gfx::instance().update();
 }
 
+void Window::print(int c) {
+  if (impl_->style.color != Style::Color::none) {
+    wattron(impl_->win, COLOR_PAIR(impl_->style.color));
+  }
+  waddch(impl_->win, c);
+  if (impl_->style.color != Style::Color::none) {
+    wattroff(impl_->win, COLOR_PAIR(impl_->style.color));
+  }
+  wnoutrefresh(impl_->win);
+}
+
 void Window::draw() {
   impl_->draw();
 }
 
 void Window::clear() {
   werase(impl_->win);
+  wmove(impl_->win, 0, 0);
   impl_->draw();
 }
 

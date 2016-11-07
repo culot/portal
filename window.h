@@ -48,6 +48,7 @@ class Window {
   Point  position() const;
 
   virtual void   print(const std::string& msg);
+  virtual void   print(int c);
   virtual void   draw();
   virtual void   clear();
 
