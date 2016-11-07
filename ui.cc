@@ -58,7 +58,7 @@ void Ui::display() {
   for (const auto& pane : pane_) {
     pane->draw();
   }
-  tray_->draw();
+  tray_->display();
   gfx::Gfx::instance().update();
 }
 

@@ -1,7 +1,7 @@
 /*-
  * Copyright (c) 2016 Frederic Culot <culot@FreeBSD.org>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -11,7 +11,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -25,7 +25,6 @@
  */
 
 #include <stdexcept>
-
 #include <curses.h>
 
 #include "tray.h"
@@ -34,31 +33,35 @@ namespace portal {
 namespace gfx {
 
 Tray::Tray(const Point& center, int nbSlots)
-  : nbSlots_(nbSlots) {
-  Size paneSize;
-  paneSize.setHeight(1);
-  paneSize.setWidth(nbSlots * 2 + 1);
-  Point panePos;
-  panePos.setX(center.x() - paneSize.width() / 2);
-  panePos.setY(center.y() - 1);
+  : Window(), nbSlots_(nbSlots) {
+  Size size;
+  size.setHeight(1);
+  size.setWidth(nbSlots * 2 + 1);
+  setSize(size);
 
-  pane_ = std::unique_ptr<Pane>(new Pane(paneSize, panePos));
-  pane_->borders(false);
-  pane_->cursorLineHighlight(false);
-  pane_->cursorLineUnderline(false);
+  Point pos;
+  pos.setX(center.x() - size.width() / 2);
+  pos.setY(center.y() - 1);
+  setPosition(pos);
+
+  drawSlots();
+}
+
+void Tray::display() {
+  drawSlots();
   draw();
 }
 
-void Tray::draw() const {
-  pane_->clear();
-  drawSlots();
-  pane_->draw();
-}
-
-void Tray::drawSlots() const {
-  for (int i = 0; i < nbSlots_; ++i) {
-    pane_->print(ACS_DIAMOND, (i == selectedSlotNum_ ? Style::Color::magenta : 0));
-    pane_->print(' ');
+void Tray::drawSlots() {
+  Style normal, highlight;
+  highlight.bold = true;
+  highlight.color = Style::Color::magenta;
+  clear();
+  print(' ');
+  for (auto i = 0; i < nbSlots_; ++i) {
+    setStyle(i == selectedSlotNum_ ? highlight : normal);
+    print(ACS_DIAMOND);
+    print(' ');
   }
 }
 
@@ -68,7 +71,7 @@ void Tray::selectSlot(int slotNum) {
                             + std::to_string(slotNum) + "]");
   }
   selectedSlotNum_ = slotNum;
-  draw();
+  display();
 }
 
 void Tray::selectNextSlot() {
@@ -76,7 +79,7 @@ void Tray::selectNextSlot() {
   if (selectedSlotNum_ >= nbSlots_) {
     selectedSlotNum_ = 0;
   }
-  draw();
+  display();
 }
 
 void Tray::selectPreviousSlot() {
@@ -84,7 +87,7 @@ void Tray::selectPreviousSlot() {
   if (selectedSlotNum_ < 0) {
     selectedSlotNum_ = nbSlots_ - 1;
   }
-  draw();
+  display();
 }
 
 }

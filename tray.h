@@ -30,26 +30,24 @@
 #include <string>
 
 #include "gfx.h"
-#include "pane.h"
+#include "window.h"
 
 namespace portal {
 namespace gfx {
 
-class Tray {
+class Tray : public Window {
  public:
   Tray(const Point& center, int nbSlots);
 
-  void draw() const;
+  void display();
   void selectSlot(int slotNum);
   void selectNextSlot();
   void selectPreviousSlot();
 
  private:
-  int                    nbSlots_ {0};
-  int                    selectedSlotNum_ {0};
-  std::unique_ptr<Pane>  pane_;
-
-  void                   drawSlots() const;
+  int  nbSlots_ {0};
+  int  selectedSlotNum_ {0};
+  void drawSlots();
 };
 
 }
