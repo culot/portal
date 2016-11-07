@@ -127,7 +127,7 @@ struct Style {
   Color  color     {Color::none};
 
   int    cursesAttrs() const {
-    int s = 0;
+    int s = A_NORMAL;
     s |= bold ? A_BOLD : 0;
     s |= reverse ? A_REVERSE : 0;
     s |= underline ? A_UNDERLINE : 0;
