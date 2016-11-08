@@ -64,106 +64,106 @@ void Ui::display() {
 
 void Ui::handleEvent(const Event& event) {
   switch (event.type()) {
-    case Event::Type::nextMode:
-      selectNextMode();
-      pane_[pkgList]->clearStatus();
-      switch (currentMode_) {
-      case Mode::browse:
-        Pkg::instance().resetFilter();
-        break;
-      case Mode::search:
-        applySearch();
-        break;
-      case Mode::filter:
-        applyFilter();
-        break;
-      }
-      updatePanes();
-      updateTray();
-    break;
-
-    case Event::Type::select: {
-      if (!Pkg::instance().isRepositoryEmpty()) {
-        if (gotCategorySelected()) {
-          std::string category = getSelectedItemName();
-          toggleCategoryFolding(category);
-          updatePanes();
-        } else {
-          registerPkgChange(event.type());
-          updatePkgListPane();
-        }
-      }
+  case Event::Type::nextMode:
+    selectNextMode();
+    pane_[pkgList]->clearStatus();
+    switch (currentMode_) {
+    case Mode::browse:
+      Pkg::instance().resetFilter();
+      break;
+    case Mode::search:
+      applySearch();
+      break;
+    case Mode::filter:
+      applyFilter();
       break;
     }
+    updatePanes();
+    updateTray();
+    break;
 
-    case Event::Type::deselect:
-      if (!Pkg::instance().isRepositoryEmpty()) {
+  case Event::Type::select: {
+    if (!Pkg::instance().isRepositoryEmpty()) {
+      if (gotCategorySelected()) {
+        std::string category = getSelectedItemName();
+        toggleCategoryFolding(category);
+        updatePanes();
+      } else {
         registerPkgChange(event.type());
         updatePkgListPane();
       }
-      break;
+    }
+    break;
+  }
 
-    case Event::Type::keyUp:
-    case Event::Type::keyDown:
-      if (!Pkg::instance().isRepositoryEmpty()) {
-        if (event.type() == Event::Type::keyUp) {
-          pane_[pkgList]->moveCursorUp();
-        } else if (event.type() == Event::Type::keyDown) {
-          pane_[pkgList]->moveCursorDown();
-        }
-        updatePkgDescrPane();
+  case Event::Type::deselect:
+    if (!Pkg::instance().isRepositoryEmpty()) {
+      registerPkgChange(event.type());
+      updatePkgListPane();
+    }
+    break;
+
+  case Event::Type::keyUp:
+  case Event::Type::keyDown:
+    if (!Pkg::instance().isRepositoryEmpty()) {
+      if (event.type() == Event::Type::keyUp) {
+        pane_[pkgList]->moveCursorUp();
+      } else if (event.type() == Event::Type::keyDown) {
+        pane_[pkgList]->moveCursorDown();
       }
-      break;
+      updatePkgDescrPane();
+    }
+    break;
 
-    case Event::Type::pageUp:
-    case Event::Type::pageDown:
-      if (!Pkg::instance().isRepositoryEmpty()) {
-        if (event.type() == Event::Type::pageUp) {
-          pane_[pkgDescr]->scrollUp();
-        } else if (event.type() == Event::Type::pageDown) {
-          pane_[pkgDescr]->scrollDown();
-        }
-        updatePkgDescrPane();
+  case Event::Type::pageUp:
+  case Event::Type::pageDown:
+    if (!Pkg::instance().isRepositoryEmpty()) {
+      if (event.type() == Event::Type::pageUp) {
+        pane_[pkgDescr]->scrollUp();
+      } else if (event.type() == Event::Type::pageDown) {
+        pane_[pkgDescr]->scrollDown();
       }
-      break;
+      updatePkgDescrPane();
+    }
+    break;
 
-    case Event::Type::character:
-      switch (currentMode_) {
-      case Mode::browse:
-        // DO NOTHING
-        break;
-      case Mode::search:
-        pane_[pkgList]->resetCursorPosition();
-        promptSearch(event.character());
-        applySearch();
-        updatePanes();
-        break;
-      case Mode::filter:
-        pane_[pkgList]->resetCursorPosition();
-        promptFilter(event.character());
-        applyFilter();
-        updatePanes();
-        break;
-      }
+  case Event::Type::character:
+    switch (currentMode_) {
+    case Mode::browse:
+      // DO NOTHING
       break;
+    case Mode::search:
+      pane_[pkgList]->resetCursorPosition();
+      promptSearch(event.character());
+      applySearch();
+      updatePanes();
+      break;
+    case Mode::filter:
+      pane_[pkgList]->resetCursorPosition();
+      promptFilter(event.character());
+      applyFilter();
+      updatePanes();
+      break;
+    }
+    break;
 
-    case Event::Type::go:
-      if (!Pkg::instance().gotRootPrivileges()) {
-        gfx::PopupWindow("Insufficient privileges, please retry as root",
-                         gfx::PopupWindow::Type::warning);
-      } else {
-        performPending();
-        closeAllFolds();
-        updatePkgListPane();
-      }
-      break;
+  case Event::Type::go:
+    if (!Pkg::instance().gotRootPrivileges()) {
+      gfx::PopupWindow("Insufficient privileges, please retry as root",
+                       gfx::PopupWindow::Type::warning);
+    } else {
+      performPending();
+      closeAllFolds();
+      updatePkgListPane();
+    }
+    break;
 
-    case Event::Type::redraw:
-      display();
-      break;
+  case Event::Type::redraw:
+    display();
+    break;
 
-    default:
-      break;
+  default:
+    break;
   }
 }
 
@@ -323,16 +323,16 @@ void Ui::registerPkgChange(Event::Type event) {
     std::string origin = getSelectedItemName();
 
     switch (event) {
-      case Event::Type::select:
-        Pkg::instance().registerInstall(origin);
-        break;
+    case Event::Type::select:
+      Pkg::instance().registerInstall(origin);
+      break;
 
-      case Event::Type::deselect:
-        Pkg::instance().registerRemoval(origin);
-        break;
+    case Event::Type::deselect:
+      Pkg::instance().registerRemoval(origin);
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
   }
 }

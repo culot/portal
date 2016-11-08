@@ -58,17 +58,17 @@ std::string InputWindow::getInput() {
     event.poll();
     clear();
     switch (event.type()) {
-      case portal::Event::Type::enter:
-        return content_;
-      case portal::Event::Type::keyBackspace:
-        content_.pop_back();
-        break;
-      case portal::Event::Type::character:
-        content_.push_back(event.character());
-        break;
-      default:
-        // DO NOTHING
-        break;
+    case portal::Event::Type::enter:
+      return content_;
+    case portal::Event::Type::keyBackspace:
+      content_.pop_back();
+      break;
+    case portal::Event::Type::character:
+      content_.push_back(event.character());
+      break;
+    default:
+      // DO NOTHING
+      break;
     }
     print(content_);
   }

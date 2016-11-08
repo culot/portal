@@ -51,11 +51,11 @@ int main(int argc, char** argv) {
   int opt;
   while ((opt = getopt(argc, argv, "v")) != -1) {
     switch (opt) {
-      case 'v':
-        version();
-        break;
-      default:
-        usage();
+    case 'v':
+      version();
+      break;
+    default:
+      usage();
     }
   }
 

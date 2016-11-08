@@ -35,52 +35,52 @@ static constexpr int ctrl(int c) {return 0x1F & c;}
 bool Event::poll() {
   character_ = getch();
   switch (character_) {
-    case '\t':
-      type_ = Type::nextMode;
-      break;
-    case ctrl('X'):
-      type_ = Type::go;
-      break;
-    case ctrl('N'):
-      type_ = Type::keyDown;
-      break;
-    case ctrl('P'):
-      type_ = Type::keyUp;
-      break;
-    case ctrl('C'):
-      type_ = Type::quit;
-      break;
-    case ctrl(' '):
-      type_ = Type::select;
-      break;
-    case ctrl('D'):
-      type_ = Type::deselect;
-      break;
-    case KEY_BACKSPACE:
-      type_ = Type::keyBackspace;
-      break;
-    case KEY_DOWN:
-      type_ = Type::keyDown;
-      break;
-    case KEY_UP:
-      type_ = Type::keyUp;
-      break;
-    case KEY_PPAGE:
-      type_ = Type::pageUp;
-      break;
-    case KEY_NPAGE:
-      type_ = Type::pageDown;
-      break;
-    case KEY_ENTER:
-    case '\n':
-      type_ = Type::enter;
-      break;
-    case ctrl('L'):
-      type_ = Type::redraw;
-      break;
-    default:
-      type_ = Type::character;
-      break;
+  case '\t':
+    type_ = Type::nextMode;
+    break;
+  case ctrl('X'):
+    type_ = Type::go;
+    break;
+  case ctrl('N'):
+    type_ = Type::keyDown;
+    break;
+  case ctrl('P'):
+    type_ = Type::keyUp;
+    break;
+  case ctrl('C'):
+    type_ = Type::quit;
+    break;
+  case ctrl(' '):
+    type_ = Type::select;
+    break;
+  case ctrl('D'):
+    type_ = Type::deselect;
+    break;
+  case KEY_BACKSPACE:
+    type_ = Type::keyBackspace;
+    break;
+  case KEY_DOWN:
+    type_ = Type::keyDown;
+    break;
+  case KEY_UP:
+    type_ = Type::keyUp;
+    break;
+  case KEY_PPAGE:
+    type_ = Type::pageUp;
+    break;
+  case KEY_NPAGE:
+    type_ = Type::pageDown;
+    break;
+  case KEY_ENTER:
+  case '\n':
+    type_ = Type::enter;
+    break;
+  case ctrl('L'):
+    type_ = Type::redraw;
+    break;
+  default:
+    type_ = Type::character;
+    break;
   }
 
   return type_ != Type::quit;

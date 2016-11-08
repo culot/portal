@@ -50,51 +50,51 @@ void Pkg::reload(Repo repo) {
   switchToReferenceRepository();
 
   switch (repo) {
-    case Repo::all:
-      buildPackagesList(Repo::remote);
-      buildPackagesList(Repo::local);
-      break;
+  case Repo::all:
+    buildPackagesList(Repo::remote);
+    buildPackagesList(Repo::local);
+    break;
 
-    default:
-      buildPackagesList(repo);
-      break;
+  default:
+    buildPackagesList(repo);
+    break;
   }
 }
 
 void Pkg::buildPackagesList(Repo repo) {
   std::vector<Port> pkgs;
   switch (repo) {
-    case Repo::local: {
-      std::stringstream args;
-      args << "query -a '%o"
-           << delimiter
-           << "%v"
-           << delimiter
-           << "%c"
-           << delimiter
-           << "%e"
-           << delimiter
-           << "'";
-      pkgs = runPkg(args.str());
-      fillPkgRepo(Repo::local, pkgs);
-      break;
-    }
+  case Repo::local: {
+    std::stringstream args;
+    args << "query -a '%o"
+         << delimiter
+         << "%v"
+         << delimiter
+         << "%c"
+         << delimiter
+         << "%e"
+         << delimiter
+         << "'";
+    pkgs = runPkg(args.str());
+    fillPkgRepo(Repo::local, pkgs);
+    break;
+  }
 
-    case Repo::remote: {
-      std::stringstream args;
-      args << "rquery -a '%o"
-           << delimiter
-           << "%v"
-           << delimiter
-           << "%c"
-           << delimiter
-           << "%e"
-           << delimiter
-           << "'";
-      pkgs = runPkg(args.str());
-      fillPkgRepo(Repo::remote, pkgs);
-      break;
-    }
+  case Repo::remote: {
+    std::stringstream args;
+    args << "rquery -a '%o"
+         << delimiter
+         << "%v"
+         << delimiter
+         << "%c"
+         << delimiter
+         << "%e"
+         << delimiter
+         << "'";
+    pkgs = runPkg(args.str());
+    fillPkgRepo(Repo::remote, pkgs);
+    break;
+  }
 
     default:
       break;
@@ -243,22 +243,22 @@ std::string Pkg::getRemoteVersion(const std::string& origin) const {
 std::string Pkg::getPkgAttr(const std::string& origin, Attr attr) const {
   const Port& port = getPort(origin);
   switch (attr) {
-    case Attr::origin:
-      return port.origin;
-    case Attr::status:
-      return getCurrentStatusAsString(port.origin);
-    case Attr::category:
-      return getCategoryFromOrigin(port.origin);
-    case Attr::name:
-      return getNameFromOrigin(port.origin);
-    case Attr::comment:
-      return port.comment;
-    case Attr::description:
-      return port.description;
-    case Attr::localVersion:
-      return port.localVersion;
-    case Attr::remoteVersion:
-      return port.remoteVersion;
+  case Attr::origin:
+    return port.origin;
+  case Attr::status:
+    return getCurrentStatusAsString(port.origin);
+  case Attr::category:
+    return getCategoryFromOrigin(port.origin);
+  case Attr::name:
+    return getNameFromOrigin(port.origin);
+  case Attr::comment:
+    return port.comment;
+  case Attr::description:
+    return port.description;
+  case Attr::localVersion:
+    return port.localVersion;
+  case Attr::remoteVersion:
+    return port.remoteVersion;
   }
 }
 
