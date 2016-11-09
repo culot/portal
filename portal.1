@@ -23,7 +23,7 @@
 .\"(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 .\"THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"
-.Dd March 01, 2016
+.Dd November 09, 2016
 .Dt PORTAL 1
 .Os
 .Sh NAME
@@ -33,33 +33,26 @@
 .Nm
 .Op Fl a
 .Sh DESCRIPTION
-.Nm
-provides a front-end to pkg(8).
+Front-end to pkg(8).
 .Pp
-Currently, the application is a MVP (Minimum Viable Product)
-which provides only the following features: packages listing
+.Nm
+provides the following features: packages listing
 and searching, installation and deinstallation of packages,
 and filtering based on the package state.
 .Sh OPTIONS
-The following options are supported by
+The following option is supported by
 .Nm :
 .Bl -tag -width automatic
 .It Fl v
 Display the current version of
 .Nm .
-.It Fl a
-Use only ascii characters to draw the user interface.
-Otherwise, utf8 characters are used to make the interface
-look nicer, but it requires a utf8-compatible environment,
-together with a unicode font able to support a large subset
-of the utf8 character set.
 .El
 .Sh INTERFACE
 The user interface is made of two panels: the upper one
 displays a list of packages sorted by category, and the bottom
 one displays the description of the currently highlighted
-package. A single row separates the two panels, which displays
-the currently highlighted package's comment line.
+package. Between those two panels lies an indicator of the
+currently selected mode.
 .Pp
 In the upper panel which displays the packages list, the
 following data appear from left to right:
@@ -91,51 +84,66 @@ The current version of the package if it is installed
 The latest version of the package available from remote
 repositories
 .El
+.Pp
+The lower panel displays the currently selected package's
+comment line as found in the port's Makefile, together with
+its longer comment as found in the port's pkg-descr file.
+.Pp
+The mode indicator found at the center of the screen between
+the two main panels highlights the current mode. Its name will
+also shortly appear above the indicator when switching mode.
+.Sh MODES
+By pressing the TAB key, the user can switch between the
+following three available modes:
+.Bl -tag -width automatic
+.It Browse
+This is the default mode, which displays the list of all
+packages without any filtering.
+.It Search
+In this mode, one can search the list of packages for a
+given string.
+.It Filter
+Four available filters can be applied to the list of
+packages when this mode is selected. The four filters
+can be toggled on or off by pressing the first letter
+of the filter name:
+.Bl -tag -width automatic
+.It (A)vailable
+To show or hide the available packages (those present in
+the remote repository but not yet installed).
+.It (I)nstalled
+To show or hide installed packages.
+.It (P)ending
+To show or hide packages that have a pending action on
+them, meaning they are either marked as to be installed
+or removed.
+.It (U)pgradable
+To show or hide packages that are installed locally but
+for which a newer version can be found in the remote
+repository.
+.El
 .Sh KEYBINDINGS
 .Bl -tag -width automatic
-.It Ctrl-b / PageUp
-Scroll up one page within the listing panel.
-.It Ctrl-f / PageDown
-Scroll down one page within the listing panel.
-.It Ctrl-l
-Redraw display, useful in case some garbage appeared on the
-screen.
-.It /
-Search for packages. A popup window will appear allowing
-the user to specify the name of the package to be searched for.
-.It +
-Mark the currently selected package for installation.
-.It -
-Mark the currently selected package for deinstallation.
-.It f
-Filter the packages list. A second key must be pressed
-after 'f' to select the filtering criteria to be used, which
-can be one of:
-.Bl -tag -width automatic
-.It '+' or 'i'
-to only display installed packages
-.It '-' or 'a'
-to only display available packages
-.It 'n'
-to reset the filtering rules
-.It 'p'
-to only display packages having pending actions
-.It 'u'
-to only display upgradable packages
-.El
-.It g
-Proceed with the installation / deinstallation of packages.
-.It j
-Move down within the listing panel.
-.It J
-Scroll down the description panel.
-.It k
-Move up within the listing panel.
-.It K
-Scroll up the description panel.
-.It q
+.It TAB
+Cycle between modes.
+.It Ctrl-C
 Quit
-.Nm .
+.Nm.
+.It Ctrl-X
+Apply pending actions
+(proceed with the installation / deinstallation of packages).
+.It Ctrl-SPC
+Mark currently highlighted package for installation.
+.It Ctrl-D
+Mark currently highlighted package for deletion.
+.It Ctrl-N
+Move down within the listing panel.
+.It Ctrl-P
+Move up within the listing panel.
+.It PageUp
+Scroll up the description panel.
+.It PageDown
+Scroll down the description panel.
 .El
 .Sh SEE ALSO
 .Xr pkg 8
