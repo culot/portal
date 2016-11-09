@@ -6,7 +6,6 @@ Table of Contents
 -----------------
 
 * [Description](#Description)
-* [Frequently Asked Questions](#FAQ)
 * [TODO](#TODO)
 * [Additional resources](#resources)
 
@@ -17,24 +16,18 @@ Table of Contents
 portal is a front-end to FreeBSD's package manipulation tool pkg(8).
 It presents the user with a text-mode interface which comprises two
 main panels: one to browse the list of packages, and the other to
-display the description of the currently selected package.
+display the currently selected package's comment line as found in
+the port's Makefile, together with its longer comment as found in
+the port's pkg-descr file.
 
-Currently, the application is a MVP (Minimum Viable Product)
-which provides only the following features: packages listing
-and searching, installation and deinstallation of packages,
-and filtering based on the package state.
+Three different modes are currently supported:
 
-
-<a name="FAQ"></a>
-### Frequently Asked Questions
-
-* Why does portal display weird characters such as squares instead of arrows?
-
-  Check that your environment supports utf8 (terminal, ...) and that you use
-  a font that implements a large set of the available utf8 characters (such
-  as DejaVu). If for some reasons you do not use such an environment, you can
-  start portal with the __-a__ flag so that only ascii characters would be
-  used to draw the user interface.
+1. *browse* mode, with which the user sees the list of all packages
+   without any filtering
+2. *search* mode, which allows to enter a string that will be used
+   to search the packages repository
+3. *filter* mode, in which various filters can be toggled on or off
+   to narrow the list of packages to be displayed
 
 
 <a name="TODO"></a>
