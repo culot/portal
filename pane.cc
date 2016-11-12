@@ -159,7 +159,7 @@ void Pane::print(const std::string& line, Align align) {
     xpos = (impl_->sizeView.width() - line.length()) / 2;
     break;
   case Align::right:
-    xpos = impl_->sizeView.width() - line.length() - 2 - (impl_->borders ? 1 : 0);
+    xpos = impl_->sizeView.width() - line.length() - 2 - (impl_->borders ? 2 : 0);
     break;
   }
 
