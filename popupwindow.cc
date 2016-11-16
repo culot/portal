@@ -75,6 +75,7 @@ PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(duration));
   clear();
+  Gfx::instance().update();
 }
 
 }
