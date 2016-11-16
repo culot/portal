@@ -158,7 +158,6 @@ void Window::Impl::destroy() {
 void Window::Impl::draw() {
   applyStyle();
   wnoutrefresh(win);
-  Gfx::instance().update();
 }
 
 void Window::Impl::applyStyle() {
