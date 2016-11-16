@@ -254,6 +254,7 @@ void Ui::updatePkgListPane() {
       pane_[pkgList]->print(pkgVersions, gfx::Pane::Align::right);
       //if (Pkg::instance().hasPendingActions(item.name)) {
         // XXX change attributes
+        // XXX Need to add a setRowStyle(const Style&, const Point& = current) method to Pane class
         //pane_[pkgList].addRowAttributes(dataGrid.height() - 1, gfx::ATTR_BOLD);
       //}
     }
