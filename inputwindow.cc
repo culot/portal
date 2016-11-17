@@ -71,12 +71,14 @@ std::string InputWindow::getInput() {
       break;
     }
     print(content_);
+    Gfx::instance().update();
   }
 }
 
 void InputWindow::setContent(const std::string& content) {
   content_ = content;
   print(content_);
+  Gfx::instance().update();
 }
 
 }

@@ -105,7 +105,6 @@ void Window::print(const std::string& msg) {
     wattroff(impl_->win, COLOR_PAIR(impl_->style.color));
   }
   wnoutrefresh(impl_->win);
-  Gfx::instance().update();
 }
 
 void Window::print(int c) {
