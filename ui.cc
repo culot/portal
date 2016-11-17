@@ -273,7 +273,7 @@ void Ui::updatePkgDescrPane() {
     std::string origin = getSelectedItemName();
     std::string comment = Pkg::instance().getPkgAttr(origin, Pkg::Attr::comment);
     pane_[pkgDescr]->print(comment);
-    pane_[pkgDescr]->colorizeCurrentLine(1);
+    pane_[pkgDescr]->colorizeCurrentLine(gfx::Style::Color::cyan);
 
     std::string desc = Pkg::instance().getPkgAttr(origin, Pkg::Attr::description);
     std::stringstream commentStream(desc);
