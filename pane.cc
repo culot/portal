@@ -137,7 +137,6 @@ void Pane::draw() const {
                impl_->posView.y() + impl_->sizeView.height() - (impl_->borders ? 2 : 0),
                impl_->posView.x() + impl_->sizeView.width() - 2);
   wnoutrefresh(impl_->win);
-  Gfx::instance().update();
 }
 
 void Pane::clear() {

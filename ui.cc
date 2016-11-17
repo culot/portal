@@ -154,7 +154,7 @@ void Ui::handleEvent(const Event& event) {
     } else {
       performPending();
       closeAllFolds();
-      updatePkgListPane();
+      updatePanes();
     }
     break;
 
@@ -435,11 +435,13 @@ void Ui::busyStatus(gfx::Pane& pane) {
       if (!busy_) {
         pane.clearStatus();
         pane.draw();
+        gfx::Gfx::instance().update();
         return;
       } else {
         pane.setStatusStyle(0, busyStringLen, {});
         pane.setStatusStyle(x, 1, busyStyle);
         pane.draw();
+        gfx::Gfx::instance().update();
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
       }
     }
