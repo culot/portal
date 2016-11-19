@@ -35,6 +35,7 @@ void Gfx::init() {
   initscr();
 
   if (has_colors() && start_color() == OK) {
+    init_pair(Style::Color::none, 0, 0);
     init_pair(Style::Color::black, COLOR_BLACK, 0);
     init_pair(Style::Color::cyan, COLOR_CYAN, 0);
     init_pair(Style::Color::magenta, COLOR_MAGENTA, 0);
