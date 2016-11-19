@@ -108,23 +108,30 @@ private:
 
 struct Style {
 
-   enum Color {
-     none,
-     black,
-     cyan,
-     magenta,
-     red,
-     yellow,
-     blue,
-     cyanOnBlue
+  enum class Alignment {
+    left,
+    center,
+    right
   };
 
-  bool   bold      {false};
-  bool   reverse   {false};
-  bool   underline {false};
-  bool   highlight {false};
-  bool   borders   {false};
-  Color  color     {Color::none};
+  enum Color {
+    none,
+    black,
+    cyan,
+    magenta,
+    red,
+    yellow,
+    blue,
+    cyanOnBlue
+  };
+
+  bool      bold      {false};
+  bool      reverse   {false};
+  bool      underline {false};
+  bool      highlight {false};
+  bool      borders   {false};
+  Alignment align     {Alignment::left};
+  Color     color     {Color::none};
 
   int    cursesAttrs() const {
     int s = A_NORMAL;
