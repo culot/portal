@@ -37,12 +37,6 @@ namespace gfx {
 class Pane {
  public:
 
-  enum class Align {
-    left,
-    center,
-    right
-  };
-
   Pane(const Size& size, const Point& pos);
   ~Pane();
 
@@ -56,8 +50,8 @@ class Pane {
   void draw() const;
   void clear();
   void newline();
-  void print(const std::string& line, Align align = Align::left);
-  void print(int c, int cursesColorNum = 0);
+  void print(const std::string& line, const Style& style = {});
+  void print(int c, const Style& style = {});
   void printStatus(const std::string& status, const Style& style = {}) const;
   void setStatusStyle(int xpos, int len, const Style& style) const;
   void clearStatus() const;

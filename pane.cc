@@ -148,16 +148,16 @@ void Pane::newline() {
   impl_->posPrint.setY(impl_->posPrint.y() + 1);
 }
 
-void Pane::print(const std::string& line, Align align) {
+void Pane::print(const std::string& line, const Style& style) {
   int xpos;
-  switch (align) {
-  case Align::left:
+  switch (style.align) {
+  case Style::Alignment::left:
     xpos = impl_->posPad.x();
     break;
-  case Align::center:
+  case Style::Alignment::center:
     xpos = (impl_->sizeView.width() - line.length()) / 2;
     break;
-  case Align::right:
+  case Style::Alignment::right:
     xpos = impl_->sizeView.width() - line.length() - 2 - (impl_->borders ? 2 : 0);
     break;
   }
@@ -166,8 +166,8 @@ void Pane::print(const std::string& line, Align align) {
   draw();
 }
 
-void Pane::print(int c, int cursesColorNum) {
-  waddch(impl_->pad, c | COLOR_PAIR(cursesColorNum));
+void Pane::print(int c, const Style& style) {
+  waddch(impl_->pad, c | COLOR_PAIR(style.color));
   draw();
 }
 
