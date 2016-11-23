@@ -240,6 +240,8 @@ void Ui::buildPkgList() {
 void Ui::updatePkgListPane() {
   buildPkgList();
   pane_[pkgList]->clear();
+  gfx::Style rightAligned;
+  rightAligned.align = gfx::Style::Alignment::right;
   for (const auto& item : pkgList_) {
     switch (item.type) {
     case pkgListItemType::category: {
@@ -251,12 +253,7 @@ void Ui::updatePkgListPane() {
       std::string pkgString = getStringForPkg(item.name);
       pane_[pkgList]->print(pkgString);
       std::string pkgVersions = getVersionsForPkg(item.name);
-      pane_[pkgList]->print(pkgVersions, gfx::Pane::Align::right);
-      //if (Pkg::instance().hasPendingActions(item.name)) {
-        // XXX change attributes
-        // XXX Need to add a setRowStyle(const Style&, const Point& = current) method to Pane class
-        //pane_[pkgList].addRowAttributes(dataGrid.height() - 1, gfx::ATTR_BOLD);
-      //}
+      pane_[pkgList]->print(pkgVersions, rightAligned);
     }
     break;
     default:
@@ -283,8 +280,6 @@ void Ui::updatePkgDescrPane() {
       pane_[pkgDescr]->print(descLine);
     }
   }
-
-  //pane_[pkgDescr].requestRefresh();
 }
 
 const Ui::pkgListItem& Ui::getCurrentPkgListItem() const {
