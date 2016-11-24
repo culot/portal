@@ -60,11 +60,57 @@ class Pane : public Window {
   void colorizeCurrentLine(short cursesColorNum) const;
 
  private:
-  class Impl;
-  std::unique_ptr<Impl> impl_;
+  // Need to use both an curses win structure (to be able to draw the border),
+  // and a curses pad structure (to display the window contents).
+  // If only using a pad, and applying the border directly to it, the bottom
+  // line of the border gets overwritten with the pad content.
+  WINDOW* pad_ {nullptr};
 
-  Pane(const Pane&) = delete;
-  void operator=(const Pane&) = delete;
+  /*
+     +------------------------------------------+-  -  -  - v posView.y
+     |                                          |           |
+     |      +-  +-----------------+ -  -  -  -  |-v -  -  - |- v-  -  -v p
+     |      |   |abc              |             | |posPad.y |  | p     | o
+     |  s . |   +-----------------+ --+ -  -  - |-^ - - - - ^  | oC    | s
+     |  i h |   |def              |   |sizeView |              | su    | P
+     |  z e |   |ghi              |   |.height  |              |  r    | r
+     |  e i |   |jkl              |   |         |              |  s    | i
+     |  P g |   |mno##############| - | -  -  - |-  - - - - - -^  o    | n
+     |  a h |   +-----------------+  -+         |                 r    | t
+     |  d t |   |pqr              |             |                 .    | .
+     |      |   |stu              |             |                 y    | y
+     |      |   |                 | -  -  -  -  |-  -  -  -  -  -  -  -^
+     |      +-  +-----------------+             |
+     |                                          |
+     |                                   screen |
+     +------------------------------------------+
+
+     Note:
+       posView and sizeView are inherited from Window class
+       (use position() and size() to obtain them, respectively)
+  */
+
+  Size  sizePad_;
+  Point posPad_;
+  Point posCursor_;
+  Point posPrint_;
+
+  bool cursorLineHighlight_ {true};
+  bool cursorLineUnderline_ {false};
+  bool borders_             {false};
+
+  void createPad();
+  void extendPrintArea();
+  void clearPrintArea();
+  void drawScrollBar() const;
+  void applyCursorLineStyle() const;
+  void resetCursorLineStyle() const;
+  bool isCursorOnFirstLine() const;
+  bool isCursorOnLastLine() const;
+  bool isCursorOnFirstVisibleLine() const;
+  bool isCursorOnLastVisibleLine() const;
+  bool canScrollUp() const;
+  bool canScrollDown() const;
 };
 
 }
