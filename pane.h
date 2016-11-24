@@ -30,17 +30,16 @@
 #include <string>
 
 #include "gfx.h"
+#include "window.h"
 
 namespace portal {
 namespace gfx {
 
-class Pane {
+class Pane : public Window {
  public:
 
   Pane(const Size& size, const Point& pos);
   ~Pane();
-
-  Size size() const;
 
   // XXX define a bitset with all possible styles
   void cursorLineHighlight(bool highlight);
@@ -52,9 +51,6 @@ class Pane {
   void newline();
   void print(const std::string& line, const Style& style = {});
   void print(int c, const Style& style = {});
-  void printStatus(const std::string& status, const Style& style = {}) const;
-  void setStatusStyle(int xpos, int len, const Style& style) const;
-  void clearStatus() const;
   void scrollDown();
   void scrollUp();
   void moveCursor(const Point& pos);

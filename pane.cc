@@ -35,10 +35,9 @@ namespace gfx {
 class Pane::Impl {
  public:
   // Need to use both an curses win structure (to be able to draw the border),
-  // and a curses pad structure (to display the window contents.
+  // and a curses pad structure (to display the window contents).
   // If only using a pad, and applying the border directly to it, the bottom
   // line of the border gets overwritten with the pad content.
-  WINDOW* win {nullptr};
   WINDOW* pad {nullptr};
 
   /*
@@ -64,23 +63,20 @@ class Pane::Impl {
   Size sizeView;
 
   Point posPad;
-  Point posView;
+  Point posView; // XXX Not needed anymore (Window heritage)
   Point posCursor;
   Point posPrint;
-  Point posStatus;
 
   bool cursorLineHighlight {true};
   bool cursorLineUnderline {false};
-  bool borders             {true};
+  bool borders             {false};
 
-  void createPane();
+  void createPad();
   void extendPrintArea();
   void clearPrintArea();
-  void drawBorders();
   void drawScrollBar();
   void applyCursorLineStyle() const;
   void resetCursorLineStyle() const;
-  void toggleBorders();
   bool isCursorOnFirstLine() const;
   bool isCursorOnLastLine() const;
   bool isCursorOnFirstVisibleLine() const;
@@ -90,21 +86,18 @@ class Pane::Impl {
 };
 
 
-Pane::Pane(const Size& size, const Point& pos) : impl_{new Impl} {
+Pane::Pane(const Size& size, const Point& pos)
+  : Window(size, pos), impl_{new Impl} {
   impl_->sizeView = size;
   impl_->sizePad.setWidth(size.width());
   impl_->sizePad.setHeight(size.height());
   impl_->posView = pos;
-  impl_->createPane();
+  impl_->createPad();
+  Window::draw();
 }
 
 Pane::~Pane() {
   delwin(impl_->pad);
-  delwin(impl_->win);
-}
-
-Size Pane::size() const {
-  return impl_->sizeView;
 }
 
 void Pane::cursorLineHighlight(bool highlight) {
@@ -116,9 +109,12 @@ void Pane::cursorLineUnderline(bool underline) {
 }
 
 void Pane::borders(bool borders) {
-  if (impl_->borders != borders) {
-    werase(impl_->win);
-    impl_->toggleBorders();
+  impl_->borders = borders;
+  Style windowStyle = style();
+  if (windowStyle.borders != borders) {
+    Window::clear();
+    windowStyle.borders = borders;
+    setStyle(windowStyle);
   }
 }
 
@@ -127,6 +123,7 @@ int Pane::getCursorRowNum() const {
 }
 
 void Pane::draw() const {
+  Window::draw();
   impl_->applyCursorLineStyle();
   impl_->drawScrollBar();
   pnoutrefresh(impl_->pad,
@@ -136,7 +133,6 @@ void Pane::draw() const {
                impl_->posView.x() + 1,
                impl_->posView.y() + impl_->sizeView.height() - (impl_->borders ? 2 : 0),
                impl_->posView.x() + impl_->sizeView.width() - 2);
-  wnoutrefresh(impl_->win);
 }
 
 void Pane::clear() {
@@ -169,41 +165,6 @@ void Pane::print(const std::string& line, const Style& style) {
 void Pane::print(int c, const Style& style) {
   waddch(impl_->pad, c | COLOR_PAIR(style.color));
   draw();
-}
-
-void Pane::printStatus(const std::string& status, const Style& style) const {
-  int statusLength = status.length();
-  int xpos = impl_->sizeView.width() - statusLength - 8;
-  int ypos = impl_->sizeView.height() - 1;
-  impl_->posStatus.setX(xpos);
-  impl_->posStatus.setY(ypos);
-
-  mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
-  mvwaddch(impl_->win, ypos, xpos++, ' ');
-
-  wattron(impl_->win, COLOR_PAIR(style.color) | style.cursesAttrs());
-  mvwaddstr(impl_->win, ypos, xpos, status.c_str());
-  wattroff(impl_->win, COLOR_PAIR(style.color) | style.cursesAttrs());
-  xpos += statusLength;
-  mvwaddch(impl_->win, ypos, xpos++, ' ');
-  mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);
-  draw();
-}
-
-void Pane::setStatusStyle(int xpos, int len, const Style& style) const {
-  mvwchgat(impl_->win,
-           impl_->posStatus.y(),
-           impl_->posStatus.x() + xpos + 2,
-           len,
-           style.cursesAttrs(),
-           style.color,
-           nullptr);
-  wnoutrefresh(impl_->win);
-}
-
-void Pane::clearStatus() const {
-  impl_->posStatus.reset();
-  impl_->drawBorders();
 }
 
 void Pane::scrollDown() {
@@ -258,11 +219,8 @@ void Pane::colorizeCurrentLine(short cursesColorNum) const {
            nullptr);
 }
 
-void Pane::Impl::createPane() {
-  win = newwin(sizeView.height(), sizeView.width(), posView.y(), posView.x());
+void Pane::Impl::createPad() {
   pad = newpad(sizePad.height(), sizePad.width());
-  drawBorders();
-  wnoutrefresh(win);
 }
 
 void Pane::Impl::extendPrintArea() {
@@ -277,14 +235,8 @@ void Pane::Impl::clearPrintArea() {
   posPrint.setY(0);
 }
 
-void Pane::Impl::drawBorders() {
-  if (borders) {
-    box(win, 0, 0);
-    wnoutrefresh(win);
-  }
-}
-
 void Pane::Impl::drawScrollBar() {
+  /* XXX Handle scrollbar
   if (canScrollUp()) {
     mvwaddch(win,
              (borders ? 1 : 0),
@@ -297,6 +249,7 @@ void Pane::Impl::drawScrollBar() {
              sizeView.width() - 1 - (borders ? 1 : 0),
              ACS_DARROW | A_BOLD);
   }
+  */
 }
 
 void Pane::Impl::applyCursorLineStyle() const {
@@ -310,10 +263,6 @@ void Pane::Impl::applyCursorLineStyle() const {
 
 void Pane::Impl::resetCursorLineStyle() const {
   mvwchgat(pad, posCursor.y(), 0, sizePad.width(), A_NORMAL, 0, nullptr);
-}
-
-void Pane::Impl::toggleBorders() {
-  borders = !borders;
 }
 
 bool Pane::Impl::isCursorOnFirstLine() const {

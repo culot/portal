@@ -194,8 +194,8 @@ void Ui::createInterface() {
   descrPos.setY(pkgPaneHeight);
 
   pane_[pkgList] = std::unique_ptr<gfx::Pane>(new gfx::Pane(listSize, listPos));
+  pane_[pkgList]->borders(true);
   pane_[pkgDescr] = std::unique_ptr<gfx::Pane>(new gfx::Pane(descrSize, descrPos));
-  pane_[pkgDescr]->borders(false);
   pane_[pkgDescr]->cursorLineHighlight(false);
 
   gfx::Point trayPos;

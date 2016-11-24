@@ -38,7 +38,7 @@ class Window::Impl {
   WINDOW* win {nullptr};
 
   Size  size;
-  Point pos;
+  Point pos, posStatus;
   Style style;
 
   // XXX Add a Point posCursor to allow for text spanning multi lines
@@ -48,9 +48,9 @@ class Window::Impl {
   void resize();
   void move();
   void destroy();
-  void draw();
-  void applyStyle();
-  void drawBorders();
+  void draw() const;
+  void applyStyle() const;
+  void drawBorders() const;
   void print(const std::string& msg);
 };
 
@@ -96,7 +96,12 @@ Point Window::position() const {
   return impl_->pos;
 }
 
-void Window::print(const std::string& msg) {
+Style Window::style() const {
+  return impl_->style;
+}
+
+  // XXX use provided style instead of class one
+void Window::print(const std::string& msg, const Style& style) {
   if (impl_->style.color != Style::Color::none) {
     wattron(impl_->win, COLOR_PAIR(impl_->style.color));
   }
@@ -107,7 +112,8 @@ void Window::print(const std::string& msg) {
   wnoutrefresh(impl_->win);
 }
 
-void Window::print(int c) {
+  // XXX use provided style instead of class one
+void Window::print(int c, const Style& style) {
   if (impl_->style.color != Style::Color::none) {
     wattron(impl_->win, COLOR_PAIR(impl_->style.color));
   }
@@ -118,7 +124,40 @@ void Window::print(int c) {
   wnoutrefresh(impl_->win);
 }
 
-void Window::draw() {
+void Window::printStatus(const std::string& status, const Style& style) const {
+  int statusLength = status.length();
+  int xpos = impl_->size.width() - statusLength - 8;
+  int ypos = impl_->size.height() - 1;
+  impl_->posStatus.setX(xpos);
+  impl_->posStatus.setY(ypos);
+  mvwaddch(impl_->win, ypos, xpos++, ACS_RTEE);
+  mvwaddch(impl_->win, ypos, xpos++, ' ');
+  wattron(impl_->win, COLOR_PAIR(style.color) | style.cursesAttrs());
+  mvwaddstr(impl_->win, ypos, xpos, status.c_str());
+  wattroff(impl_->win, COLOR_PAIR(style.color) | style.cursesAttrs());
+  xpos += statusLength;
+  mvwaddch(impl_->win, ypos, xpos++, ' ');
+  mvwaddch(impl_->win, ypos, xpos, ACS_LTEE);
+  wnoutrefresh(impl_->win);
+}
+
+void Window::setStatusStyle(int xpos, int len, const Style& style) const {
+  mvwchgat(impl_->win,
+           impl_->posStatus.y(),
+           impl_->posStatus.x() + xpos + 2,
+           len,
+           style.cursesAttrs(),
+           style.color,
+           nullptr);
+  wnoutrefresh(impl_->win);
+}
+
+void Window::clearStatus() const {
+  impl_->posStatus.reset();
+  impl_->drawBorders();
+}
+
+void Window::draw() const {
   impl_->draw();
 }
 
@@ -154,12 +193,12 @@ void Window::Impl::destroy() {
   delwin(win);
 }
 
-void Window::Impl::draw() {
+void Window::Impl::draw() const {
   applyStyle();
   wnoutrefresh(win);
 }
 
-void Window::Impl::applyStyle() {
+void Window::Impl::applyStyle() const {
   if (style.borders) {
     drawBorders();
   }
@@ -171,8 +210,13 @@ void Window::Impl::applyStyle() {
   }
 }
 
-void Window::Impl::drawBorders() {
-  box(win, 0, 0);
+void Window::Impl::drawBorders() const {
+  // If a status is displayed (ie its position is not null), then we
+  // must not override it by drawing the border, hence the following
+  // test on posStatus.
+  if (posStatus.isNull()) {
+    box(win, 0, 0);
+  }
 }
 
 void Window::Impl::print(const std::string& msg) {

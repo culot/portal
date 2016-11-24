@@ -46,10 +46,17 @@ class Window {
   void   setStyle(const Style& style);
   Size   size() const;
   Point  position() const;
+  Style  style() const;
 
-  virtual void   print(const std::string& msg);
-  virtual void   print(int c);
-  virtual void   draw();
+  virtual void   print(const std::string& msg, const Style& style = {});
+  virtual void   print(int c, const Style& style = {});
+  virtual void   printStatus(const std::string& status,
+                             const Style& style = {}) const;
+  virtual void   setStatusStyle(int xpos,
+                                int len,
+                                const Style& style) const;
+  virtual void   clearStatus() const;
+  virtual void   draw() const;
   virtual void   clear();
 
  private:
