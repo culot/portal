@@ -8,7 +8,7 @@ SRCS=		portal.cc        \
 		window.cc        \
 		inputwindow.cc   \
 		popupwindow.cc   \
-		pane.cc          \
+		scrollwindow.cc  \
 		tray.cc          \
                 ui.cc
 

@@ -33,7 +33,7 @@
 
 #include "pkg.h"
 #include "event.h"
-#include "pane.h"
+#include "scrollwindow.h"
 #include "tray.h"
 
 namespace portal {
@@ -76,15 +76,15 @@ class Ui {
     nbModes
   };
 
-  std::string                    modeName_[nbModes] {"Browse", "Search", "Filter"};
-  std::string                    searchString_;
-  Pkg::Status                    filters_;
-  bool                           busy_ {false};
-  std::unique_ptr<gfx::Pane>     pane_[PaneType::nbtypes];
-  std::unique_ptr<gfx::Tray>     tray_;
-  std::map<std::string, bool>    unfolded_;
-  std::vector<pkgListItem>       pkgList_;
-  int                            currentMode_ {Mode::browse};
+  std::string                         modeName_[nbModes] {"Browse", "Search", "Filter"};
+  std::string                         searchString_;
+  Pkg::Status                         filters_;
+  bool                                busy_ {false};
+  std::unique_ptr<gfx::ScrollWindow>  pane_[PaneType::nbtypes];
+  std::unique_ptr<gfx::Tray>          tray_;
+  std::map<std::string, bool>         unfolded_;
+  std::vector<pkgListItem>            pkgList_;
+  int                                 currentMode_ {Mode::browse};
 
   void                createInterface();
   void                updatePanes();
@@ -104,7 +104,7 @@ class Ui {
   void                applyFilter() const;
   void                promptSearch(int character);
   void                applySearch() const;
-  void                busyStatus(gfx::Pane& pane);
+  void                busyStatus(gfx::ScrollWindow& pane);
   bool                isCategoryFolded(const std::string& category) const;
   std::string         getStringForCategory(const std::string& category) const;
   std::string         getStringForPkg(const std::string& origin) const;

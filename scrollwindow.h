@@ -35,11 +35,11 @@
 namespace portal {
 namespace gfx {
 
-class Pane : public Window {
+class ScrollWindow : public Window {
  public:
 
-  Pane(const Size& size, const Point& pos);
-  ~Pane();
+  ScrollWindow(const Size& size, const Point& pos);
+  ~ScrollWindow();
 
   // XXX define a bitset with all possible styles
   void cursorLineHighlight(bool highlight);

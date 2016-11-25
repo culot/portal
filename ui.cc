@@ -193,9 +193,9 @@ void Ui::createInterface() {
   gfx::Point listPos, descrPos;
   descrPos.setY(pkgPaneHeight);
 
-  pane_[pkgList] = std::unique_ptr<gfx::Pane>(new gfx::Pane(listSize, listPos));
+  pane_[pkgList] = std::unique_ptr<gfx::ScrollWindow>(new gfx::ScrollWindow(listSize, listPos));
   pane_[pkgList]->borders(true);
-  pane_[pkgDescr] = std::unique_ptr<gfx::Pane>(new gfx::Pane(descrSize, descrPos));
+  pane_[pkgDescr] = std::unique_ptr<gfx::ScrollWindow>(new gfx::ScrollWindow(descrSize, descrPos));
   pane_[pkgDescr]->cursorLineHighlight(false);
 
   gfx::Point trayPos;
@@ -417,7 +417,7 @@ void Ui::applySearch() const {
   }
 }
 
-void Ui::busyStatus(gfx::Pane& pane) {
+void Ui::busyStatus(gfx::ScrollWindow& pane) {
   pane.clearStatus();
   gfx::Style busyStyle;
   busyStyle.color = gfx::Style::Color::magenta;

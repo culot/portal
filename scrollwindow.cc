@@ -26,32 +26,32 @@
 
 #include <curses.h>
 
-#include "pane.h"
+#include "scrollwindow.h"
 
 
 namespace portal {
 namespace gfx {
 
-Pane::Pane(const Size& size, const Point& pos) : Window(size, pos) {
+ScrollWindow::ScrollWindow(const Size& size, const Point& pos) : Window(size, pos) {
   sizePad_.setWidth(size.width());
   sizePad_.setHeight(size.height());
   createPad();
   Window::draw();
 }
 
-Pane::~Pane() {
+ScrollWindow::~ScrollWindow() {
   delwin(pad_);
 }
 
-void Pane::cursorLineHighlight(bool highlight) {
+void ScrollWindow::cursorLineHighlight(bool highlight) {
   cursorLineHighlight_ = highlight;
 }
 
-void Pane::cursorLineUnderline(bool underline) {
+void ScrollWindow::cursorLineUnderline(bool underline) {
   cursorLineUnderline_ = underline;
 }
 
-void Pane::borders(bool borders) {
+void ScrollWindow::borders(bool borders) {
   borders_ = borders;
   Style windowStyle = style();
   if (windowStyle.borders != borders) {
@@ -61,11 +61,11 @@ void Pane::borders(bool borders) {
   }
 }
 
-int Pane::getCursorRowNum() const {
+int ScrollWindow::getCursorRowNum() const {
   return posCursor_.y();
 }
 
-void Pane::draw() const {
+void ScrollWindow::draw() const {
   Window::draw();
   applyCursorLineStyle();
   drawScrollBar();
@@ -78,16 +78,16 @@ void Pane::draw() const {
                position().x() + size().width() - 2);
 }
 
-void Pane::clear() {
+void ScrollWindow::clear() {
   clearPrintArea();
 }
 
-void Pane::newline() {
+void ScrollWindow::newline() {
   extendPrintArea();
   posPrint_.setY(posPrint_.y() + 1);
 }
 
-void Pane::print(const std::string& line, const Style& style) {
+void ScrollWindow::print(const std::string& line, const Style& style) {
   int xpos;
   switch (style.align) {
   case Style::Alignment::left:
@@ -105,28 +105,28 @@ void Pane::print(const std::string& line, const Style& style) {
   draw();
 }
 
-void Pane::print(int c, const Style& style) {
+void ScrollWindow::print(int c, const Style& style) {
   waddch(pad_, c | COLOR_PAIR(style.color));
   draw();
 }
 
-void Pane::scrollDown() {
+void ScrollWindow::scrollDown() {
   if (canScrollDown()) {
     posPad_.setY(posPad_.y() + 1);
   }
 }
 
-void Pane::scrollUp() {
+void ScrollWindow::scrollUp() {
   if (canScrollUp()) {
     posPad_.setY(posPad_.y() - 1);
   }
 }
 
-void Pane::moveCursor(const Point& pos) {
+void ScrollWindow::moveCursor(const Point& pos) {
   posCursor_ = pos;
 }
 
-void Pane::moveCursorDown() {
+void ScrollWindow::moveCursorDown() {
   if (!isCursorOnLastLine()) {
     resetCursorLineStyle();
     posCursor_.setY(posCursor_.y() + 1);
@@ -136,7 +136,7 @@ void Pane::moveCursorDown() {
   }
 }
 
-void Pane::moveCursorUp() {
+void ScrollWindow::moveCursorUp() {
   if (!isCursorOnFirstLine()) {
     resetCursorLineStyle();
     posCursor_.setY(posCursor_.y() - 1);
@@ -146,13 +146,13 @@ void Pane::moveCursorUp() {
   }
 }
 
-void Pane::resetCursorPosition() {
+void ScrollWindow::resetCursorPosition() {
   posCursor_.setX(0);
   posCursor_.setY(0);
   posPad_.setY(0);
 }
 
-void Pane::colorizeCurrentLine(short cursesColorNum) const {
+void ScrollWindow::colorizeCurrentLine(short cursesColorNum) const {
   mvwchgat(pad_,
            posCursor_.y(),
            0,
@@ -162,23 +162,23 @@ void Pane::colorizeCurrentLine(short cursesColorNum) const {
            nullptr);
 }
 
-void Pane::createPad() {
+void ScrollWindow::createPad() {
   pad_ = newpad(sizePad_.height(), sizePad_.width());
 }
 
-void Pane::extendPrintArea() {
+void ScrollWindow::extendPrintArea() {
   if (posPrint_.y() == sizePad_.height() - 1) {
     sizePad_.setHeight(sizePad_.height() * 2);
     wresize(pad_, sizePad_.height(), sizePad_.width());
   }
 }
 
-void Pane::clearPrintArea() {
+void ScrollWindow::clearPrintArea() {
   werase(pad_);
   posPrint_.setY(0);
 }
 
-void Pane::drawScrollBar() const {
+void ScrollWindow::drawScrollBar() const {
   /* XXX Handle scrollbar
   if (canScrollUp()) {
     mvwaddch(win,
@@ -195,7 +195,7 @@ void Pane::drawScrollBar() const {
   */
 }
 
-void Pane::applyCursorLineStyle() const {
+void ScrollWindow::applyCursorLineStyle() const {
   if (cursorLineHighlight_) {
     mvwchgat(pad_, posCursor_.y(), 0, sizePad_.width(), A_REVERSE, 0, nullptr);
   }
@@ -204,31 +204,31 @@ void Pane::applyCursorLineStyle() const {
   }
 }
 
-void Pane::resetCursorLineStyle() const {
+void ScrollWindow::resetCursorLineStyle() const {
   mvwchgat(pad_, posCursor_.y(), 0, sizePad_.width(), A_NORMAL, 0, nullptr);
 }
 
-bool Pane::isCursorOnFirstLine() const {
+bool ScrollWindow::isCursorOnFirstLine() const {
   return posCursor_.y() == 0;
 }
 
-bool Pane::isCursorOnLastLine() const {
+bool ScrollWindow::isCursorOnLastLine() const {
 return posCursor_.y() == posPrint_.y() - (borders_ ? 1 : 0);
 }
 
-bool Pane::isCursorOnFirstVisibleLine() const {
+bool ScrollWindow::isCursorOnFirstVisibleLine() const {
   return posCursor_.y() == posPad_.y() - (borders_ ? 1 : 0);
 }
 
-bool Pane::isCursorOnLastVisibleLine() const {
+bool ScrollWindow::isCursorOnLastVisibleLine() const {
   return posCursor_.y() == size().height() + posPad_.y() - (borders_ ? 2 : 0);
 }
 
-bool Pane::canScrollUp() const {
+bool ScrollWindow::canScrollUp() const {
   return posPad_.y() > 0;
 }
 
-bool Pane::canScrollDown() const {
+bool ScrollWindow::canScrollDown() const {
   return posPrint_.y() - posPad_.y() > size().height() - (borders_ ? 2 : 0);
 }
 
