@@ -32,29 +32,15 @@
 namespace portal {
 namespace gfx {
 
-ScrollWindow::ScrollWindow(const Size& size, const Point& pos) : Window(size, pos) {
+ScrollWindow::ScrollWindow(const Size& size, const Point& pos, const Style& style)
+  : Window(size, pos, style) {
   sizePad_.setWidth(size.width() - 2);
   sizePad_.setHeight(size.height());
   createPad();
-  Window::draw();
 }
 
 ScrollWindow::~ScrollWindow() {
   delwin(pad_);
-}
-
-void ScrollWindow::cursorLineHighlight(bool highlight) {
-  cursorLineHighlight_ = highlight;
-}
-
-void ScrollWindow::borders(bool borders) {
-  borders_ = borders;
-  Style windowStyle = style();
-  if (windowStyle.borders != borders) {
-    Window::clear();
-    windowStyle.borders = borders;
-    setStyle(windowStyle);
-  }
 }
 
 int ScrollWindow::getCursorRowNum() const {
@@ -68,10 +54,10 @@ void ScrollWindow::draw() const {
   pnoutrefresh(pad_,
                posPad_.y(),
                posPad_.x(),
-               position().y() + (borders_ ? 1 : 0),
+               position().y() + (style().borders ? 1 : 0),
                position().x() + 1,
-               position().y() + size().height() - (borders_ ? 2 : 0),
-               position().x() + size().width() - 2 - (borders_ ? 1 : 0));
+               position().y() + size().height() - (style().borders ? 2 : 0),
+               position().x() + size().width() - 2 - (style().borders ? 1 : 0));
 }
 
 void ScrollWindow::clear() {
@@ -93,7 +79,7 @@ void ScrollWindow::print(const std::string& line, const Style& style) {
     xpos = (size().width() - line.length()) / 2;
     break;
   case Style::Alignment::right:
-    xpos = size().width() - line.length() - 2 - (borders_ ? 2 : 0);
+    xpos = size().width() - line.length() - 2 - (Window::style().borders ? 2 : 0);
     break;
   }
 
@@ -172,22 +158,23 @@ void ScrollWindow::clearPrintArea() {
 void ScrollWindow::drawScrollBar() const {
   Style style;
   style.color = Style::Color::magenta;
+  bool hasBorders = Window::style().borders;
   if (canScrollUp()) {
     Point pos;
-    pos.setX(size().width() - 1 -(borders_ ? 1 : 0));
-    pos.setY(borders_ ? 1 : 0);
+    pos.setX(size().width() - 1 - (hasBorders ? 1 : 0));
+    pos.setY(hasBorders ? 1 : 0);
     Window::print(ACS_UARROW | A_BOLD, pos, style);
   }
   if (canScrollDown()) {
     Point pos;
-    pos.setX(size().width() - 1 -(borders_ ? 1 : 0));
-    pos.setY(size().height() - 1 - (borders_ ? 1 : 0));
+    pos.setX(size().width() - 1 -(hasBorders ? 1 : 0));
+    pos.setY(size().height() - 1 - (hasBorders ? 1 : 0));
     Window::print(ACS_DARROW | A_BOLD, pos, style);
   }
 }
 
 void ScrollWindow::applyCursorLineStyle() const {
-  if (cursorLineHighlight_) {
+  if (style().highlight) {
     mvwchgat(pad_, posCursor_.y(), 0, sizePad_.width(), A_REVERSE, 0, nullptr);
   }
 }
@@ -201,15 +188,15 @@ bool ScrollWindow::isCursorOnFirstLine() const {
 }
 
 bool ScrollWindow::isCursorOnLastLine() const {
-return posCursor_.y() == posPrint_.y() - (borders_ ? 1 : 0);
+  return posCursor_.y() == posPrint_.y() - (style().borders ? 1 : 0);
 }
 
 bool ScrollWindow::isCursorOnFirstVisibleLine() const {
-  return posCursor_.y() == posPad_.y() - (borders_ ? 1 : 0);
+  return posCursor_.y() == posPad_.y() - (style().borders ? 1 : 0);
 }
 
 bool ScrollWindow::isCursorOnLastVisibleLine() const {
-  return posCursor_.y() == size().height() + posPad_.y() - (borders_ ? 2 : 0);
+  return posCursor_.y() == size().height() + posPad_.y() - (style().borders ? 2 : 0);
 }
 
 bool ScrollWindow::canScrollUp() const {
@@ -217,7 +204,7 @@ bool ScrollWindow::canScrollUp() const {
 }
 
 bool ScrollWindow::canScrollDown() const {
-  return posPrint_.y() - posPad_.y() > size().height() - (borders_ ? 2 : 0);
+  return posPrint_.y() - posPad_.y() > size().height() - (style().borders ? 2 : 0);
 }
 
 }

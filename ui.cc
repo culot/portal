@@ -193,10 +193,13 @@ void Ui::createInterface() {
   gfx::Point listPos, descrPos;
   descrPos.setY(pkgPaneHeight);
 
+  gfx::Style listStyle;
+  listStyle.borders = true;
+  listStyle.highlight = true;
+
   pane_[pkgList] = std::unique_ptr<gfx::ScrollWindow>(new gfx::ScrollWindow(listSize, listPos));
-  pane_[pkgList]->borders(true);
+  pane_[pkgList]->setStyle(listStyle);
   pane_[pkgDescr] = std::unique_ptr<gfx::ScrollWindow>(new gfx::ScrollWindow(descrSize, descrPos));
-  pane_[pkgDescr]->cursorLineHighlight(false);
 
   gfx::Point trayPos;
   trayPos.setY(pkgPaneHeight);

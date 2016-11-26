@@ -38,12 +38,9 @@ namespace gfx {
 class ScrollWindow : public Window {
  public:
 
-  ScrollWindow(const Size& size, const Point& pos);
+  ScrollWindow(const Size& size, const Point& pos, const Style& style = {});
   ~ScrollWindow();
 
-  // XXX define a bitset with all possible styles
-  void cursorLineHighlight(bool highlight);
-  void borders(bool borders);
   int  getCursorRowNum() const;
   void draw() const;
   void clear();
@@ -92,9 +89,6 @@ class ScrollWindow : public Window {
   Point posPad_;
   Point posCursor_;
   Point posPrint_;
-
-  bool cursorLineHighlight_ {true};
-  bool borders_             {false};
 
   void createPad();
   void extendPrintArea();
