@@ -47,10 +47,6 @@ void ScrollWindow::cursorLineHighlight(bool highlight) {
   cursorLineHighlight_ = highlight;
 }
 
-void ScrollWindow::cursorLineUnderline(bool underline) {
-  cursorLineUnderline_ = underline;
-}
-
 void ScrollWindow::borders(bool borders) {
   borders_ = borders;
   Style windowStyle = style();
@@ -193,9 +189,6 @@ void ScrollWindow::drawScrollBar() const {
 void ScrollWindow::applyCursorLineStyle() const {
   if (cursorLineHighlight_) {
     mvwchgat(pad_, posCursor_.y(), 0, sizePad_.width(), A_REVERSE, 0, nullptr);
-  }
-  if (cursorLineUnderline_) {
-    mvwchgat(pad_, posCursor_.y(), 0, sizePad_.width(), A_UNDERLINE, 0, nullptr);
   }
 }
 

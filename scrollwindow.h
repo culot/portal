@@ -43,7 +43,6 @@ class ScrollWindow : public Window {
 
   // XXX define a bitset with all possible styles
   void cursorLineHighlight(bool highlight);
-  void cursorLineUnderline(bool underline);
   void borders(bool borders);
   int  getCursorRowNum() const;
   void draw() const;
@@ -95,7 +94,6 @@ class ScrollWindow : public Window {
   Point posPrint_;
 
   bool cursorLineHighlight_ {true};
-  bool cursorLineUnderline_ {false};
   bool borders_             {false};
 
   void createPad();
