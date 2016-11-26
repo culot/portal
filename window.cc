@@ -59,9 +59,11 @@ Window::Window() : impl_{new Impl} {
   impl_->create();
 }
 
-Window::Window(const Size& size, const Point& pos): impl_{new Impl} {
+Window::Window(const Size& size, const Point& pos, const Style& style)
+  : impl_{new Impl} {
   impl_->size = size;
   impl_->pos = pos;
+  impl_->style = style;
   impl_->create();
   impl_->draw();
 }

@@ -38,7 +38,7 @@ namespace gfx {
 class Window {
  public:
   Window();
-  Window(const Size& size, const Point& pos);
+  Window(const Size& size, const Point& pos, const Style& style = {});
   ~Window();
 
   void   setSize(const Size& size);
