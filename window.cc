@@ -205,9 +205,6 @@ void Window::Impl::applyStyle() const {
   if (style.underline) {
     mvwchgat(win, 0, 0, size.width(), A_UNDERLINE, 0, nullptr);
   }
-  if (style.highlight) {
-    mvwchgat(win, 0, 0, size.width(), A_STANDOUT, 0, nullptr);
-  }
 }
 
 void Window::Impl::drawBorders() const {
