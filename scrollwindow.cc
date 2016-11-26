@@ -105,11 +105,6 @@ void ScrollWindow::print(const std::string& line, const Style& style) {
   draw();
 }
 
-void ScrollWindow::print(int c, const Style& style) {
-  waddch(pad_, c | COLOR_PAIR(style.color));
-  draw();
-}
-
 void ScrollWindow::scrollDown() {
   if (canScrollDown()) {
     posPad_.setY(posPad_.y() + 1);
