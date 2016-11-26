@@ -112,15 +112,15 @@ void Window::print(const std::string& msg, const Style& style) {
   wnoutrefresh(impl_->win);
 }
 
-  // XXX use provided style instead of class one
-void Window::print(int c, const Style& style) {
-  if (impl_->style.color != Style::Color::none) {
-    wattron(impl_->win, COLOR_PAIR(impl_->style.color));
+void Window::print(int c, const Point& pos, const Style& style) const {
+  int color =
+    style.color != Style::Color::none ? style.color : impl_->style.color;
+  wattron(impl_->win, COLOR_PAIR(color));
+  if (!pos.isNull()) {
+    wmove(impl_->win, pos.y(), pos.x());
   }
   waddch(impl_->win, c);
-  if (impl_->style.color != Style::Color::none) {
-    wattroff(impl_->win, COLOR_PAIR(impl_->style.color));
-  }
+  wattroff(impl_->win, COLOR_PAIR(color));
   wnoutrefresh(impl_->win);
 }
 

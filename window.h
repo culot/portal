@@ -49,7 +49,7 @@ class Window {
   Style  style() const;
 
   virtual void   print(const std::string& msg, const Style& style = {});
-  virtual void   print(int c, const Style& style = {});
+  virtual void   print(int c, const Point& pos = {}, const Style& style = {}) const;
   virtual void   printStatus(const std::string& status,
                              const Style& style = {}) const;
   virtual void   setStatusStyle(int xpos,
