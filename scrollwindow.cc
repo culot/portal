@@ -33,7 +33,7 @@ namespace portal {
 namespace gfx {
 
 ScrollWindow::ScrollWindow(const Size& size, const Point& pos) : Window(size, pos) {
-  sizePad_.setWidth(size.width());
+  sizePad_.setWidth(size.width() - 2);
   sizePad_.setHeight(size.height());
   createPad();
   Window::draw();
@@ -75,7 +75,7 @@ void ScrollWindow::draw() const {
                position().y() + (borders_ ? 1 : 0),
                position().x() + 1,
                position().y() + size().height() - (borders_ ? 2 : 0),
-               position().x() + size().width() - 2);
+               position().x() + size().width() - 2 - (borders_ ? 1 : 0));
 }
 
 void ScrollWindow::clear() {
@@ -179,20 +179,20 @@ void ScrollWindow::clearPrintArea() {
 }
 
 void ScrollWindow::drawScrollBar() const {
-  /* XXX Handle scrollbar
+  Style style;
+  style.color = Style::Color::magenta;
   if (canScrollUp()) {
-    mvwaddch(win,
-             (borders ? 1 : 0),
-             sizeView.width() - 1 - (borders ? 1 : 0),
-             ACS_UARROW | A_BOLD);
+    Point pos;
+    pos.setX(size().width() - 1 -(borders_ ? 1 : 0));
+    pos.setY(borders_ ? 1 : 0);
+    Window::print(ACS_UARROW | A_BOLD, pos, style);
   }
   if (canScrollDown()) {
-    mvwaddch(win,
-             sizeView.height() - 1 - (borders ? 1 : 0),
-             sizeView.width() - 1 - (borders ? 1 : 0),
-             ACS_DARROW | A_BOLD);
+    Point pos;
+    pos.setX(size().width() - 1 -(borders_ ? 1 : 0));
+    pos.setY(size().height() - 1 - (borders_ ? 1 : 0));
+    Window::print(ACS_DARROW | A_BOLD, pos, style);
   }
-  */
 }
 
 void ScrollWindow::applyCursorLineStyle() const {
