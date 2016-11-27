@@ -35,13 +35,14 @@ void Gfx::init() {
   initscr();
 
   if (has_colors() && start_color() == OK) {
-    init_pair(Style::Color::none, 0, 0);
-    init_pair(Style::Color::black, COLOR_BLACK, 0);
-    init_pair(Style::Color::cyan, COLOR_CYAN, 0);
-    init_pair(Style::Color::magenta, COLOR_MAGENTA, 0);
-    init_pair(Style::Color::red, COLOR_RED, 0);
-    init_pair(Style::Color::yellow, COLOR_YELLOW, 0);
-    init_pair(Style::Color::blue, COLOR_BLUE, 0);
+    use_default_colors();
+    init_pair(Style::Color::none, -1, -1);
+    init_pair(Style::Color::black, COLOR_BLACK, -1);
+    init_pair(Style::Color::cyan, COLOR_CYAN, -1);
+    init_pair(Style::Color::magenta, COLOR_MAGENTA, -1);
+    init_pair(Style::Color::red, COLOR_RED, -1);
+    init_pair(Style::Color::yellow, COLOR_YELLOW, -1);
+    init_pair(Style::Color::blue, COLOR_BLUE, -1);
     init_pair(Style::Color::cyanOnBlue, COLOR_CYAN, COLOR_BLUE);
   } else {
     // XXX Need to deal with B&W terminals
