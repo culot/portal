@@ -221,12 +221,6 @@ std::vector<std::string> Pkg::getPkgOrigins(const std::string& category) const {
   return portsList;
 }
 
-Pkg::Status Pkg::getStatus(const std::string& origin) const {
-  const Port& port = getPort(origin);
-
-  return port.status;
-}
-
 std::string Pkg::getLocalVersion(const std::string& origin) const {
   const Port& port = getPort(origin);
 

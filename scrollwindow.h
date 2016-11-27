@@ -48,7 +48,6 @@ class ScrollWindow : public Window {
   void print(const std::string& line, const Style& style = {});
   void scrollDown();
   void scrollUp();
-  void moveCursor(const Point& pos);
   void moveCursorDown();
   void moveCursorUp();
   void resetCursorPosition();

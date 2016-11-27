@@ -73,7 +73,6 @@ class Pkg {
   std::vector<std::string>  getPkgOrigins() const;
   std::vector<std::string>  getPkgOrigins(const std::string& category) const;
   std::string               getNameFromOrigin(const std::string& origin) const;
-  Status                    getStatus(const std::string& origin) const;
   std::string               getLocalVersion(const std::string& origin) const;
   std::string               getRemoteVersion(const std::string& origin) const;
   std::vector<std::string>  getPkgCategories() const;

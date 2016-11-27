@@ -99,10 +99,6 @@ void ScrollWindow::scrollUp() {
   }
 }
 
-void ScrollWindow::moveCursor(const Point& pos) {
-  posCursor_ = pos;
-}
-
 void ScrollWindow::moveCursorDown() {
   if (!isCursorOnLastLine()) {
     resetCursorLineStyle();

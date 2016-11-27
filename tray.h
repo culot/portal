@@ -41,8 +41,6 @@ class Tray : public Window {
 
   void display();
   void selectSlot(int slotNum);
-  void selectNextSlot();
-  void selectPreviousSlot();
 
  private:
   int  nbSlots_ {0};

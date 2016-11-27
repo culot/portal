@@ -74,21 +74,5 @@ void Tray::selectSlot(int slotNum) {
   display();
 }
 
-void Tray::selectNextSlot() {
-  ++selectedSlotNum_;
-  if (selectedSlotNum_ >= nbSlots_) {
-    selectedSlotNum_ = 0;
-  }
-  display();
-}
-
-void Tray::selectPreviousSlot() {
-  --selectedSlotNum_;
-  if (selectedSlotNum_ < 0) {
-    selectedSlotNum_ = nbSlots_ - 1;
-  }
-  display();
-}
-
 }
 }
