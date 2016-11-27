@@ -1,3 +1,10 @@
+Version 0.4 ():
+
+  New features:
+    - switch from termbox to ncurses to fix display issues
+    - introduce mutli-mode interface to increase user-friendliness
+
+
 Version 0.3 (2016-03-14):
 
   New features:
@@ -14,7 +21,7 @@ Version 0.2 (2016-02-24):
     - Page{Up,Down} keys now used to scroll up/down one page
 
   Bugfixes
-    - fix build on i386 
+    - fix build on i386
 
 
 Version 0.1 (2016-02-20):
