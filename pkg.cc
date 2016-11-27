@@ -131,8 +131,9 @@ std::vector<Pkg::Port> Pkg::runPkg(const std::string & args) const {
   std::string cmd("pkg " + args);
 
   FILE * pipe = popen(cmd.c_str(), "r");
-  if (!pipe)
+  if (!pipe) {
     throw std::runtime_error("Pkg::runPkg(): could not execute [" + cmd + "]");
+  }
 
   std::vector<Pkg::Port> result;
 
@@ -141,23 +142,23 @@ std::vector<Pkg::Port> Pkg::runPkg(const std::string & args) const {
     struct Port port;
 
     std::tie(eof, port.origin) = extractToken(pipe, delimiter);
-    if (eof)
+    if (eof) {
       break;
-
+    }
     std::tie(eof, port.remoteVersion) = extractToken(pipe, delimiter);
-    if (eof)
+    if (eof) {
       break;
-
+    }
     std::tie(eof, port.comment) = extractToken(pipe, delimiter);
-    if (eof)
-      throw std::runtime_error("Pkg::runPkg(): EOF reached when reading comment for [" 
+    if (eof) {
+      throw std::runtime_error("Pkg::runPkg(): EOF reached when reading comment for ["
                                + port.origin + "]");
-
+    }
     std::tie(eof, port.description) = extractToken(pipe, delimiter);
-    if (eof)
-      throw std::runtime_error("Pkg::runPkg(): EOF reached when reading descr for [" 
+    if (eof) {
+      throw std::runtime_error("Pkg::runPkg(): EOF reached when reading descr for ["
                                + port.origin + "]");
-
+    }
     // discard end of line
     fgetc(pipe);
 
@@ -181,14 +182,13 @@ std::vector<Pkg::Port> Pkg::runPkgSearch(const std::string & args) const {
 
   bool eof;
   char buf[1024];
-  do
-  {
+  do {
     struct Port port;
 
     std::tie(eof, port.origin) = extractToken(pipe, ' ');
-    if (eof)
+    if (eof) {
       break;
-
+    }
     // discard to the end of line
     fgets(buf, sizeof(buf), pipe);
 
@@ -204,9 +204,11 @@ std::vector<Pkg::Port> Pkg::runPkgSearch(const std::string & args) const {
 std::vector<std::string> Pkg::getPkgOrigins() const {
   std::vector<std::string> origins;
 
-  for (const auto& pkg : *pkgs_)
-    for (const auto& port : pkg.second)
+  for (const auto& pkg : *pkgs_) {
+    for (const auto& port : pkg.second) {
       origins.push_back(port.origin);
+    }
+  }
 
   return origins;
 }
@@ -214,9 +216,11 @@ std::vector<std::string> Pkg::getPkgOrigins() const {
 std::vector<std::string> Pkg::getPkgOrigins(const std::string& category) const {
   std::vector<std::string> portsList;
 
-  if (pkgs_->find(category) != pkgs_->end())
-    for (const auto& port : pkgs_->at(category))
+  if (pkgs_->find(category) != pkgs_->end()) {
+    for (const auto& port : pkgs_->at(category)) {
       portsList.push_back(port.origin);
+    }
+  }
 
   return portsList;
 }
@@ -258,8 +262,9 @@ std::string Pkg::getPkgAttr(const std::string& origin, Attr attr) const {
 
 std::vector<std::string> Pkg::getPkgCategories() const {
   std::vector<std::string> categories;
-  for (const auto & category : (*pkgs_))
+  for (const auto & category : (*pkgs_)) {
     categories.push_back(category.first);
+  }
 
   return categories;
 }
@@ -267,8 +272,9 @@ std::vector<std::string> Pkg::getPkgCategories() const {
 unsigned int Pkg::getCategorySize(const std::string& category) const {
   unsigned int size = 0;
 
-  if (pkgs_->find(category) != pkgs_->end())
+  if (pkgs_->find(category) != pkgs_->end()) {
     size = pkgs_->at(category).size();
+  }
 
   return size;
 }
@@ -338,9 +344,11 @@ const Pkg::Port& Pkg::getPort(const std::string& origin) const {
 
   if (refPkgs_.find(category) != refPkgs_.end()) {
     const std::set<Port>& portSet = refPkgs_.at(category);
-    for (const auto& port : portSet)
-      if (port.origin == origin)
+    for (const auto& port : portSet) {
+      if (port.origin == origin) {
         return port;
+      }
+    }
   }
 
   throw std::runtime_error("Pkg::getPort(): port [" + origin + "] not found");
@@ -356,22 +364,24 @@ std::string Pkg::getNameFromOrigin(const std::string& origin) const {
 
 void Pkg::registerInstall(const std::string& origin) {
   const Port& port = getPort(origin);
-  if (!port.status[installed])
+  if (!port.status[installed]) {
     port.status.set(pendingInstall);
-  else {
-    if (port.status[pendingRemoval])
+  } else {
+    if (port.status[pendingRemoval]) {
       port.status.reset(pendingRemoval);
-    else if (port.status[upgradable])
+    } else if (port.status[upgradable]) {
       port.status.set(pendingInstall);
+    }
   }
 }
 
 void Pkg::registerRemoval(const std::string& origin) {
   const Port& port = getPort(origin);
-  if (port.status[pendingInstall])
+  if (port.status[pendingInstall]) {
     port.status.reset(pendingInstall);
-  else if (port.status[installed])
+  } else if (port.status[installed]) {
     port.status.set(pendingRemoval);
+  }
 }
 
 void Pkg::performPending() {
@@ -389,12 +399,12 @@ void Pkg::performPending() {
     }
   }
 
-  if (!remove.empty())
+  if (!remove.empty()) {
     execPkg("delete -qy" + remove);
-
-  if (!install.empty())
+  }
+  if (!install.empty()) {
     execPkg("install -qy" + install);
-
+  }
   if (!remove.empty() || !install.empty()) {
     reload();
     resetPending();
@@ -402,11 +412,12 @@ void Pkg::performPending() {
 }
 
 void Pkg::resetPending() {
-  for (const auto& category : refPkgs_)
+  for (const auto& category : refPkgs_) {
     for (const auto& port : category.second) {
       port.status.reset(pendingInstall);
       port.status.reset(pendingRemoval);
     }
+  }
 }
 
 void Pkg::search(const std::string & search) {
