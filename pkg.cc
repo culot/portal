@@ -48,6 +48,7 @@ void Pkg::checkPrivileges() {
 
 void Pkg::reload(Repo repo) {
   switchToReferenceRepository();
+  refPkgs_.clear();
 
   switch (repo) {
   case Repo::all:
