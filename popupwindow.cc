@@ -48,7 +48,7 @@ PopupWindow::PopupWindow(const std::string& msg, Type type, const Point& center)
   Style style;
   switch (type) {
   case Type::brief:
-    style.color = Style::Color::magenta;
+    style.color = Style::Color::cyan;
     break;
   case Type::info:
     style.color = Style::Color::blue;

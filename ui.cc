@@ -384,7 +384,7 @@ void Ui::applyFilter() const {
   pane_[pkgList]->setStatusStyle(0, statusString.length(), unselectedStyle);
 
   gfx::Style selectedStyle;
-  selectedStyle.color = gfx::Style::Color::magenta;
+  selectedStyle.color = gfx::Style::Color::cyan;
   int pos = 0;
   if (filters_[Pkg::Statuses::available]) {
     pane_[pkgList]->setStatusStyle(0, availableStatus.length(), selectedStyle);
@@ -415,7 +415,7 @@ void Ui::applySearch() const {
     Pkg::instance().search(searchString_);
     pane_[pkgList]->clearStatus();
     gfx::Style promptStyle;
-    promptStyle.color = gfx::Style::Color::magenta;
+    promptStyle.color = gfx::Style::Color::cyan;
     pane_[pkgList]->printStatus(searchString_, promptStyle);
   }
 }
@@ -423,7 +423,7 @@ void Ui::applySearch() const {
 void Ui::busyStatus(gfx::ScrollWindow& pane) {
   pane.clearStatus();
   gfx::Style busyStyle;
-  busyStyle.color = gfx::Style::Color::magenta;
+  busyStyle.color = gfx::Style::Color::cyan;
   busyStyle.reverse = true;
   std::string busyString("     ");
   int busyStringLen = busyString.length();

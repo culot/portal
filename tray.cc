@@ -55,7 +55,7 @@ void Tray::display() {
 void Tray::drawSlots() {
   Style normal, highlight;
   highlight.bold = true;
-  highlight.color = Style::Color::magenta;
+  highlight.color = Style::Color::cyan;
   clear();
   print(' ');
   for (auto i = 0; i < nbSlots_; ++i) {

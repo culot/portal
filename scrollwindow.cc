@@ -153,7 +153,7 @@ void ScrollWindow::clearPrintArea() {
 
 void ScrollWindow::drawScrollBar() const {
   Style style;
-  style.color = Style::Color::magenta;
+  style.color = Style::Color::cyan;
   bool hasBorders = Window::style().borders;
   if (canScrollUp()) {
     Point pos;
