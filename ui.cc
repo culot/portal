@@ -367,14 +367,40 @@ void Ui::promptFilter(int character) {
 }
 
 void Ui::applyFilter() const {
-  static const std::string availableStatus = "(A)vailable";
-  static const std::string installedStatus = "(I)nstalled";
-  static const std::string pendingStatus = "(P)ending";
-  static const std::string upgradableStatus = "(U)pgradable";
-  static const std::string statusString =
-    availableStatus + " / " + installedStatus + " / " + pendingStatus + " / " + upgradableStatus;
-
   Pkg::instance().applyFilter(filters_);
+
+  static const std::string avlbLong = "(A)vailable";
+  static const std::string instLong = "(I)nstalled";
+  static const std::string pendLong = "(P)ending";
+  static const std::string upgdLong = "(U)pgradable";
+  static const std::string delimLong = " / ";
+  static const std::string statusLong =
+    avlbLong + delimLong + instLong + delimLong + pendLong + delimLong + upgdLong;
+
+  static const std::string avlbShort = "A)vail";
+  static const std::string instShort = "I)nst";
+  static const std::string pendShort = "P)end";
+  static const std::string upgdShort = "U)pgd";
+  static const std::string delimShort = "/";
+  static const std::string statusShort =
+    avlbShort + delimShort + instShort + delimShort + pendShort + delimShort + upgdShort;
+
+  std::string avlbStatus, instStatus, pendStatus, upgdStatus, statusString, delim;
+  if ((pane_[pkgList]->size().width() - tray_->size().width()) / 2 < statusLong.length() + 8) {
+    avlbStatus = avlbShort;
+    instStatus = instShort;
+    pendStatus = pendShort;
+    upgdStatus = upgdShort;
+    delim = delimShort;
+    statusString = statusShort;
+  } else {
+    avlbStatus = avlbLong;
+    instStatus = instLong;
+    pendStatus = pendLong;
+    upgdStatus = upgdLong;
+    delim = delimLong;
+    statusString = statusLong;
+  }
 
   pane_[pkgList]->clearStatus();
   pane_[pkgList]->printStatus(statusString);
@@ -387,19 +413,19 @@ void Ui::applyFilter() const {
   selectedStyle.color = gfx::Style::Color::cyan;
   int pos = 0;
   if (filters_[Pkg::Statuses::available]) {
-    pane_[pkgList]->setStatusStyle(0, availableStatus.length(), selectedStyle);
+    pane_[pkgList]->setStatusStyle(0, avlbStatus.length(), selectedStyle);
   }
-  pos += availableStatus.length() + 3;
+  pos += avlbStatus.length() + delim.length();
   if (filters_[Pkg::Statuses::installed]) {
-    pane_[pkgList]->setStatusStyle(pos, installedStatus.length(), selectedStyle);
+    pane_[pkgList]->setStatusStyle(pos, instStatus.length(), selectedStyle);
   }
-  pos += installedStatus.length() + 3;
+  pos += instStatus.length() + delim.length();
   if (filters_[Pkg::Statuses::pendingInstall]) {
-    pane_[pkgList]->setStatusStyle(pos, pendingStatus.length(), selectedStyle);
+    pane_[pkgList]->setStatusStyle(pos, pendStatus.length(), selectedStyle);
   }
-  pos += pendingStatus.length() + 3;
+  pos += pendStatus.length() + delim.length();
   if (filters_[Pkg::Statuses::upgradable]) {
-    pane_[pkgList]->setStatusStyle(pos, upgradableStatus.length(), selectedStyle);
+    pane_[pkgList]->setStatusStyle(pos, upgdStatus.length(), selectedStyle);
   }
 }
 
