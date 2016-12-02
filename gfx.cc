@@ -64,15 +64,11 @@ void Gfx::init() {
 
 // The curses library fails to handle two concurrent threads trying to
 // update the display at the same time. This creates a single point of
-// entry that prevents this case from happening. Morevover, a try_lock
-// is used here instead of just lock, as if a thread is already
-// updating the display, we assume there is no need to update it again
-// right after, so we skip an update to avoir too frequent refreshes.
+// entry that prevents this case from happening.
 void Gfx::update() {
-  if (mutex_.try_lock()) {
-    doupdate();
-    mutex_.unlock();
-  }
+  mutex_.lock();
+  doupdate();
+  mutex_.unlock();
 }
 
 void Gfx::terminate() {
