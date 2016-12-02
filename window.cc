@@ -49,7 +49,6 @@ class Window::Impl {
   void move();
   void destroy();
   void draw() const;
-  void applyStyle() const;
   void drawBorders() const;
   void print(const std::string& msg);
 };
@@ -88,6 +87,7 @@ void Window::setPosition(const Point& pos) {
 
 void Window::setStyle(const Style& style) {
   impl_->style = style;
+  impl_->drawBorders();
 }
 
 Size Window::size() const {
@@ -178,6 +178,7 @@ void Window::Impl::create() {
     throw std::runtime_error("Window::Impl::create() - Object already initialized");
   }
   win = newwin(size.height(), size.width(), pos.y(), pos.x());
+  drawBorders();
 }
 
 void Window::Impl::resize() {
@@ -196,24 +197,14 @@ void Window::Impl::destroy() {
 }
 
 void Window::Impl::draw() const {
-  applyStyle();
   wnoutrefresh(win);
-}
-
-void Window::Impl::applyStyle() const {
-  if (style.borders) {
-    drawBorders();
-  }
-  if (style.underline) {
-    mvwchgat(win, 0, 0, size.width(), A_UNDERLINE, 0, nullptr);
-  }
 }
 
 void Window::Impl::drawBorders() const {
   // If a status is displayed (ie its position is not null), then we
   // must not override it by drawing the border, hence the following
   // test on posStatus.
-  if (posStatus.isNull()) {
+  if (style.borders && posStatus.isNull()) {
     box(win, 0, 0);
   }
 }
