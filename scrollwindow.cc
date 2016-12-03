@@ -155,17 +155,23 @@ void ScrollWindow::drawScrollBar() const {
   Style style;
   style.color = Style::Color::cyan;
   bool hasBorders = Window::style().borders;
+
+  Point posBarUp;
+  posBarUp.setX(size().width() - 1 - (hasBorders ? 1 : 0));
+  posBarUp.setY(hasBorders ? 1 : 0);
   if (canScrollUp()) {
-    Point pos;
-    pos.setX(size().width() - 1 - (hasBorders ? 1 : 0));
-    pos.setY(hasBorders ? 1 : 0);
-    Window::print(ACS_UARROW | A_BOLD, pos, style);
+    Window::print(ACS_UARROW | A_BOLD, posBarUp, style);
+  } else {
+    Window::print(' ', posBarUp);
   }
+
+  Point posBarDown;
+  posBarDown.setX(size().width() - 1 -(hasBorders ? 1 : 0));
+  posBarDown.setY(size().height() - 1 - (hasBorders ? 1 : 0));
   if (canScrollDown()) {
-    Point pos;
-    pos.setX(size().width() - 1 -(hasBorders ? 1 : 0));
-    pos.setY(size().height() - 1 - (hasBorders ? 1 : 0));
-    Window::print(ACS_DARROW | A_BOLD, pos, style);
+    Window::print(ACS_DARROW | A_BOLD, posBarDown, style);
+  } else {
+    Window::print(' ', posBarDown);
   }
 }
 
