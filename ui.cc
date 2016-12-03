@@ -458,8 +458,7 @@ void Ui::busyStatus(gfx::ScrollWindow& pane) {
     for (int x = 0; x < busyStringLen; ++x) {
       if (!busy_) {
         pane.clearStatus();
-        pane.draw();
-        gfx::Gfx::instance().update();
+        display();
         return;
       } else {
         pane.setStatusStyle(0, busyStringLen, {});
