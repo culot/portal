@@ -2,16 +2,14 @@ portal - Front-end to pkg(8)
 ============================
 
 
-Table of Contents
------------------
+Screenshot
+==========
 
-* [Description](#Description)
-* [TODO](#TODO)
-* [Additional resources](#resources)
+![Portal](http://0xd0.org/portal.png "Portal")
 
 
-<a name="Description"></a>
-### Description
+About
+=====
 
 portal is a front-end to FreeBSD's package manipulation tool pkg(8).
 It presents the user with a text-mode interface which comprises two
@@ -30,8 +28,8 @@ Three different modes are currently supported:
    to narrow the list of packages to be displayed
 
 
-<a name="TODO"></a>
-### TODO
+TODO
+====
 
 This is the list of items that should be worked on for future releases
 
@@ -39,8 +37,8 @@ This is the list of items that should be worked on for future releases
 * portal should use the libpkg directly instead of calling pkg(8)
 
 
-<a name="resources"></a>
-### Additional resources
+Additional resources
+====================
 
 * The Git repository of [portal is hosted on GitHub][1]
 * In order to share your thoughts about portal, you can join the
