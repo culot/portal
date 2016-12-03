@@ -49,6 +49,7 @@ class Window::Impl {
   void move();
   void destroy();
   void draw() const;
+  void applyStyle() const;
   void drawBorders() const;
   void print(const std::string& msg);
 };
@@ -197,7 +198,14 @@ void Window::Impl::destroy() {
 }
 
 void Window::Impl::draw() const {
+  applyStyle();
   wnoutrefresh(win);
+}
+
+void Window::Impl::applyStyle() const {
+  if (style.underline) {
+    mvwchgat(win, 0, 0, size.width(), A_UNDERLINE, 0, nullptr);
+  }
 }
 
 void Window::Impl::drawBorders() const {
