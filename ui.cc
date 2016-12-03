@@ -80,6 +80,7 @@ void Ui::handleEvent(const Event& event) {
     }
     updatePanes();
     updateTray();
+    updateStatus();
     break;
 
   case Event::Type::select: {
@@ -137,12 +138,14 @@ void Ui::handleEvent(const Event& event) {
       promptSearch(event.character());
       applySearch();
       updatePanes();
+      updateStatus();
       break;
     case Mode::filter:
       pane_[pkgList]->resetCursorPosition();
       promptFilter(event.character());
       applyFilter();
       updatePanes();
+      updateStatus();
       break;
     }
     break;
@@ -366,9 +369,15 @@ void Ui::promptFilter(int character) {
   }
 }
 
-void Ui::applyFilter() const {
-  Pkg::instance().applyFilter(filters_);
+void Ui::displaySearchStatus() const {
+  if (!searchString_.empty()) {
+    gfx::Style style;
+    style.color = gfx::Style::Color::cyan;
+    pane_[pkgList]->printStatus(searchString_, style);
+  }
+}
 
+void Ui::displayFilterStatus() const {
   static const std::string avlbLong = "(A)vailable";
   static const std::string instLong = "(I)nstalled";
   static const std::string pendLong = "(P)ending";
@@ -429,6 +438,25 @@ void Ui::applyFilter() const {
   }
 }
 
+void Ui::updateStatus() const {
+  pane_[pkgList]->clearStatus();
+  switch (currentMode_) {
+  case Mode::browse:
+    // DO NOTHING
+    break;
+  case Mode::search:
+    displaySearchStatus();
+    break;
+  case Mode::filter:
+    displayFilterStatus();
+    break;
+  }
+}
+
+void Ui::applyFilter() const {
+  Pkg::instance().applyFilter(filters_);
+}
+
 void Ui::promptSearch(int character) {
   gfx::Point pos = gfx::Point::Label::center;
   gfx::InputWindow inputWindow(pos, 40);
@@ -439,10 +467,6 @@ void Ui::promptSearch(int character) {
 void Ui::applySearch() const {
   if (!searchString_.empty()) {
     Pkg::instance().search(searchString_);
-    pane_[pkgList]->clearStatus();
-    gfx::Style promptStyle;
-    promptStyle.color = gfx::Style::Color::cyan;
-    pane_[pkgList]->printStatus(searchString_, promptStyle);
   }
 }
 
@@ -458,6 +482,7 @@ void Ui::busyStatus(gfx::ScrollWindow& pane) {
     for (int x = 0; x < busyStringLen; ++x) {
       if (!busy_) {
         pane.clearStatus();
+        updateStatus();
         display();
         return;
       } else {

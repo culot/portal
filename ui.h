@@ -103,6 +103,9 @@ class Ui {
   void                promptFilter(int character);
   void                applyFilter() const;
   void                promptSearch(int character);
+  void                displaySearchStatus() const;
+  void                displayFilterStatus() const;
+  void                updateStatus() const;
   void                applySearch() const;
   void                busyStatus(gfx::ScrollWindow& pane);
   bool                isCategoryFolded(const std::string& category) const;
