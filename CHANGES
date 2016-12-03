@@ -1,4 +1,4 @@
-Version 0.4 ():
+Version 0.4 (2016-12-03):
 
   New features:
     - switch from termbox to ncurses to fix display issues
